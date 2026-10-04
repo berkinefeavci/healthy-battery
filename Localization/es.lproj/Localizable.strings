@@ -857,3 +857,7 @@
 "Işık değişti." = "La luz ha cambiado.";
 "Işık değiştiriliyor…" = "Cambiando la luz…";
 "Işık istenen renge geçmedi." = "La luz no cambió al color pedido.";
+
+"Hata bildir" = "Informar de un error";
+"Öneri gönder" = "Sugerir una función";
+"Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "El archivo de diagnóstico solo se comparte si decides adjuntarlo.";
