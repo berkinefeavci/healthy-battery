@@ -123,9 +123,7 @@ See [PRIVACY.md](PRIVACY.md).
 
 ## Contributing
 
-Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for build/test commands and the rules around hardware-writing code.
-
-If Healthy Battery is useful to you: <!-- TODO: Buy Me a Coffee link --> ☕
+Report bugs and suggest improvements through [GitHub Issues](../../issues). Attach diagnostics only if you choose to share them. Pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for build/test commands and the rules around hardware-writing code.
 
 ## Security
 
