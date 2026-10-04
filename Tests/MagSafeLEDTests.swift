@@ -49,6 +49,15 @@ import Foundation
         expect(decide(off, .magsafe3, .unknown, fresh: false) == .write(.off))
         expect(decide(green, .magsafe3, .charging, outputs: [.green]) == .noWrite(.unsupportedOutput(.orange)))
 
+        expect(MagSafeLEDHelperState.parse("2 1380 600\n") == .policy(.scheduled, start: 1380, end: 600))
+        expect(MagSafeLEDHelperState.parse("0 0 0") == .policy(.system, start: 0, end: 0))
+        expect(MagSafeLEDHelperState.parse("3 0 0") == .pausedByTest)
+        expect(MagSafeLEDHelperState.parse("4 0 0") == nil && MagSafeLEDHelperState.parse("2 1440 0") == nil)
+        expect(MagSafeLEDHelperState.parse("") == nil && MagSafeLEDHelperState.parse("2 x 0") == nil)
+        expect(MagSafeLEDTimeWindow.repaired(policy: .system, start: 0, end: 0) == (1320, 480))
+        expect(MagSafeLEDTimeWindow.repaired(policy: .system, start: 1380, end: 600) == (1380, 600))
+        expect(MagSafeLEDTimeWindow.repaired(policy: .scheduled, start: 0, end: 0) == (0, 0))
+
         print("MagSafe LED: \(assertions) assertions passed; preferences and fake capability only, no hardware writes.")
     }
 }

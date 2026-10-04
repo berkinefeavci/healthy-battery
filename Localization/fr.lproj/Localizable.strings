@@ -21,7 +21,6 @@
 "%@ boyutunu %@ yap" = "Rendre %@ %@";
 "%@ bu Mac'te okunamadı." = "%@ n’a pas pu être lu sur ce Mac.";
 "%@ dakikası" = "Minute de %@";
-"%@ etkin. Işık en geç birkaç saniye içinde güncellenir." = "%@ est actif. Le voyant se met à jour en quelques secondes.";
 "%@ grafiği" = "Graphique %@";
 "%@ kaldır" = "Supprimer %@";
 "%@ profili: %@" = "Profil %@ : %@";
@@ -137,7 +136,6 @@
 "Başka şarj uygulaması açıkken kilitli" = "Verrouillé tant qu’une autre app de charge est ouverte";
 "Başla" = "Démarrer";
 "Başla yalnız izlemeyi sürdürür; şarj kontrolünü veya otomasyonu etkinleştirmez." = "Démarrer ne fait que poursuivre la surveillance ; le contrôle de charge et l’automatisation ne sont pas activés.";
-"Başlangıca dön" = "Revenir au départ";
 "Başlangıç" = "Début";
 "Başlangıç LED durumu geri yüklenemedi." = "L’état d’origine de la LED n’a pas pu être restauré.";
 "Başlangıç LED durumu güvenle geri yüklenemiyor." = "L’état d’origine de la LED ne peut pas être restauré en toute sécurité.";
@@ -216,6 +214,7 @@
 "Detaylı" = "Détaillé";
 "Detaylı: 520 pt genişlik — grafikler ve istatistikler için daha fazla yer." = "Détaillé : 520 pt de large — plus de place pour les graphiques et statistiques.";
 "Devam eden macOS işleminin bitmesini bekleyin." = "Attendez la fin de l’opération macOS en cours.";
+"Devam ettir" = "Reprendre";
 "Deşarj" = "Décharger";
 "Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Décharge et Calibrage ne seront ajoutés à Raccourcis qu’une fois leurs moteurs vérifiés terminés.";
 "Deşarj yakında; henüz kullanılamıyor" = "Décharge bientôt disponible ; pas encore disponible";
@@ -355,6 +354,11 @@
 "Hafta içi" = "Jours de semaine";
 "Hafta sonu tam dolum" = "Charge complète le week-end";
 "Günde bir yeni sürüm denetle" = "Rechercher une nouvelle version une fois par jour";
+"MagSafe ışığı kayıtlı ışık politikasına döndü." = "Le voyant MagSafe suit de nouveau la règle enregistrée.";
+"Manuel deneme otomatik ışık ayarını duraklatır. 'Testi bitir' kayıtlı ayara döner; Cellkeep yeniden açıldığında da kendiliğinden devam eder." = "Un test manuel met en pause le réglage automatique du voyant. « Terminer le test » revient au réglage enregistré ; il reprend aussi tout seul à la réouverture de Cellkeep.";
+"Manuel test otomatik ışık ayarını duraklattı." = "Un test manuel a mis en pause le réglage automatique du voyant.";
+"Testi bitir" = "Terminer le test";
+"Uygulandı: %@. Işık birkaç saniye içinde güncellenir." = "Appliqué : %@. Le voyant change en quelques secondes.";
 "Yeni sürüm çıkınca bildirim göster" = "M’avertir lorsqu’une nouvelle version est disponible";
 "Güncellemek için tıklayın." = "Cliquez pour mettre à jour.";
 "Hakkında" = "À propos";
@@ -465,14 +469,11 @@
 "MagSafe Işığını Ayarla" = "Définir le voyant MagSafe";
 "MagSafe LED yeteneği salt okunur olarak denetleniyor." = "Vérification en lecture seule de la fonction LED MagSafe.";
 "MagSafe ışığı" = "Voyant MagSafe";
-"MagSafe ışığı sistem durumuna döndü." = "Le voyant MagSafe est revenu à l’état du système.";
 "MagSafe ışığı zaten seçilen durumda." = "Le voyant MagSafe est déjà dans l’état sélectionné.";
 "MagSafe ışığı: %@." = "Voyant MagSafe : %@.";
 "MagSafe ışığını seçili duruma getirir." = "Règle le voyant MagSafe sur l’état sélectionné.";
-"Maksimum" = "Maximum";
 "Maksimum kapasite" = "Capacité maximale";
 "Maksimum kapasitenin tasarıma oranı, %" = "Capacité maximale par rapport à la capacité nominale, %";
-"Manuel deneme otomatik ışık ayarını duraklatır. Denemeden sonra üstteki 'Uygula' ile devam ettirin. 'Başlangıca dön' önceki rengi geri yükler." = "Un test manuel met en pause le réglage automatique du voyant. Après le test, reprenez-le avec « Appliquer » ci-dessus. « Revenir au départ » rétablit la couleur précédente.";
 "Menü ikonu yüklenemedi (%@); yedek çizim kullanılıyor." = "L’icône du menu n’a pas pu être chargée (%@) ; un dessin de secours est utilisé.";
 "Menü panelini açılışta göster" = "Afficher le panneau du menu au lancement";
 "Menü Çubuğu" = "Barre des menus";
@@ -851,8 +852,6 @@
 "Kartları sürükleyerek sıralayın; kaldırmak için eksiye basın, boyutunu sağ alt köşeden değiştirin." = "Faites glisser les cartes pour les réordonner ; moins pour retirer, coin inférieur droit pour redimensionner.";
 "Panelde olmayan bir kart ya da grafik ekle" = "Ajouter une carte ou un graphique absent du panneau";
 "Tümü panelde" = "Tout est dans le panneau";
-"Işık macOS'a bırakıldı; rengi macOS seçer." = "Le voyant est rendu à macOS ; macOS choisit sa couleur.";
-"Işık macOS'a bırakılıyor…" = "Restitution du voyant à macOS…";
 "Kayıtlı ışık politikası yeniden uygulanıyor…" = "Réapplication de la règle de voyant enregistrée…";
 "Test bitti; kayıtlı ışık politikası yeniden uygulandı." = "Test terminé ; la règle de voyant enregistrée est de nouveau appliquée.";
 "Işık değişti." = "Le voyant a changé.";

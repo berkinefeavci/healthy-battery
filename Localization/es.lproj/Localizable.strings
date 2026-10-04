@@ -21,7 +21,6 @@
 "%@ boyutunu %@ yap" = "Hacer %@ %@";
 "%@ bu Mac'te okunamadı." = "No se pudo leer %@ en este Mac.";
 "%@ dakikası" = "Minuto de %@";
-"%@ etkin. Işık en geç birkaç saniye içinde güncellenir." = "%@ está activo. La luz se actualiza en pocos segundos.";
 "%@ grafiği" = "Gráfico de %@";
 "%@ kaldır" = "Eliminar %@";
 "%@ profili: %@" = "Perfil %@: %@";
@@ -137,7 +136,6 @@
 "Başka şarj uygulaması açıkken kilitli" = "Bloqueado mientras haya otra app de carga abierta";
 "Başla" = "Iniciar";
 "Başla yalnız izlemeyi sürdürür; şarj kontrolünü veya otomasyonu etkinleştirmez." = "Iniciar solo mantiene la supervisión; no activa el control de carga ni la automatización.";
-"Başlangıca dön" = "Volver al inicio";
 "Başlangıç" = "Comienzo";
 "Başlangıç LED durumu geri yüklenemedi." = "No se pudo restaurar el estado original del LED.";
 "Başlangıç LED durumu güvenle geri yüklenemiyor." = "El estado original del LED no se puede restaurar de forma segura.";
@@ -216,6 +214,7 @@
 "Detaylı" = "Detallado";
 "Detaylı: 520 pt genişlik — grafikler ve istatistikler için daha fazla yer." = "Detallado: 520 pt de ancho — más espacio para gráficos y estadísticas.";
 "Devam eden macOS işleminin bitmesini bekleyin." = "Espera a que termine la operación de macOS en curso.";
+"Devam ettir" = "Reanudar";
 "Deşarj" = "Descargar";
 "Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Descarga y Calibración no se añadirán a Atajos hasta que sus motores verificados estén terminados.";
 "Deşarj yakında; henüz kullanılamıyor" = "Descarga próximamente; aún no disponible";
@@ -355,6 +354,11 @@
 "Hafta içi" = "Entre semana";
 "Hafta sonu tam dolum" = "Carga completa del fin de semana";
 "Günde bir yeni sürüm denetle" = "Buscar una nueva versión una vez al día";
+"MagSafe ışığı kayıtlı ışık politikasına döndü." = "La luz MagSafe volvió a la política de luz guardada.";
+"Manuel deneme otomatik ışık ayarını duraklatır. 'Testi bitir' kayıtlı ayara döner; Cellkeep yeniden açıldığında da kendiliğinden devam eder." = "Una prueba manual pausa el ajuste automático de la luz. «Terminar prueba» vuelve al ajuste guardado; también se reanuda solo cuando Cellkeep se abre de nuevo.";
+"Manuel test otomatik ışık ayarını duraklattı." = "Una prueba manual pausó el ajuste automático de la luz.";
+"Testi bitir" = "Terminar prueba";
+"Uygulandı: %@. Işık birkaç saniye içinde güncellenir." = "Aplicado: %@. La luz se actualiza en unos segundos.";
 "Yeni sürüm çıkınca bildirim göster" = "Avisarme cuando haya una nueva versión";
 "Güncellemek için tıklayın." = "Haz clic para actualizar.";
 "Hakkında" = "Acerca de";
@@ -465,14 +469,11 @@
 "MagSafe Işığını Ayarla" = "Establecer luz MagSafe";
 "MagSafe LED yeteneği salt okunur olarak denetleniyor." = "Comprobando la función LED de MagSafe en modo de solo lectura.";
 "MagSafe ışığı" = "Luz MagSafe";
-"MagSafe ışığı sistem durumuna döndü." = "La luz MagSafe volvió al estado del sistema.";
 "MagSafe ışığı zaten seçilen durumda." = "La luz MagSafe ya está en el estado seleccionado.";
 "MagSafe ışığı: %@." = "Luz MagSafe: %@.";
 "MagSafe ışığını seçili duruma getirir." = "Pone la luz MagSafe en el estado seleccionado.";
-"Maksimum" = "Máximo";
 "Maksimum kapasite" = "Capacidad máxima";
 "Maksimum kapasitenin tasarıma oranı, %" = "Capacidad máxima respecto al diseño, %";
-"Manuel deneme otomatik ışık ayarını duraklatır. Denemeden sonra üstteki 'Uygula' ile devam ettirin. 'Başlangıca dön' önceki rengi geri yükler." = "Una prueba manual pausa el ajuste automático de la luz. Después, reanúdalo con «Aplicar» arriba. «Volver al inicio» restaura el color anterior.";
 "Menü ikonu yüklenemedi (%@); yedek çizim kullanılıyor." = "No se pudo cargar el icono del menú (%@); se usa un dibujo alternativo.";
 "Menü panelini açılışta göster" = "Mostrar el panel del menú al abrir";
 "Menü Çubuğu" = "Barra de menús";
@@ -851,8 +852,6 @@
 "Kartları sürükleyerek sıralayın; kaldırmak için eksiye basın, boyutunu sağ alt köşeden değiştirin." = "Arrastra las tarjetas para ordenarlas; pulsa menos para quitar y cambia el tamaño desde la esquina inferior derecha.";
 "Panelde olmayan bir kart ya da grafik ekle" = "Añadir una tarjeta o gráfico que no esté en el panel";
 "Tümü panelde" = "Todo en el panel";
-"Işık macOS'a bırakıldı; rengi macOS seçer." = "La luz vuelve a macOS; macOS elige su color.";
-"Işık macOS'a bırakılıyor…" = "Devolviendo la luz a macOS…";
 "Kayıtlı ışık politikası yeniden uygulanıyor…" = "Volviendo a aplicar la regla de luz guardada…";
 "Test bitti; kayıtlı ışık politikası yeniden uygulandı." = "Prueba terminada; la regla de luz guardada vuelve a aplicarse.";
 "Işık değişti." = "La luz ha cambiado.";

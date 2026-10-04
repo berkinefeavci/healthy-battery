@@ -353,7 +353,7 @@ private enum ChargeMateShortcutService {
         case .unchanged: return String(localized: "MagSafe ışığı zaten seçilen durumda.")
         case .blocked(let message): throw ChargeMateShortcutError.commandFailed(message)
         case .restored:
-            return String(localized: "MagSafe ışığı sistem durumuna döndü.")
+            return String(localized: "MagSafe ışığı kayıtlı ışık politikasına döndü.")
         }
     }
 
