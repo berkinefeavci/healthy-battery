@@ -115,7 +115,7 @@ struct MenubarSettingsView: View {
         case "Sağlık": return String(localized: "Batarya sağlığı")
         case "Batarya": return String(localized: "Batarya özellikleri")
         case "Adaptör": return String(localized: "Güç adaptörü özellikleri")
-        default: return String(localized: "Cellkeep durumları")
+        default: return String(localized: "Healthy Battery durumları")
         }
     }
     private func change(_ update: (inout MenubarPreferences) -> Void) {

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Pure plan for the "Cellkeep'i kaldır" action: which root-owned helpers/daemons get removed
+/// Pure plan for the "Healthy Battery'i kaldır" action: which root-owned helpers/daemons get removed
 /// (both current and any leftover legacy "ChargeMate" ones), and which optional steps run based
 /// on the user's checkbox choices. Building the plan never touches the file system, launchctl,
 /// or an admin prompt — only `UninstallExecutor` (not covered by unit tests) actually runs it.

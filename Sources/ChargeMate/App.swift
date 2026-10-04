@@ -93,11 +93,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             capabilities: { [weak battery] in battery?.scheduleCapabilities ?? .unavailable },
             chargeLimit: { [weak battery] limit in
                 battery?.applyScheduledLimit(limit)
-                    ?? .init(operationID: UUID(), status: .rejected, state: nil, message: String(localized: "Cellkeep kullanılamıyor."))
+                    ?? .init(operationID: UUID(), status: .rejected, state: nil, message: String(localized: "Healthy Battery kullanılamıyor."))
             },
             topUp: { [weak battery] executionID in
                 battery?.startScheduledTopUp(executionID: executionID)
-                    ?? .init(operationID: UUID(), status: .rejected, state: nil, message: String(localized: "Cellkeep kullanılamıyor."))
+                    ?? .init(operationID: UUID(), status: .rejected, state: nil, message: String(localized: "Healthy Battery kullanılamıyor."))
             })
         scheduleRuntime?.start()
         // A no-op when the user turned the daily release check off.
@@ -113,7 +113,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                                                content: CGSize(width: bootMode.width, height: 480),
                                                screen: bootScreen)
         panel = MenuPanel(contentRect: bootFrame, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-        panel.title = "Cellkeep Panel"
+        panel.title = "Healthy Battery Panel"
         let hosting = NSHostingController(rootView: AnyView(PopoverView().environmentObject(battery).clipShape(RoundedRectangle(cornerRadius: 22))))
         // NOT: `.preferredContentSize` KASITLIYLA kapalı — bu seçenek pencere içeriğinin
         // hosting'in ideal boyutuna kilitlenmesine yol açıyor ve PanelSizing.panelFrame
@@ -158,7 +158,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             button.action = #selector(statusItemClicked(_:))
             button.target = self
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
-            button.setAccessibilityLabel("Cellkeep")
+            button.setAccessibilityLabel("Healthy Battery")
         }
         outsideMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             self?.closePanelIfOutside(at: NSEvent.mouseLocation)
@@ -193,10 +193,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private func installApplicationMenu() {
         let menu = NSMenu()
         let item = NSMenuItem()
-        let appMenu = NSMenu(title: "Cellkeep")
+        let appMenu = NSMenu(title: "Healthy Battery")
         appMenu.addItem(withTitle: String(localized: "Gösterge Tablosu’nu aç"), action: #selector(openDashboard), keyEquivalent: "d").target = self
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: String(localized: "Cellkeep’ten çık"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        appMenu.addItem(withTitle: String(localized: "Healthy Battery’ten çık"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         item.submenu = appMenu
         menu.addItem(item)
         NSApp.mainMenu = menu
@@ -328,7 +328,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             controller.view = effect
             controller.addChild(hosting)
             let window = NSWindow(contentViewController: controller)
-            window.title = "Cellkeep"
+            window.title = "Healthy Battery"
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
             window.titlebarAppearsTransparent = true
             window.titleVisibility = .hidden

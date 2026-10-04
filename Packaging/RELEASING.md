@@ -27,5 +27,5 @@ profile, so no signing secret is stored in GitHub.
 2. **Actions → Release → Run workflow** on `main` (the Mac must be awake and online).
 3. The workflow refuses to publish if the tag already exists, the changelog section is missing,
    or the DMG is not Developer ID signed and notarized. On success it creates `v<version>` with the
-   changelog section as notes and attaches `Cellkeep-<version>.dmg` and its `.sha256`.
+   changelog section as notes and attaches both `Healthy-Battery-<version>.dmg` and legacy `Cellkeep-<version>.dmg`, each with a `.sha256`.
 4. Update the Homebrew cask with that DMG (`Tools/update-cask.sh`, see `Packaging/homebrew`).

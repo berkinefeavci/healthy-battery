@@ -26,8 +26,6 @@ echo "==> build.sh"
 test -d "$app_path"
 
 version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Packaging/Info.plist)"
-dmg_name="Cellkeep-${version}.dmg"
-dmg_path="$dist_dir/$dmg_name"
 
 # ---------------------------------------------------------------------------
 # 1. Signing identity
@@ -133,55 +131,44 @@ if $did_notarize; then
 fi
 
 # ---------------------------------------------------------------------------
-# 5. DMG: staging folder with Cellkeep.app + /Applications symlink, UDZO
+# 5. Two DMGs: new name for new installs; old asset and app names for 1.2.1 updaters.
 # ---------------------------------------------------------------------------
 stage_dir="$(mktemp -d)"
 trap 'rm -rf "$stage_dir"' EXIT
 
-cp -R "$app_path" "$stage_dir/Cellkeep.app"
-ln -s /Applications "$stage_dir/Applications"
-
-rm -f "$dmg_path"
-echo "==> hdiutil create $dmg_path"
-hdiutil create -volname Cellkeep -srcfolder "$stage_dir" -format UDZO -ov "$dmg_path"
-
-echo "==> signing $dmg_path"
-codesign --force --sign "$identity" "$dmg_path"
-
-# ---------------------------------------------------------------------------
-# 6. Notarize + staple the DMG
-# ---------------------------------------------------------------------------
+for package_name in Healthy-Battery Cellkeep; do
+  if [[ "$package_name" == Healthy-Battery ]]; then
+    bundle_name="Healthy Battery.app"
+    volume_name="Healthy Battery"
+  else
+    bundle_name="Cellkeep.app"
+    volume_name="Cellkeep"
+  fi
+  rm -rf "$stage_dir"/*
+  cp -R "$app_path" "$stage_dir/$bundle_name"
+  ln -s /Applications "$stage_dir/Applications"
+  dmg_name="${package_name}-${version}.dmg"
+  dmg_path="$dist_dir/$dmg_name"
+  rm -f "$dmg_path"
+  hdiutil create -volname "$volume_name" -srcfolder "$stage_dir" -format UDZO -ov "$dmg_path"
+  codesign --force --sign "$identity" "$dmg_path"
+  if $did_notarize; then
+    xcrun notarytool submit "$dmg_path" --keychain-profile "$notary_profile" --wait
+    xcrun stapler staple "$dmg_path"
+  fi
+  (cd "$dist_dir" && shasum -a 256 "$dmg_name" > "$dmg_name.sha256")
+  mount_dir="$(mktemp -d)"
+  hdiutil attach -nobrowse -readonly -mountpoint "$mount_dir" "$dmg_path" >/dev/null
+  if [[ ! -d "$mount_dir/$bundle_name" ]]; then
+    hdiutil detach "$mount_dir" >/dev/null 2>&1 || true
+    rmdir "$mount_dir" 2>/dev/null || true
+    echo "ERROR: $dmg_path does not contain $bundle_name" >&2
+    exit 1
+  fi
+  hdiutil detach "$mount_dir" >/dev/null
+  rmdir "$mount_dir" 2>/dev/null || true
+  echo "==> done: $dmg_path"
+done
 if $did_notarize; then
-  echo "==> notarizing dmg"
-  xcrun notarytool submit "$dmg_path" --keychain-profile "$notary_profile" --wait
-  echo "==> stapling dmg"
-  xcrun stapler staple "$dmg_path"
-
-  echo "==> spctl -a -vvv -t exec (post-staple)"
   spctl -a -vvv -t exec "$app_path"
 fi
-
-# ---------------------------------------------------------------------------
-# 7. Checksum
-# ---------------------------------------------------------------------------
-shasum_path="$dmg_path.sha256"
-(cd "$dist_dir" && shasum -a 256 "$dmg_name" > "$(basename "$shasum_path")")
-echo "==> $shasum_path"
-cat "$shasum_path"
-
-# ---------------------------------------------------------------------------
-# 8. Sanity mount: verify the DMG actually contains Cellkeep.app
-# ---------------------------------------------------------------------------
-mount_dir="$(mktemp -d)"
-hdiutil attach -nobrowse -readonly -mountpoint "$mount_dir" "$dmg_path" >/dev/null
-if [[ ! -d "$mount_dir/Cellkeep.app" ]]; then
-  hdiutil detach "$mount_dir" >/dev/null 2>&1 || true
-  rmdir "$mount_dir" 2>/dev/null || true
-  echo "ERROR: $dmg_path does not contain Cellkeep.app" >&2
-  exit 1
-fi
-echo "==> verified: $mount_dir/Cellkeep.app present"
-hdiutil detach "$mount_dir" >/dev/null
-rmdir "$mount_dir" 2>/dev/null || true
-
-echo "==> done: $dmg_path"

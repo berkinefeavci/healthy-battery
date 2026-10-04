@@ -121,7 +121,7 @@ enum EnergyPresentation {
     /// - `rowPID`/`isApplication`/`iconPath` mirror the matching `EnergyApp` fields. `iconPath` is the
     ///   owning `.app` bundle path (the row's own bundle for a regular app, the owner's bundle for a
     ///   helper process); nil means no owner `.app` was found (a system process).
-    /// - `ownBundleIdentifier` is Cellkeep's own bundle identifier, so Cellkeep never offers to
+    /// - `ownBundleIdentifier` is Healthy Battery's own bundle identifier, so Healthy Battery never offers to
     ///   quit itself.
     /// - `bundleIdentifier` resolves a bundle path to its `CFBundleIdentifier` (injected so tests never
     ///   touch disk; production passes `Bundle(path:)?.bundleIdentifier`).
@@ -132,7 +132,7 @@ enum EnergyPresentation {
     /// - `isRegularApp` reports whether a PID's activation policy is `.regular` (injected; production
     ///   passes `NSRunningApplication(processIdentifier:)?.activationPolicy == .regular`).
     ///
-    /// Returns nil for a system process (no owner `.app`), Cellkeep itself, Finder, a helper whose
+    /// Returns nil for a system process (no owner `.app`), Healthy Battery itself, Finder, a helper whose
     /// owner app is not currently running, or any owner without a regular activation policy.
     static func quitTargetPID(rowPID: Int, isApplication: Bool, iconPath: String?,
                               ownBundleIdentifier: String?,
@@ -166,7 +166,7 @@ enum EnergyPresentation {
 
     /// Groups energy-list rows by owner `.app` bundle path, sums each group's POWER, sorts by that
     /// total (descending, ties broken by name) and caps the result to `limit`. A row with no owner
-    /// `.app` (a system process), Cellkeep itself, or Finder is never included — matching
+    /// `.app` (a system process), Healthy Battery itself, or Finder is never included — matching
     /// `quitTargetPID`'s exclusions, minus the activation-policy check (that needs a live running app,
     /// resolved later at render/tap time, not while merely grouping a sample).
     ///

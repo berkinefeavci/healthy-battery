@@ -21,7 +21,7 @@ enum ShortcutLimitSource: String, AppEnum {
 
     static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Şarj limiti kaynağı")
     static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-        .committed: "Cellkeep hedefi",
+        .committed: "Healthy Battery hedefi",
         .nativeManual: "macOS manuel limiti",
         .nativeCurrent: "macOS geçerli limiti"
     ]
@@ -114,7 +114,7 @@ struct GetBatteryPercentageIntent: AppIntent {
 
 struct GetChargeLimitIntent: AppIntent {
     static let title: LocalizedStringResource = "Şarj Limitini Al"
-    static let description = IntentDescription("Cellkeep hedefini veya macOS native limitini döndürür.")
+    static let description = IntentDescription("Healthy Battery hedefini veya macOS native limitini döndürür.")
     static let openAppWhenRun = false
 
     @Parameter(title: "Kaynak", default: .committed)
@@ -126,8 +126,8 @@ struct GetChargeLimitIntent: AppIntent {
 }
 
 struct GetChargeMateStateIntent: AppIntent {
-    static let title: LocalizedStringResource = "Cellkeep Durumunu Al"
-    static let description = IntentDescription("Kararlı Cellkeep durum adını döndürür.")
+    static let title: LocalizedStringResource = "Healthy Battery Durumunu Al"
+    static let description = IntentDescription("Kararlı Healthy Battery durum adını döndürür.")
     static let openAppWhenRun = false
 
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
@@ -147,7 +147,7 @@ struct GetBatteryTemperatureIntent: AppIntent {
 
 struct SetChargeLimitIntent: AppIntent {
     static let title: LocalizedStringResource = "Şarj Limitini Ayarla"
-    static let description = IntentDescription("Desteklenen hedefi Cellkeep'in güvenli şarj denetim hattından uygular.")
+    static let description = IntentDescription("Desteklenen hedefi Healthy Battery'in güvenli şarj denetim hattından uygular.")
     static let openAppWhenRun = false
 
     @Parameter(title: "Hedef")
@@ -173,7 +173,7 @@ struct ControlTopUpIntent: AppIntent {
 
 struct SetPowerModeIntent: AppIntent {
     static let title: LocalizedStringResource = "Güç Modunu Ayarla"
-    static let description = IntentDescription("Önceden etkinleştirilmiş Cellkeep yardımcısıyla macOS güç modunu değiştirir.")
+    static let description = IntentDescription("Önceden etkinleştirilmiş Healthy Battery yardımcısıyla macOS güç modunu değiştirir.")
     static let openAppWhenRun = false
 
     @Parameter(title: "Mod")
@@ -186,7 +186,7 @@ struct SetPowerModeIntent: AppIntent {
 
 struct SetMagSafeLightIntent: AppIntent {
     static let title: LocalizedStringResource = "MagSafe Işığını Ayarla"
-    static let description = IntentDescription("Önceden etkinleştirilmiş Cellkeep LED denetimiyle MagSafe ışığını değiştirir.")
+    static let description = IntentDescription("Önceden etkinleştirilmiş Healthy Battery LED denetimiyle MagSafe ışığını değiştirir.")
     static let openAppWhenRun = false
 
     @Parameter(title: "Işık")
@@ -207,7 +207,7 @@ struct ChargeMateAppShortcuts: AppShortcutsProvider {
                     shortTitle: "Şarj limiti", systemImageName: "gauge.with.dots.needle.33percent")
         AppShortcut(intent: GetChargeMateStateIntent(),
                     phrases: ["\(.applicationName) durumunu öğren"],
-                    shortTitle: "Cellkeep durumu", systemImageName: "bolt.shield")
+                    shortTitle: "Healthy Battery durumu", systemImageName: "bolt.shield")
         AppShortcut(intent: GetBatteryTemperatureIntent(),
                     phrases: ["\(.applicationName) batarya sıcaklığını öğren"],
                     shortTitle: "Batarya sıcaklığı", systemImageName: "thermometer.medium")

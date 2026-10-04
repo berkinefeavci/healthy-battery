@@ -1,8 +1,8 @@
 import AppKit
 import Darwin
 
-/// Other charge-limit tools that write the same SMC/native charge settings as Cellkeep. Two writers
-/// fight over the limit, so while any of them is present Cellkeep locks its own hardware writes.
+/// Other charge-limit tools that write the same SMC/native charge settings as Healthy Battery. Two writers
+/// fight over the limit, so while any of them is present Healthy Battery locks its own hardware writes.
 ///
 /// Identifiers come from each project's own source (bundle IDs, launchd labels, daemon executable
 /// names); verify against the upstream project before adding or changing an entry.

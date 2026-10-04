@@ -5,7 +5,7 @@ import Foundation
 /// release. Downloading and installing happen only when the user presses "Update"; see
 /// `UpdateInstaller`.
 enum UpdateCheck {
-    static let releasesAPI = URL(string: "https://api.github.com/repos/berkinefeavci/cellkeep/releases/latest")!
+    static let releasesAPI = URL(string: "https://api.github.com/repos/berkinefeavci/healthy-battery/releases/latest")!
     static let checkInterval: TimeInterval = 24 * 60 * 60
 
     enum Keys {
@@ -55,7 +55,8 @@ enum UpdateCheck {
     /// Only a release page of this repository on github.com is ever opened.
     static func isTrustedReleasePage(_ url: URL) -> Bool {
         url.scheme == "https" && url.host == "github.com"
-            && url.path.hasPrefix("/berkinefeavci/cellkeep/releases/")
+            && (url.path.hasPrefix("/berkinefeavci/healthy-battery/releases/")
+                || url.path.hasPrefix("/berkinefeavci/cellkeep/releases/"))
     }
 
     /// On unless the user explicitly turned the toggle off.
