@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.8
+## 1.2.1
 
 - MagSafe Light: the "System" test button no longer replaces the saved light policy. Before, pressing it saved "Let the system manage it" over a chosen night window, and the page then also reset the window to 00:00–00:00, so the light stayed on at night. The button is gone; "End test" (was "Back to start") goes back to the saved policy, and the Shortcuts "System" option does the same.
 - The page no longer copies 0:00 times from "System" or "Always off" into the time range; a range broken that way goes back to 22:00–08:00.
