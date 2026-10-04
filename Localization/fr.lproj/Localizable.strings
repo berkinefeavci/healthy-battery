@@ -857,3 +857,7 @@
 "Işık değişti." = "Le voyant a changé.";
 "Işık değiştiriliyor…" = "Changement du voyant…";
 "Işık istenen renge geçmedi." = "Le voyant n’est pas passé à la couleur demandée.";
+
+"Hata bildir" = "Signaler un bug";
+"Öneri gönder" = "Proposer une fonctionnalité";
+"Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "Un fichier de diagnostic est partagé uniquement si vous choisissez de le joindre.";

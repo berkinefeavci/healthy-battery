@@ -857,3 +857,7 @@
 "Işık değişti." = "The light changed.";
 "Işık değiştiriliyor…" = "Changing the light…";
 "Işık istenen renge geçmedi." = "The light didn’t switch to the requested colour.";
+
+"Hata bildir" = "Report a bug";
+"Öneri gönder" = "Suggest a feature";
+"Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "A diagnostic file is shared only if you choose to attach it.";
