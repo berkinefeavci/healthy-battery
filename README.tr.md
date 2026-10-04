@@ -71,10 +71,10 @@ Bunlar arayüzde kilitli olarak ve **"Yakında"** etiketiyle görünür. Bunlar 
 
 ### Homebrew ile
 
-[Healthy Battery Homebrew deposu](https://github.com/berkinefeavci/homebrew-cellkeep) yayında:
+[Healthy Battery Homebrew deposu](https://github.com/berkinefeavci/homebrew-healthy-battery) yayında:
 
 ```sh
-brew install --cask berkinefeavci/cellkeep/cellkeep
+brew install --cask berkinefeavci/healthy-battery/healthy-battery
 ```
 
 ## Kaynaktan derleme
