@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.3
+
+- General Settings now has separate GitHub links for bug reports and feature suggestions. Diagnostic files are shared only when you attach them yourself.
+- The README points to the same support channel and removes a placeholder donation link.
+
 ## 1.2.2
 
 - The app is now called Healthy Battery. Existing settings, history, charge helpers and bundle identity stay in place.

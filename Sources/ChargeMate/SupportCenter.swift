@@ -54,6 +54,12 @@ struct SupportCenterView: View {
     private var helpCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Yerel yardım", systemImage: "questionmark.circle").font(.headline)
+            HStack(spacing: 16) {
+                Link("Hata bildir", destination: URL(string: "https://github.com/berkinefeavci/healthy-battery/issues/new?title=Hata%3A%20")!)
+                Link("Öneri gönder", destination: URL(string: "https://github.com/berkinefeavci/healthy-battery/issues/new?title=%C3%96neri%3A%20")!)
+            }
+            Text("Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır.")
+                .font(.caption).foregroundStyle(.secondary)
             DisclosureGroup("Neden bazı değerler — görünüyor?") {
                 Text("Sensör yoksa, veri geçersizse veya ölçüm 10 saniyeden eskiyse Healthy Battery tahmin üretmez.")
                     .font(.caption).foregroundStyle(.secondary).padding(.top, 6)
