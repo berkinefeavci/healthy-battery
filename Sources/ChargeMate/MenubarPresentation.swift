@@ -124,7 +124,7 @@ enum MenubarRenderer {
             return true
         }
         image.isTemplate = !colored
-        let description = (["Cellkeep", model.stateDescription] + (style == .iosBattery ? [String(localized: "Doluluk: \(iosText(model))")] : []) + model.values.map(\.description)
+        let description = (["Healthy Battery", model.stateDescription] + (style == .iosBattery ? [String(localized: "Doluluk: \(iosText(model))")] : []) + model.values.map(\.description)
                            + (hidden > 0 ? [String(localized: "\(hidden) öğe gizlendi")] : [])
                            + (warning.map { [$0] } ?? [])).joined(separator: " · ")
         return MenubarRenderResult(image: image, description: description, hiddenCount: hidden, resourceWarning: warning)

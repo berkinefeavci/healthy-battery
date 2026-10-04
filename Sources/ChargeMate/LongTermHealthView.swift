@@ -45,7 +45,7 @@ struct LongTermHealthCard: View {
                 .frame(height: 130)
                 .accessibilityLabel("Günlük batarya sağlığı grafiği")
             } else {
-                Text("Sağlık eğilimi için en az iki günlük ölçüm gerekiyor. Cellkeep açık kaldıkça her gün bir özet kaydedilir.")
+                Text("Sağlık eğilimi için en az iki günlük ölçüm gerekiyor. Healthy Battery açık kaldıkça her gün bir özet kaydedilir.")
                     .font(.system(size: 11)).foregroundStyle(Color.primary.opacity(0.72))
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -54,7 +54,7 @@ struct LongTermHealthCard: View {
                 statsColumn(title: String(localized: "Son 7 gün"), stats: stats(days: 7))
                 statsColumn(title: String(localized: "Son 30 gün"), stats: stats(days: 30))
             }
-            Text("Günlük özetler bu Mac’te 400 güne kadar saklanır; yalnızca Cellkeep açıkken kaydedilen ölçümlerden hesaplanır.")
+            Text("Günlük özetler bu Mac’te 400 güne kadar saklanır; yalnızca Healthy Battery açıkken kaydedilen ölçümlerden hesaplanır.")
                 .font(.system(size: 9)).foregroundStyle(Color.primary.opacity(0.5))
                 .fixedSize(horizontal: false, vertical: true)
         }.frame(maxWidth: .infinity, alignment: .leading).chargeCard()

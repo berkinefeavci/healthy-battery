@@ -18,6 +18,7 @@ import Foundation
 
         // Only this repository's release pages on github.com are trusted.
         precondition(UpdateCheck.isTrustedReleasePage(URL(string: "https://github.com/berkinefeavci/cellkeep/releases/tag/v1.1.0")!))
+        precondition(UpdateCheck.isTrustedReleasePage(URL(string: "https://github.com/berkinefeavci/healthy-battery/releases/tag/v1.1.0")!))
         precondition(!UpdateCheck.isTrustedReleasePage(URL(string: "http://github.com/berkinefeavci/cellkeep/releases/tag/v1.1.0")!))
         precondition(!UpdateCheck.isTrustedReleasePage(URL(string: "https://evil.example/berkinefeavci/cellkeep/releases/x")!))
         precondition(!UpdateCheck.isTrustedReleasePage(URL(string: "https://github.com/someone/else/releases/tag/v9")!))

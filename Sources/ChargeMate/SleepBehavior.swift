@@ -78,7 +78,7 @@ enum SleepAssertionBackend {
         let result = IOPMAssertionCreateWithName(
             "PreventUserIdleSystemSleep" as CFString,
             IOPMAssertionLevel(kIOPMAssertionLevelOn),
-            String(localized: "Cellkeep hedef doluluğa kadar şarjı izliyor") as CFString,
+            String(localized: "Healthy Battery hedef doluluğa kadar şarjı izliyor") as CFString,
             &identifier
         )
         guard result == kIOReturnSuccess else { throw SleepAssertionError.creationFailed(result) }

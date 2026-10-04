@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2
+
+- The app is now called Healthy Battery. Existing settings, history, charge helpers and bundle identity stay in place.
+- New GitHub downloads use `Healthy-Battery-1.2.2.dmg` with `Healthy Battery.app`. The release also includes `Cellkeep-1.2.2.dmg` with `Cellkeep.app` so installed Cellkeep 1.2.1 copies can update normally.
+- Update checks and release links now use `berkinefeavci/healthy-battery`. The old GitHub address continues to redirect for older versions.
+
 ## 1.2.1
 
 - MagSafe Light: the "System" test button no longer replaces the saved light policy. Before, pressing it saved "Let the system manage it" over a chosen night window, and the page then also reset the window to 00:00–00:00, so the light stayed on at night. The button is gone; "End test" (was "Back to start") goes back to the saved policy, and the Shortcuts "System" option does the same.

@@ -13,9 +13,9 @@ struct ShortcutsSettingsView: View {
     private let reads = [
         Action(title: String(localized: "Pil Yüzdesini Al"), detail: String(localized: "macOS veya bağımsız donanım yüzdesi"),
                example: String(localized: "Çıktı: 83"), icon: "battery.75percent"),
-        Action(title: String(localized: "Şarj Limitini Al"), detail: String(localized: "Cellkeep hedefi, native manuel veya geçerli limit"),
+        Action(title: String(localized: "Şarj Limitini Al"), detail: String(localized: "Healthy Battery hedefi, native manuel veya geçerli limit"),
                example: String(localized: "Çıktı: 85"), icon: "gauge.with.dots.needle.33percent"),
-        Action(title: String(localized: "Cellkeep Durumunu Al"), detail: String(localized: "Kararlı otomasyon durum adı"),
+        Action(title: String(localized: "Healthy Battery Durumunu Al"), detail: String(localized: "Kararlı otomasyon durum adı"),
                example: String(localized: "Çıktı: charging"), icon: "bolt.shield"),
         Action(title: String(localized: "Batarya Sıcaklığını Al"), detail: String(localized: "Sayısal Celsius değeri"),
                example: String(localized: "Çıktı: 35,5"), icon: "thermometer.medium")
@@ -41,7 +41,7 @@ struct ShortcutsSettingsView: View {
                     .background(.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
                 VStack(alignment: .leading, spacing: 5) {
                     Text("Apple Kestirmeler").font(.headline)
-                    Text("Sekiz yerel eylem. Okumalar güncel veri döndürür; denetimler Cellkeep'in güvenli işlem hattını kullanır.")
+                    Text("Sekiz yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır.")
                         .font(.callout).foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }

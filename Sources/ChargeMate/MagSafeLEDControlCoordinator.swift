@@ -118,7 +118,7 @@ final class MagSafeLEDControlCoordinator {
         guard let session else { return .unchanged }
         do {
             let observed = try backend.read()
-            // Another process may have taken ownership while Cellkeep was closed.
+            // Another process may have taken ownership while Healthy Battery was closed.
             // Never overwrite an output that is neither ours nor the saved baseline.
             guard observed == session.baseline || observed == session.requested else {
                 return .blocked(String(localized: "LED durumu dışarıdan değişti; otomatik geri yükleme yapılmadı."))

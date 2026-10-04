@@ -431,7 +431,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     @Published var chargeLimit: Double {
         didSet { if chargeLimit.isFinite { defaults.set(chargeLimit, forKey: "chargeLimit") } }
     }
-    /// A Cellkeep target is only committed after the explicit native Apply readback succeeds.
+    /// A Healthy Battery target is only committed after the explicit native Apply readback succeeds.
     @Published private(set) var committedLimit: Int?
     @Published var sailingEnabled: Bool {
         didSet { defaults.set(sailingEnabled, forKey: "sailingEnabled") }
@@ -939,7 +939,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
 
     private static func unavailableShortcutResult() -> ChargeControlCoordinator.Result {
         .init(operationID: UUID(), status: .rejected, state: nil,
-              message: String(localized: "Cellkeep denetimi kullanılamıyor."))
+              message: String(localized: "Healthy Battery denetimi kullanılamıyor."))
     }
 
     func reapplyChargeMateTarget() {
@@ -965,7 +965,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         controlQueue.async { [weak self] in
             guard let self else { return }
             let message: String
-            do { try self.policyController.adoptObservedLimit(); message = String(localized: "macOS limiti Cellkeep hedefi olarak benimsendi.") }
+            do { try self.policyController.adoptObservedLimit(); message = String(localized: "macOS limiti Healthy Battery hedefi olarak benimsendi.") }
             catch { message = String(localized: "macOS limiti benimsenemedi: \(error.localizedDescription)") }
             DispatchQueue.main.async {
                 self.applyingLimit = false
@@ -1222,7 +1222,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         case .topUpRestoring: controlState = .topUp
         case .recoveryRequired(let message): actionMessage = message
         case .pausedByConflict(let expected, let observed):
-            actionMessage = String(localized: "Cellkeep hedefi %\(expected), macOS ayarı %\(observed). Seçiminizi yapın.")
+            actionMessage = String(localized: "Healthy Battery hedefi %\(expected), macOS ayarı %\(observed). Seçiminizi yapın.")
         case .maintainingLimit: if !topUpActive { actionMessage = nil }
         case .idle: break
         }
@@ -1464,7 +1464,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         case .charging:
             return String(localized: "Adaptör MacBook’u çalıştırıyor ve bataryayı şarj ediyor. \(otherControllerRunning ? String(localized: "Şarj yönetimi için başka bir uygulama açık.") : String(localized: "macOS’un bildirdiği şarj durumu izleniyor."))")
         case .adapterOnly:
-            return String(localized: "Şarj beklemede. MacBook adaptörden çalışıyor; batarya şu anda güç almıyor. \(otherControllerRunning ? String(localized: "Başka bir şarj uygulaması açık olduğu için Cellkeep ayar değiştirmiyor.") : String(localized: "Uyku davranışını macOS yönetiyor."))")
+            return String(localized: "Şarj beklemede. MacBook adaptörden çalışıyor; batarya şu anda güç almıyor. \(otherControllerRunning ? String(localized: "Başka bir şarj uygulaması açık olduğu için Healthy Battery ayar değiştirmiyor.") : String(localized: "Uyku davranışını macOS yönetiyor."))")
         case .batteryOnly:
             return String(localized: "Batarya MacBook’a güç sağlıyor. Adaptör bağlı değil.")
         case .batteryAssist:

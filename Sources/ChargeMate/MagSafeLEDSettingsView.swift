@@ -63,7 +63,7 @@ struct MagSafeLEDSettingsView: View {
                     .background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 13))
                 VStack(alignment: .leading, spacing: 5) {
                     Text("MagSafe ışığı").font(.headline)
-                    Text("Şarj kablosundaki durum ışığının Cellkeep durumlarını nasıl göstereceğini seçin.")
+                    Text("Şarj kablosundaki durum ışığının Healthy Battery durumlarını nasıl göstereceğini seçin.")
                         .font(.callout).foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -107,7 +107,7 @@ struct MagSafeLEDSettingsView: View {
                 .disabled(isWorking || battery.otherControllerRunning || !helperInstalled)
             if battery.otherControllerRunning { Text("Başka bir şarj uygulaması açıkken ışık denetimi bekler.").font(.caption) }
             if !helperInstalled && !isWorking {
-                // An older helper (from Cellkeep 1.0) still answers on the socket but is not trusted
+                // An older helper (from Healthy Battery 1.0) still answers on the socket but is not trusted
                 // any more; sending it the policy only produced an unclear wait.
                 Text("Önce aşağıdaki 'Işık denetimini etkinleştir' ile ışık yardımcısını kurun veya güncelleyin; yönetici şifresi bir kez istenir.")
                     .font(.caption).foregroundStyle(.orange)
@@ -154,7 +154,7 @@ struct MagSafeLEDSettingsView: View {
             mappingRow(String(localized: "Isı koruması bekletiyor"), color: .orange, result: String(localized: "Turuncu"))
             mappingRow(String(localized: "Boşalıyor"), color: .orange,
                        result: blinkWhileDischarging ? String(localized: "Turuncu yanıp sönme") : String(localized: "Turuncu"))
-            Text("Bilinmeyen, çelişkili veya eski ölçümde Cellkeep ışığı değiştirmez.")
+            Text("Bilinmeyen, çelişkili veya eski ölçümde Healthy Battery ışığı değiştirmez.")
                 .font(.caption).foregroundStyle(.secondary)
         }.chargeCard()
     }
@@ -167,7 +167,7 @@ struct MagSafeLEDSettingsView: View {
                 Button { refreshCapability() } label: { Label("Yeniden denetle", systemImage: "arrow.clockwise") }
                     .chargeMateButtonStyle()
             }
-            Text("Manuel deneme otomatik ışık ayarını duraklatır. 'Testi bitir' kayıtlı ayara döner; Cellkeep yeniden açıldığında da kendiliğinden devam eder.")
+            Text("Manuel deneme otomatik ışık ayarını duraklatır. 'Testi bitir' kayıtlı ayara döner; Healthy Battery yeniden açıldığında da kendiliğinden devam eder.")
                 .font(.callout).foregroundStyle(.secondary)
             if !helperInstalled {
                 Button { installHelper() } label: {

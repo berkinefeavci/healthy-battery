@@ -108,7 +108,7 @@ final class ChargePolicyController {
     }
 
     func reapplyPolicy() -> ChargeControlCoordinator.Result {
-        guard let policy, policy.enabled else { return blockedResult("Etkin bir Cellkeep hedefi yok.", recovery: false) }
+        guard let policy, policy.enabled else { return blockedResult("Etkin bir Healthy Battery hedefi yok.", recovery: false) }
         return applyManualLimit(policy.desiredLimit)
     }
 

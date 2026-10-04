@@ -55,7 +55,7 @@ struct SupportCenterView: View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Yerel yardım", systemImage: "questionmark.circle").font(.headline)
             DisclosureGroup("Neden bazı değerler — görünüyor?") {
-                Text("Sensör yoksa, veri geçersizse veya ölçüm 10 saniyeden eskiyse Cellkeep tahmin üretmez.")
+                Text("Sensör yoksa, veri geçersizse veya ölçüm 10 saniyeden eskiyse Healthy Battery tahmin üretmez.")
                     .font(.caption).foregroundStyle(.secondary).padding(.top, 6)
             }
             DisclosureGroup("Neden bazı kontroller kapalı?") {
@@ -63,7 +63,7 @@ struct SupportCenterView: View {
                     .font(.caption).foregroundStyle(.secondary).padding(.top, 6)
             }
             DisclosureGroup("Başka bir şarj uygulaması açıksa ne olur?") {
-                Text("Cellkeep başka bir pil denetleyicisi algıladığında donanım değişikliğini kilitler; izleme ve geçmiş çalışmaya devam eder.")
+                Text("Healthy Battery başka bir pil denetleyicisi algıladığında donanım değişikliğini kilitler; izleme ve geçmiş çalışmaya devam eder.")
                     .font(.caption).foregroundStyle(.secondary).padding(.top, 6)
             }
         }.chargeCard()
@@ -99,7 +99,7 @@ struct SupportCenterView: View {
                     Button("Son geçmiş yedeğini geri al") { battery.restoreHistoryBackup { message = $0 } }
                 }
             }.chargeMateButtonStyle()
-            .confirmationDialog("Yalnız Cellkeep arayüz ayarları sıfırlansın mı?", isPresented: $showResetConfirmation) {
+            .confirmationDialog("Yalnız Healthy Battery arayüz ayarları sıfırlansın mı?", isPresented: $showResetConfirmation) {
                 Button("Arayüz ayarlarını sıfırla", role: .destructive) {
                     ChargeMatePreferences.resetUI(in: .standard)
                     message = String(localized: "Arayüz ayarları sıfırlandı; geçmiş ve sistem limiti korundu.")
@@ -114,12 +114,12 @@ struct SupportCenterView: View {
     private var aboutCard: some View {
         VStack(spacing: 12) {
             Image(systemName: "bolt.shield.fill").font(.system(size: 46)).foregroundStyle(.blue.gradient)
-            Text("Cellkeep").font(.title.bold())
+            Text("Healthy Battery").font(.title.bold())
             Text("Sürüm \(version) (\(build)) · bağımsız macOS uygulaması.")
                 .font(.caption).foregroundStyle(.secondary)
             UpdateCheckSection()
             DisclosureGroup("Uygulamayı kaldırma") {
-                Text("Ayarlar → Genel’deki “Cellkeep’i kaldır” düğmesi yardımcıları ve arka plan servislerini kaldırır. Ardından Applications içindeki Cellkeep’i Çöp Sepeti’ne taşıyın.")
+                Text("Ayarlar → Genel’deki “Healthy Battery’i kaldır” düğmesi yardımcıları ve arka plan servislerini kaldırır. Ardından Applications içindeki Healthy Battery’i Çöp Sepeti’ne taşıyın.")
                     .font(.caption).foregroundStyle(.secondary).padding(.top, 6)
             }.frame(maxWidth: 520)
         }.frame(maxWidth: .infinity).padding(.vertical, 12).chargeCard()
@@ -130,7 +130,7 @@ struct SupportCenterView: View {
 
     private func exportHistoryCSV() {
         let panel = NSSavePanel()
-        panel.nameFieldStringValue = "Cellkeep-History.csv"
+        panel.nameFieldStringValue = "Healthy Battery-History.csv"
         panel.allowedContentTypes = [.commaSeparatedText]
         panel.canCreateDirectories = true
         guard panel.runModal() == .OK, let url = panel.url else { return }
@@ -149,7 +149,7 @@ struct SupportCenterView: View {
 
     private func exportDailyCSV() {
         let panel = NSSavePanel()
-        panel.nameFieldStringValue = "Cellkeep-Daily.csv"
+        panel.nameFieldStringValue = "Healthy Battery-Daily.csv"
         panel.allowedContentTypes = [.commaSeparatedText]
         panel.canCreateDirectories = true
         guard panel.runModal() == .OK, let url = panel.url else { return }
@@ -162,7 +162,7 @@ struct SupportCenterView: View {
 
     private func exportDiagnostics() {
         let panel = NSSavePanel()
-        panel.nameFieldStringValue = "Cellkeep-Tanilama.txt"
+        panel.nameFieldStringValue = "Healthy Battery-Tanilama.txt"
         panel.allowedContentTypes = [.plainText]
         panel.canCreateDirectories = true
         guard panel.runModal() == .OK, let url = panel.url else { return }

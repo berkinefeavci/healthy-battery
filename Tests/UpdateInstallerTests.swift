@@ -3,13 +3,13 @@ import Foundation
 @main enum UpdateInstallerTests {
     static func main() {
         // Download URLs: only this repo's release assets, only plain versions and DMG files.
-        precondition(UpdatePackage.downloadURL(version: "1.1.4", file: "Cellkeep-1.1.4.dmg")?.absoluteString
-                     == "https://github.com/berkinefeavci/cellkeep/releases/download/v1.1.4/Cellkeep-1.1.4.dmg")
-        precondition(UpdatePackage.downloadURL(version: "1.1.4", file: "Cellkeep-1.1.4.dmg.sha256") != nil)
-        precondition(UpdatePackage.downloadURL(version: "1.1.4-beta", file: "Cellkeep-1.1.4-beta.dmg") == nil)
+        precondition(UpdatePackage.downloadURL(version: "1.1.4", file: "Healthy-Battery-1.1.4.dmg")?.absoluteString
+                     == "https://github.com/berkinefeavci/healthy-battery/releases/download/v1.1.4/Healthy-Battery-1.1.4.dmg")
+        precondition(UpdatePackage.downloadURL(version: "1.1.4", file: "Healthy-Battery-1.1.4.dmg.sha256") != nil)
+        precondition(UpdatePackage.downloadURL(version: "1.1.4-beta", file: "Healthy-Battery-1.1.4-beta.dmg") == nil)
         precondition(UpdatePackage.downloadURL(version: "1.1.4", file: "Other.dmg") == nil)
-        precondition(UpdatePackage.downloadURL(version: "1.1.4", file: "Cellkeep-1.1.4.dmg/../x") == nil)
-        precondition(UpdatePackage.downloadURL(version: "../1", file: "Cellkeep-../1.dmg") == nil)
+        precondition(UpdatePackage.downloadURL(version: "1.1.4", file: "Healthy-Battery-1.1.4.dmg/../x") == nil)
+        precondition(UpdatePackage.downloadURL(version: "../1", file: "Healthy-Battery-../1.dmg") == nil)
 
         // Checksum file parsing.
         let hash = String(repeating: "ab", count: 32)

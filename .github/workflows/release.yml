@@ -44,16 +44,17 @@ jobs:
       - name: Build, sign and notarize (release.sh)
         run: env -u CI ./release.sh
 
-      - name: Verify the DMG is notarized
+      - name: Verify both DMGs are notarized
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          dmg="dist/Cellkeep-$VERSION.dmg"
-          test -f "$dmg"
-          # release.sh falls back to ad-hoc signing when no Developer ID or notary profile is
-          # found; such a build must never be published.
-          xcrun stapler validate "$dmg"
-          codesign -dv --verbose=2 "$dmg" 2>&1 | grep -q '^Authority=Developer ID Application:'
+          # release.sh can fall back to ad-hoc signing; neither package may ship then.
+          for name in Healthy-Battery Cellkeep; do
+            dmg="dist/$name-$VERSION.dmg"
+            test -f "$dmg"
+            xcrun stapler validate "$dmg"
+            codesign -dv --verbose=2 "$dmg" 2>&1 | grep -q '^Authority=Developer ID Application:'
+          done
 
       - name: Publish GitHub release
         env:
@@ -67,17 +68,18 @@ jobs:
           body="$(NOTES="$notes" VERSION="$VERSION" SHA="$SHA" /usr/bin/python3 -c '
           import json, os
           print(json.dumps({"tag_name": "v" + os.environ["VERSION"], "target_commitish": os.environ["SHA"],
-                            "name": "Cellkeep " + os.environ["VERSION"], "body": os.environ["NOTES"].strip() + "\n"}))')"
+                            "name": "Healthy Battery " + os.environ["VERSION"], "body": os.environ["NOTES"].strip() + "\n"}))')"
           api="https://api.github.com/repos/$REPO"
           auth=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json")
           release="$(curl -fsS "${auth[@]}" -X POST "$api/releases" -d "$body")"
           upload_url="$(printf '%s' "$release" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["upload_url"].split("{")[0])')"
-          for file in "dist/Cellkeep-$VERSION.dmg" "dist/Cellkeep-$VERSION.dmg.sha256"; do
+          for file in "dist/Healthy-Battery-$VERSION.dmg" "dist/Healthy-Battery-$VERSION.dmg.sha256" \
+                      "dist/Cellkeep-$VERSION.dmg" "dist/Cellkeep-$VERSION.dmg.sha256"; do
             name="$(basename "$file")"
             case "$name" in *.dmg) type=application/x-apple-diskimage ;; *) type=text/plain ;; esac
             curl -fsS "${auth[@]}" -H "Content-Type: $type" --data-binary @"$file" \
               "$upload_url?name=$name" >/dev/null
             echo "uploaded $name"
           done
-          echo "### Published Cellkeep $VERSION" >> "$GITHUB_STEP_SUMMARY"
-          cat "dist/Cellkeep-$VERSION.dmg.sha256" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Published Healthy Battery $VERSION" >> "$GITHUB_STEP_SUMMARY"
+          cat "dist/Healthy-Battery-$VERSION.dmg.sha256" >> "$GITHUB_STEP_SUMMARY"

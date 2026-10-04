@@ -5,13 +5,14 @@ import Security
 
 /// Pure parts of the in-app update, separate so they can be tested without network or disk.
 enum UpdatePackage {
-    static func dmgName(_ version: String) -> String { "Cellkeep-\(version).dmg" }
+    static func dmgName(_ version: String) -> String { "Healthy-Battery-\(version).dmg" }
 
     /// Only release assets of this repository, for a plain numeric version, are ever downloaded.
     static func downloadURL(version: String, file: String) -> URL? {
         guard UpdateCheck.versionComponents(version) != nil, !version.contains("-"),
-              !file.contains("/"), file.hasPrefix("Cellkeep-\(version).dmg") else { return nil }
-        return URL(string: "https://github.com/berkinefeavci/cellkeep/releases/download/v\(version)/\(file)")
+              !file.contains("/"),
+              (file == dmgName(version) || file == dmgName(version) + ".sha256") else { return nil }
+        return URL(string: "https://github.com/berkinefeavci/healthy-battery/releases/download/v\(version)/\(file)")
     }
 
     /// `shasum -a 256` output ("<64 hex>  <name>"); only the line for `name` counts.
@@ -34,7 +35,7 @@ enum UpdatePackage {
         return hasher.finalize().map { String(format: "%02x", $0) }.joined()
     }
 
-    /// Runs after Cellkeep quits: swaps the bundle, restores the old one if the copy fails, and
+    /// Runs after Healthy Battery quits: swaps the bundle, restores the old one if the copy fails, and
     /// reopens the app. Paths arrive as positional arguments and are never interpolated.
     static let swapScript = """
     pid="$1"; staged="$2"; target="$3"
@@ -79,7 +80,7 @@ final class UpdateInstaller: ObservableObject {
 
         var errorDescription: String? {
             switch self {
-            case .unsupportedLocation: return String(localized: "Cellkeep bu konumdan güncellenemiyor. Uygulamayı Applications klasörüne taşıyın veya sürümü sayfasından indirin.")
+            case .unsupportedLocation: return String(localized: "Healthy Battery bu konumdan güncellenemiyor. Uygulamayı Applications klasörüne taşıyın veya sürümü sayfasından indirin.")
             case .unsignedBuild: return String(localized: "Bu kopya imzalı bir sürüm değil; güncellemeyi sürüm sayfasından indirin.")
             case .download: return String(localized: "Güncelleme indirilemedi.")
             case .checksum: return String(localized: "İndirilen dosya yayınlanan sağlama değeriyle uyuşmuyor; kurulmadı.")
@@ -151,7 +152,7 @@ final class UpdateInstaller: ObservableObject {
         guard run("/usr/bin/hdiutil", ["attach", "-nobrowse", "-readonly", "-noautoopen",
                                        "-mountpoint", mount.path, dmg.path]) == 0 else { throw InstallError.mount }
         defer { _ = run("/usr/bin/hdiutil", ["detach", mount.path, "-force"]) }
-        let app = mount.appendingPathComponent("Cellkeep.app")
+        let app = mount.appendingPathComponent("Healthy Battery.app")
         guard let info = Bundle(url: app)?.infoDictionary,
               info["CFBundleIdentifier"] as? String == bundleIdentifier,
               info["CFBundleShortVersionString"] as? String == version else {
@@ -163,7 +164,7 @@ final class UpdateInstaller: ObservableObject {
         guard run("/usr/sbin/spctl", ["--assess", "--type", "execute", app.path]) == 0 else {
             throw InstallError.verification(String(localized: "Apple onayı (notarization) doğrulanamadı."))
         }
-        let staged = work.appendingPathComponent("Cellkeep.app")
+        let staged = work.appendingPathComponent("Healthy Battery.app")
         guard run("/usr/bin/ditto", [app.path, staged.path]) == 0 else { throw InstallError.copy }
         return staged
     }

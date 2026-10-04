@@ -49,7 +49,7 @@ enum ChargeMateDiagnostics {
             return "- \(field.rawValue): kalite=\(reading.metadata.quality.rawValue), kaynak=\(safeSource(reading.metadata.source))"
         }.joined(separator: "\n")
         return """
-        Cellkeep Tanılama Raporu
+        Healthy Battery Tanılama Raporu
         Oluşturma: \(formatter.string(from: now))
         Uygulama: \(version) (\(build))
         macOS: \(safeToken(osVersion ?? ProcessInfo.processInfo.operatingSystemVersionString))

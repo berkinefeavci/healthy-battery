@@ -68,7 +68,7 @@ struct GeneralSettingsView: View {
                     }
                 }
                 Text(hotKeyFailed ? String(localized: "Kısayol kaydedilemedi; başka bir uygulama kullanıyor olabilir. Diğer seçeneği deneyin.")
-                                  : String(localized: "Uygulama açıkken her yerden çalışır. Erişilebilirlik izni gerekmez; Cellkeep yalnızca bu tuş birleşimini görür."))
+                                  : String(localized: "Uygulama açıkken her yerden çalışır. Erişilebilirlik izni gerekmez; Healthy Battery yalnızca bu tuş birleşimini görür."))
                     .font(.caption)
                     .foregroundStyle(hotKeyFailed ? Color.orange : Color.secondary)
             }
@@ -91,7 +91,7 @@ struct GeneralSettingsView: View {
                         languageChanged = true
                     }
                 }
-                Text("Yeni dil, Cellkeep yeniden başlayınca geçerli olur.")
+                Text("Yeni dil, Healthy Battery yeniden başlayınca geçerli olur.")
                     .font(.caption).foregroundStyle(.secondary)
                 if languageChanged {
                     Button("Şimdi yeniden başlat") { AppLanguage.relaunch() }
@@ -106,7 +106,7 @@ struct GeneralSettingsView: View {
                 if let uninstallError {
                     Text(uninstallError).font(.caption).foregroundStyle(.orange)
                 }
-                Button("Cellkeep'i kaldır", role: .destructive) { showUninstallConfirm = true }
+                Button("Healthy Battery'i kaldır", role: .destructive) { showUninstallConfirm = true }
                     .disabled(uninstalling)
             }
             .chargeCard()
@@ -148,7 +148,7 @@ struct GeneralSettingsView: View {
                 switch result {
                 case .success:
                     let alert = NSAlert()
-                    alert.messageText = String(localized: "Cellkeep kaldırıldı")
+                    alert.messageText = String(localized: "Healthy Battery kaldırıldı")
                     alert.informativeText = String(localized: "Yardımcı süreçler ve servisler kaldırıldı. Şimdi uygulamayı Çöp Sepeti'ne sürükleyin.")
                     alert.runModal()
                     NSApplication.shared.terminate(nil)
@@ -160,7 +160,7 @@ struct GeneralSettingsView: View {
     }
 }
 
-/// Confirmation shown before the "Cellkeep'i kaldır" action executes. Explains what gets
+/// Confirmation shown before the "Healthy Battery'i kaldır" action executes. Explains what gets
 /// removed, one admin prompt, then two independent checkboxes for the destructive extras
 /// (native limit reset defaults on, app-data removal defaults off — matching the task's alert).
 private struct UninstallConfirmationView: View {
@@ -171,7 +171,7 @@ private struct UninstallConfirmationView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Label("Cellkeep'i kaldır", systemImage: "trash").font(.title3.bold())
+            Label("Healthy Battery'i kaldır", systemImage: "trash").font(.title3.bold())
             Text("Yönetici izniyle yardımcı süreçler ve arka plan servisleri (yeni ve varsa eski ChargeMate sürümünden kalanlar) kaldırılır, giriş öğesi kayıttan silinir. Tek bir yönetici onayı istenir. İşlem bitince uygulamayı Çöp Sepeti'ne sürüklemeniz istenir. Bu adım geri alınamaz.")
                 .font(.callout).foregroundStyle(.secondary)
             Toggle("Native şarj limitini %100'e sıfırla", isOn: $resetLimit)

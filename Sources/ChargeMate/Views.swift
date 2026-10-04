@@ -79,8 +79,8 @@ struct PopoverView: View {
                             Image(systemName: "square.grid.2x2")
                         }
                         .popoverToolbarButtonStyle(iconOnly: true)
-                        .accessibilityLabel("Cellkeep menüsünü aç")
-                        .help("Cellkeep menüsünü aç")
+                        .accessibilityLabel("Healthy Battery menüsünü aç")
+                        .help("Healthy Battery menüsünü aç")
                     }
                     ChargeLimitBar()
                     if limitEditor {
@@ -111,7 +111,7 @@ struct PopoverView: View {
                         } else {
                             VStack(spacing: 12) {
                                 HStack { ReadOnlyBadge(); Spacer(); HistoryRangePicker() }
-                                Text("Cellkeep \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "") · Bu Mac’te saklanır")
+                                Text("Healthy Battery \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "") · Bu Mac’te saklanır")
                                     .font(.system(size: 10)).foregroundStyle(.secondary)
                                 if let update = UpdateCheck.rememberedUpdate() { updateRow(update) }
                                 Text("Düzenleme moduna girmek için bir karta uzun basın.")
@@ -703,7 +703,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 9) {
                     Image(systemName: "bolt.shield.fill").font(.system(size: 15)).foregroundStyle(Color.primary.opacity(0.72))
-                    Text("Cellkeep").font(.system(size: 13, weight: .semibold))
+                    Text("Healthy Battery").font(.system(size: 13, weight: .semibold))
                 }.padding(.horizontal, 12).padding(.top, 43).padding(.bottom, 13)
                 sidebarButton(.dashboard)
                 sidebarGroup(String(localized: "PİL BAKIMI"), pages: [.charge, .sleep, .energy])
@@ -716,7 +716,7 @@ struct SettingsView: View {
                     ReadOnlyBadge(compact: true)
                     Spacer()
                     Button { NSApp.terminate(nil) } label: { Image(systemName: "power") }
-                        .buttonStyle(IconCircleButtonStyle()).help("Cellkeep’ten çık")
+                        .buttonStyle(IconCircleButtonStyle()).help("Healthy Battery’ten çık")
                 }.padding(10)
             }.padding(.horizontal, 10).frame(width: SettingsLayout.sidebarWidth).background(.ultraThinMaterial)
             Divider()
@@ -880,7 +880,7 @@ struct SettingsView: View {
             }
             if battery.policyConflict != nil {
                 HStack {
-                    Button("Cellkeep hedefini yeniden uygula") { battery.reapplyChargeMateTarget() }.chargeMateButtonStyle()
+                    Button("Healthy Battery hedefini yeniden uygula") { battery.reapplyChargeMateTarget() }.chargeMateButtonStyle()
                     Button("macOS değerini benimse") { battery.adoptMacOSLimit() }.chargeMateButtonStyle()
                 }.disabled(battery.applyingLimit || battery.otherControllerRunning)
             }

@@ -1,6 +1,6 @@
 import Foundation
 
-/// One-time migration of user state from the previous "ChargeMate" identity into "Cellkeep":
+/// One-time migration of user state from the previous "ChargeMate" identity into "Healthy Battery":
 /// UserDefaults and the Application Support data folder (history, schedule, journal, policy
 /// files). Pure and testable — every read/write is injected, nothing here touches the real
 /// file system or `UserDefaults` directly. `IdentityMigration.run(...)` performs the copy;

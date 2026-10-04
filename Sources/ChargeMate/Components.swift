@@ -547,7 +547,7 @@ struct NativeLimitControls: View {
                     Spacer(minLength: 4)
                     Button("Diğerini kapat") { battery.quitOtherChargeController() }
                         .chargeMateButtonStyle()
-                        .help("Diğer şarj uygulamasını normal şekilde kapatır; ardından Cellkeep denetimi devralır.")
+                        .help("Diğer şarj uygulamasını normal şekilde kapatır; ardından Healthy Battery denetimi devralır.")
                 }
             } else if !battery.nativeLimits.contains(Int(battery.chargeLimit)) {
                 Text("Bu Mac %80–100 arasında beşer puan sunuyor.").font(caption).foregroundStyle(.secondary).lineLimit(1)
@@ -1247,7 +1247,7 @@ private struct EnergyQuitControl: View {
         }
     }
 
-    /// `terminate()` only *asks* the app to quit (it may prompt to save); Cellkeep never force-quits.
+    /// `terminate()` only *asks* the app to quit (it may prompt to save); Healthy Battery never force-quits.
     /// A fresh energy sample has no public trigger on `BatteryMonitor`, so a successful request just
     /// waits in "Kapatılıyor…" until the row drops off the next 60 s sample.
     private func performQuit(_ target: NSRunningApplication) {

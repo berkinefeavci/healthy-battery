@@ -6,8 +6,8 @@ enum MenubarStyle: String, Codable, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .hidden: return String(localized: "Gizle")
-        case .cellkeepLogo: return String(localized: "Cellkeep logosu")
-        case .chargeStatus: return String(localized: "Cellkeep durumu")
+        case .cellkeepLogo: return String(localized: "Healthy Battery logosu")
+        case .chargeStatus: return String(localized: "Healthy Battery durumu")
         case .macNative: return String(localized: "macOS sade")
         case .macColored: return String(localized: "macOS renkli")
         case .iosBattery: return String(localized: "iOS tarzı")
