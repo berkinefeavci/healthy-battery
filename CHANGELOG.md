@@ -4,7 +4,7 @@
 
 - The app is now called Healthy Battery. Existing settings, history, charge helpers and bundle identity stay in place.
 - New GitHub downloads use `Healthy-Battery-1.2.2.dmg` with `Healthy Battery.app`. The release also includes `Cellkeep-1.2.2.dmg` with `Cellkeep.app` so installed Cellkeep 1.2.1 copies can update normally.
-- Update checks and release links now use `berkinefeavci/healthy-battery`. The old GitHub address continues to redirect for older versions.
+- Update checks and release links now use `berkinefeavci/healthy-battery`. A small `berkinefeavci/cellkeep` compatibility repository serves the 1.2.2 release expected by installed 1.2.1 copies.
 
 ## 1.2.1
 

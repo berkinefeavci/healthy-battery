@@ -71,10 +71,10 @@ These are shown in the UI as locked and marked **"Yakında"** (Coming soon). The
 
 ### With Homebrew
 
-The [Healthy Battery Homebrew tap](https://github.com/berkinefeavci/homebrew-cellkeep) is available:
+The [Healthy Battery Homebrew tap](https://github.com/berkinefeavci/homebrew-healthy-battery) is available:
 
 ```sh
-brew install --cask berkinefeavci/cellkeep/cellkeep
+brew install --cask berkinefeavci/healthy-battery/healthy-battery
 ```
 
 ## Build from source
