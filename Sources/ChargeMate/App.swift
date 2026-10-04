@@ -80,6 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             UserDefaults.standard.set(true, forKey: "chartHoverOverviewMigrationV1")
         }
         battery.start()
+        DispatchQueue.global(qos: .utility).async { MagSafeLEDHardwareService.resumeIfPausedByTest() }
         sleepObservation = battery.$snapshot
             .combineLatest(battery.$nativeLimit, battery.$committedLimit)
             .sink { [weak self] _ in self?.updateSleepBehavior() }

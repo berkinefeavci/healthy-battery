@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1
+
+- MagSafe Light: the "System" test button no longer replaces the saved light policy. Before, pressing it saved "Let the system manage it" over a chosen night window, and the page then also reset the window to 00:00–00:00, so the light stayed on at night. The button is gone; "End test" (was "Back to start") goes back to the saved policy, and the Shortcuts "System" option does the same.
+- The page no longer copies 0:00 times from "System" or "Always off" into the time range; a range broken that way goes back to 22:00–08:00.
+- A manual test that paused the automatic light setting is now shown on the policy card with a "Resume" button, and Cellkeep resumes it on its own when it opens.
+- Policy and test messages appear only in their own card, and only failures are shown in orange. The Green and Orange test buttons show their colour.
+
 ## 1.2.0
 
 - Cellkeep now tells you when a new version is out: one macOS notification per version. Clicking it opens Settings → About, where "Update" downloads, verifies and installs it as before, without visiting GitHub.

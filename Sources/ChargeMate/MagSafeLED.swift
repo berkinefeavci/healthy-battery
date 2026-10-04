@@ -51,6 +51,38 @@ enum MagSafeLEDPhase: Equatable {
     case unknown
 }
 
+/// What the root LED service is doing, parsed from its policy file ("mode start end").
+/// Mode 3 means a manual test paused the automatic policy until it is resumed.
+enum MagSafeLEDHelperState: Equatable {
+    case policy(MagSafeLEDPolicy, start: Int, end: Int)
+    case pausedByTest
+
+    static func parse(_ text: String) -> Self? {
+        let values = text.split(whereSeparator: { $0.isWhitespace }).map { Int($0) }
+        guard values.count == 3, let mode = values[0], let start = values[1], let end = values[2],
+              (0..<1440).contains(start), (0..<1440).contains(end) else { return nil }
+        switch mode {
+        case 0: return .policy(.system, start: start, end: end)
+        case 1: return .policy(.alwaysOff, start: start, end: end)
+        case 2: return .policy(.scheduled, start: start, end: end)
+        case 3: return .pausedByTest
+        default: return nil
+        }
+    }
+}
+
+enum MagSafeLEDTimeWindow {
+    static let defaultStart = 1320, defaultEnd = 480
+    static let startKey = "magSafeLEDStartMinute", endKey = "magSafeLEDEndMinute"
+
+    /// Times the page should show. Only a scheduled policy carries real times: "System" and
+    /// "Always off" store 0 0, and copying those once turned a saved night window into 00:00–00:00.
+    static func repaired(policy: MagSafeLEDPolicy, start: Int, end: Int) -> (start: Int, end: Int) {
+        guard policy != .scheduled, start == end else { return (start, end) }
+        return (defaultStart, defaultEnd)
+    }
+}
+
 struct MagSafeLEDPreferences: Equatable {
     static let policyKey = "magSafeLEDPolicy"
     static let completionKey = "magSafeLEDCompletionBehavior"

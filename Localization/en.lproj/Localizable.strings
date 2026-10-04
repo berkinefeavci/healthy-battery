@@ -21,7 +21,6 @@
 "%@ boyutunu %@ yap" = "Make %@ %@";
 "%@ bu Mac'te okunamadı." = "%@ could not be read on this Mac.";
 "%@ dakikası" = "%@ minute";
-"%@ etkin. Işık en geç birkaç saniye içinde güncellenir." = "%@ is active. The light updates within a few seconds.";
 "%@ grafiği" = "%@ chart";
 "%@ kaldır" = "Remove %@";
 "%@ profili: %@" = "%@ profile: %@";
@@ -137,7 +136,6 @@
 "Başka şarj uygulaması açıkken kilitli" = "Locked while another charging app is open";
 "Başla" = "Start";
 "Başla yalnız izlemeyi sürdürür; şarj kontrolünü veya otomasyonu etkinleştirmez." = "Start only keeps monitoring; it does not turn on charge control or automation.";
-"Başlangıca dön" = "Back to start";
 "Başlangıç" = "Start";
 "Başlangıç LED durumu geri yüklenemedi." = "The original LED state could not be restored.";
 "Başlangıç LED durumu güvenle geri yüklenemiyor." = "The original LED state cannot be restored safely.";
@@ -216,6 +214,7 @@
 "Detaylı" = "Detailed";
 "Detaylı: 520 pt genişlik — grafikler ve istatistikler için daha fazla yer." = "Detailed: 520 pt wide — more room for charts and statistics.";
 "Devam eden macOS işleminin bitmesini bekleyin." = "Wait for the ongoing macOS operation to finish.";
+"Devam ettir" = "Resume";
 "Deşarj" = "Discharge";
 "Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Discharge and Calibration will not be added to Shortcuts until their verified engines are complete.";
 "Deşarj yakında; henüz kullanılamıyor" = "Discharge coming soon; not available yet";
@@ -355,6 +354,11 @@
 "Hafta içi" = "Weekdays";
 "Hafta sonu tam dolum" = "Weekend full charge";
 "Günde bir yeni sürüm denetle" = "Check for a new version once a day";
+"MagSafe ışığı kayıtlı ışık politikasına döndü." = "The MagSafe light went back to the saved light policy.";
+"Manuel deneme otomatik ışık ayarını duraklatır. 'Testi bitir' kayıtlı ayara döner; Cellkeep yeniden açıldığında da kendiliğinden devam eder." = "A manual test pauses the automatic light setting. 'End test' goes back to the saved setting; it also resumes on its own when Cellkeep opens again.";
+"Manuel test otomatik ışık ayarını duraklattı." = "A manual test paused the automatic light setting.";
+"Testi bitir" = "End test";
+"Uygulandı: %@. Işık birkaç saniye içinde güncellenir." = "Applied: %@. The light updates within a few seconds.";
 "Yeni sürüm çıkınca bildirim göster" = "Notify me when a new version is available";
 "Güncellemek için tıklayın." = "Click to update.";
 "Hakkında" = "About";
@@ -465,14 +469,11 @@
 "MagSafe Işığını Ayarla" = "Set MagSafe Light";
 "MagSafe LED yeteneği salt okunur olarak denetleniyor." = "Checking the MagSafe LED capability read-only.";
 "MagSafe ışığı" = "MagSafe light";
-"MagSafe ışığı sistem durumuna döndü." = "The MagSafe light returned to the system state.";
 "MagSafe ışığı zaten seçilen durumda." = "The MagSafe light is already in the selected state.";
 "MagSafe ışığı: %@." = "MagSafe light: %@.";
 "MagSafe ışığını seçili duruma getirir." = "Sets the MagSafe light to the selected state.";
-"Maksimum" = "Maximum";
 "Maksimum kapasite" = "Maximum capacity";
 "Maksimum kapasitenin tasarıma oranı, %" = "Maximum capacity relative to design, %";
-"Manuel deneme otomatik ışık ayarını duraklatır. Denemeden sonra üstteki 'Uygula' ile devam ettirin. 'Başlangıca dön' önceki rengi geri yükler." = "A manual test pauses the automatic light setting. After testing, resume it with 'Apply' above. 'Back to start' restores the previous color.";
 "Menü ikonu yüklenemedi (%@); yedek çizim kullanılıyor." = "The menu icon could not be loaded (%@); using a fallback drawing.";
 "Menü panelini açılışta göster" = "Show the menu panel at launch";
 "Menü Çubuğu" = "Menu Bar";
@@ -851,8 +852,6 @@
 "Kartları sürükleyerek sıralayın; kaldırmak için eksiye basın, boyutunu sağ alt köşeden değiştirin." = "Drag cards to reorder; press minus to remove, resize from the bottom-right corner.";
 "Panelde olmayan bir kart ya da grafik ekle" = "Add a card or chart that isn’t on the panel";
 "Tümü panelde" = "All on panel";
-"Işık macOS'a bırakıldı; rengi macOS seçer." = "The light is back with macOS; macOS picks its colour.";
-"Işık macOS'a bırakılıyor…" = "Handing the light back to macOS…";
 "Kayıtlı ışık politikası yeniden uygulanıyor…" = "Re-applying the saved light policy…";
 "Test bitti; kayıtlı ışık politikası yeniden uygulandı." = "Test finished; the saved light policy is applied again.";
 "Işık değişti." = "The light changed.";

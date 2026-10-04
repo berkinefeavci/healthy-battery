@@ -107,12 +107,9 @@ final class MagSafeLEDHardwareService {
 
     func apply(_ output: MagSafeLEDOutput) -> MagSafeLEDControlCoordinator.Outcome {
         guard Self.installed() else { return .blocked(String(localized: "LED yardımcısı kurulmamış.")) }
-        if output == .system {
-            // In system mode macOS picks the colour, so the light reads back green or orange, never
-            // "system": a verified write could never succeed. Hand the light to macOS instead.
-            do { try Self.configure(policy: .system, start: 0, end: 0); return .applied }
-            catch { return .blocked(error.localizedDescription) }
-        }
+        // "System" ends manual control and returns to the policy saved on the MagSafe page. It used to
+        // save "System" as that policy, which silently erased a chosen night window.
+        if output == .system { return resumeSavedPolicy() }
         // A half-finished or unreadable test is settled by the saved policy, not by forcing the
         // colour read before it (that colour may have been macOS's own choice).
         if coordinator.requiresRecovery && !coordinator.sessionActive {
@@ -131,8 +128,8 @@ final class MagSafeLEDHardwareService {
     private func resumeSavedPolicy() -> MagSafeLEDControlCoordinator.Outcome {
         let defaults = UserDefaults.standard
         let saved = MagSafeLEDPolicy(rawValue: defaults.string(forKey: MagSafeLEDPreferences.policyKey) ?? "") ?? .system
-        let start = defaults.object(forKey: "magSafeLEDStartMinute") as? Int ?? 1320
-        let end = defaults.object(forKey: "magSafeLEDEndMinute") as? Int ?? 480
+        let start = defaults.object(forKey: MagSafeLEDTimeWindow.startKey) as? Int ?? MagSafeLEDTimeWindow.defaultStart
+        let end = defaults.object(forKey: MagSafeLEDTimeWindow.endKey) as? Int ?? MagSafeLEDTimeWindow.defaultEnd
         do {
             try Self.configure(policy: saved == .status ? .system : saved, start: start, end: end)
             return .restored
@@ -142,6 +139,13 @@ final class MagSafeLEDHardwareService {
     }
 
     var requiresRecovery: Bool { coordinator.requiresRecovery }
+
+    /// A manual test pauses the root service until the policy is applied again. At launch nobody is
+    /// mid-test any more, so a pause left behind (app quit, forgotten "Back to start") is ended here.
+    static func resumeIfPausedByTest() {
+        guard helperState() == .pausedByTest, installed() else { return }
+        _ = shared.restore()
+    }
 
     static func configure(policy: MagSafeLEDPolicy, start: Int, end: Int) throws {
         guard (0..<1440).contains(start), (0..<1440).contains(end) else { throw ServiceError.unsupportedValue }
@@ -161,14 +165,13 @@ final class MagSafeLEDHardwareService {
         shared.coordinator = shared.makeCoordinator()
     }
 
+    static func helperState() -> MagSafeLEDHelperState? {
+        (try? String(contentsOfFile: "/Library/Application Support/CellkeepLED/policy")).flatMap(MagSafeLEDHelperState.parse)
+    }
+
     static func savedPolicy() -> (MagSafeLEDPolicy, Int, Int)? {
-        guard let text = try? String(contentsOfFile: "/Library/Application Support/CellkeepLED/policy"),
-              text.split(whereSeparator: { $0.isWhitespace }).count == 3 else { return nil }
-        let values = text.split(whereSeparator: { $0.isWhitespace }).compactMap { Int($0) }
-        guard values.count == 3, (0..<1440).contains(values[1]), (0..<1440).contains(values[2]) else { return nil }
-        let policy: MagSafeLEDPolicy
-        switch values[0] { case 0: policy = .system; case 1: policy = .alwaysOff; case 2: policy = .scheduled; default: return nil }
-        return (policy, values[1], values[2])
+        guard case .policy(let policy, let start, let end) = helperState() else { return nil }
+        return (policy, start, end)
     }
 
     private static func readLED() throws -> MagSafeLEDOutput {

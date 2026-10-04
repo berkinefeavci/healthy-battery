@@ -11,13 +11,16 @@ struct MagSafeLEDSettingsView: View {
     @State private var helperInstalled = false
     @State private var isWorking = false
     @State private var testMessage = ""
+    @State private var testFailed = false
+    @State private var policyMessage = ""
+    @State private var pausedByTest = false
     @State private var loadedSelection = false
-    @AppStorage("magSafeLEDStartMinute") private var startMinute = 1320
-    @AppStorage("magSafeLEDEndMinute") private var endMinute = 480
+    @AppStorage(MagSafeLEDTimeWindow.startKey) private var startMinute = MagSafeLEDTimeWindow.defaultStart
+    @AppStorage(MagSafeLEDTimeWindow.endKey) private var endMinute = MagSafeLEDTimeWindow.defaultEnd
 
     private var policy: Binding<MagSafeLEDPolicy> {
         Binding(get: { MagSafeLEDPolicy(rawValue: policyRaw) ?? .system },
-                set: { policyRaw = $0.rawValue; testMessage = "" })
+                set: { policyRaw = $0.rawValue; policyMessage = "" })
     }
 
     private var completion: Binding<MagSafeLEDCompletionBehavior> {
@@ -35,9 +38,15 @@ struct MagSafeLEDSettingsView: View {
         .onAppear {
             refreshCapability()
             if !loadedSelection {
-                if let saved = MagSafeLEDHardwareService.savedPolicy() {
-                    policyRaw = saved.0.rawValue; startMinute = saved.1; endMinute = saved.2
+                switch MagSafeLEDHardwareService.helperState() {
+                case .policy(let saved, let start, let end):
+                    policyRaw = saved.rawValue
+                    if saved == .scheduled { startMinute = start; endMinute = end }
+                case .pausedByTest: pausedByTest = true
+                case nil: break
                 }
+                let times = MagSafeLEDTimeWindow.repaired(policy: policy.wrappedValue, start: startMinute, end: endMinute)
+                startMinute = times.start; endMinute = times.end
                 loadedSelection = true
             }
         }
@@ -104,8 +113,16 @@ struct MagSafeLEDSettingsView: View {
                     .font(.caption).foregroundStyle(.orange)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            if pausedByTest && !isWorking {
+                HStack(spacing: 10) {
+                    Label("Manuel test otomatik ışık ayarını duraklattı.", systemImage: "pause.circle.fill")
+                        .font(.caption).foregroundStyle(.orange)
+                    Spacer()
+                    Button("Devam ettir") { restoreLED() }.chargeMateButtonStyle()
+                }
+            }
             if isWorking { ProgressView(String(localized: "Ayar uygulanıyor…")) }
-            if !testMessage.isEmpty { Text(testMessage).font(.caption).foregroundStyle(.secondary) }
+            if !policyMessage.isEmpty { Text(policyMessage).font(.caption).foregroundStyle(.secondary) }
 
             if policy.wrappedValue == .status {
                 Divider()
@@ -150,7 +167,7 @@ struct MagSafeLEDSettingsView: View {
                 Button { refreshCapability() } label: { Label("Yeniden denetle", systemImage: "arrow.clockwise") }
                     .chargeMateButtonStyle()
             }
-            Text("Manuel deneme otomatik ışık ayarını duraklatır. Denemeden sonra üstteki 'Uygula' ile devam ettirin. 'Başlangıca dön' önceki rengi geri yükler.")
+            Text("Manuel deneme otomatik ışık ayarını duraklatır. 'Testi bitir' kayıtlı ayara döner; Cellkeep yeniden açıldığında da kendiliğinden devam eder.")
                 .font(.callout).foregroundStyle(.secondary)
             if !helperInstalled {
                 Button { installHelper() } label: {
@@ -160,17 +177,16 @@ struct MagSafeLEDSettingsView: View {
                 .disabled(isWorking)
             }
             HStack {
-                testButton(String(localized: "Sistem"), icon: "gearshape", output: .system)
-                testButton(String(localized: "Yeşil"), icon: "circle.fill", output: .green)
-                testButton(String(localized: "Turuncu"), icon: "circle.fill", output: .orange)
+                testButton(String(localized: "Yeşil"), icon: "circle.fill", output: .green, tint: .green)
+                testButton(String(localized: "Turuncu"), icon: "circle.fill", output: .orange, tint: .orange)
                 testButton(String(localized: "Kapalı"), icon: "lightbulb.slash", output: .off)
-                Button("Başlangıca dön") { restoreLED() }
+                Button("Testi bitir") { restoreLED() }
                     .chargeMateButtonStyle()
                     .disabled(!helperInstalled || isWorking)
             }
             if isWorking { ProgressView(String(localized: "Işık doğrulanıyor…")) }
             if !testMessage.isEmpty {
-                Text(testMessage).font(.caption).foregroundStyle(.orange)
+                Text(testMessage).font(.caption).foregroundStyle(testFailed ? Color.orange : Color.secondary)
                     .textSelection(.enabled)
             }
         }.chargeCard()
@@ -185,8 +201,10 @@ struct MagSafeLEDSettingsView: View {
         }
     }
 
-    private func testButton(_ title: String, icon: String, output: MagSafeLEDOutput) -> some View {
-        Button { runTest(output) } label: { Label(title, systemImage: icon) }
+    private func testButton(_ title: String, icon: String, output: MagSafeLEDOutput, tint: Color? = nil) -> some View {
+        Button { runTest(output) } label: {
+            Label { Text(title) } icon: { Image(systemName: icon).foregroundStyle(tint ?? .primary) }
+        }
             .chargeMateButtonStyle()
             .disabled(!helperInstalled || isWorking || !battery.snapshot.externalConnected)
             .help("MagSafe ışığını seçili duruma getirir.")
@@ -243,18 +261,19 @@ struct MagSafeLEDSettingsView: View {
         }
         let start = startMinute, end = endMinute
         isWorking = true
-        testMessage = String(localized: "Ayar kaydediliyor…")
+        policyMessage = String(localized: "Ayar kaydediliyor…")
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 try MagSafeLEDHardwareService.configure(policy: selected, start: start, end: end)
                 DispatchQueue.main.async {
                     policyRaw = selected.rawValue
                     helperInstalled = MagSafeLEDHardwareService.installed()
-                    testMessage = String(localized: "\(selected.title) etkin. Işık en geç birkaç saniye içinde güncellenir.")
+                    policyMessage = String(localized: "Uygulandı: \(selected.title). Işık birkaç saniye içinde güncellenir.")
+                    pausedByTest = false; testMessage = ""
                     isWorking = false
                 }
             } catch {
-                DispatchQueue.main.async { testMessage = error.localizedDescription; isWorking = false }
+                DispatchQueue.main.async { policyMessage = error.localizedDescription; isWorking = false }
             }
         }
     }
@@ -280,13 +299,15 @@ struct MagSafeLEDSettingsView: View {
 
     private func runTest(_ output: MagSafeLEDOutput) {
         isWorking = true
-        testMessage = output == .system ? String(localized: "Işık macOS'a bırakılıyor…")
-            : String(localized: "Işık değiştiriliyor…")
+        testFailed = false
+        testMessage = String(localized: "Işık değiştiriliyor…")
         DispatchQueue.global(qos: .userInitiated).async {
             let outcome = MagSafeLEDHardwareService.shared.apply(output)
+            let paused = MagSafeLEDHardwareService.helperState() == .pausedByTest
             DispatchQueue.main.async {
-                testMessage = output == .system && outcome == .applied
-                    ? String(localized: "Işık macOS'a bırakıldı; rengi macOS seçer.") : outcomeMessage(outcome)
+                testMessage = outcomeMessage(outcome)
+                if case .blocked = outcome { testFailed = true }
+                pausedByTest = paused
                 isWorking = false
             }
         }
@@ -294,11 +315,15 @@ struct MagSafeLEDSettingsView: View {
 
     private func restoreLED() {
         isWorking = true
+        testFailed = false
         testMessage = String(localized: "Kayıtlı ışık politikası yeniden uygulanıyor…")
         DispatchQueue.global(qos: .userInitiated).async {
             let outcome = MagSafeLEDHardwareService.shared.restore()
+            let paused = MagSafeLEDHardwareService.helperState() == .pausedByTest
             DispatchQueue.main.async {
                 testMessage = outcomeMessage(outcome)
+                if case .blocked = outcome { testFailed = true }
+                pausedByTest = paused
                 isWorking = false
             }
         }

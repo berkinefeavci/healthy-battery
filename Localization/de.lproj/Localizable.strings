@@ -21,7 +21,6 @@
 "%@ boyutunu %@ yap" = "%@ %@ machen";
 "%@ bu Mac'te okunamadı." = "%@ konnte auf diesem Mac nicht gelesen werden.";
 "%@ dakikası" = "%@ Minute";
-"%@ etkin. Işık en geç birkaç saniye içinde güncellenir." = "%@ ist aktiv. Das Licht wird innerhalb weniger Sekunden aktualisiert.";
 "%@ grafiği" = "Diagramm %@";
 "%@ kaldır" = "%@ entfernen";
 "%@ profili: %@" = "Profil %@: %@";
@@ -137,7 +136,6 @@
 "Başka şarj uygulaması açıkken kilitli" = "Gesperrt, solange eine andere Lade-App geöffnet ist";
 "Başla" = "Starten";
 "Başla yalnız izlemeyi sürdürür; şarj kontrolünü veya otomasyonu etkinleştirmez." = "„Starten“ setzt nur die Überwachung fort; Ladesteuerung oder Automatisierung werden nicht eingeschaltet.";
-"Başlangıca dön" = "Zurück zum Anfang";
 "Başlangıç" = "Beginn";
 "Başlangıç LED durumu geri yüklenemedi." = "Der ursprüngliche LED-Zustand konnte nicht wiederhergestellt werden.";
 "Başlangıç LED durumu güvenle geri yüklenemiyor." = "Der ursprüngliche LED-Zustand kann nicht sicher wiederhergestellt werden.";
@@ -216,6 +214,7 @@
 "Detaylı" = "Detailliert";
 "Detaylı: 520 pt genişlik — grafikler ve istatistikler için daha fazla yer." = "Detailliert: 520 pt breit – mehr Platz für Diagramme und Statistiken.";
 "Devam eden macOS işleminin bitmesini bekleyin." = "Warte, bis der laufende macOS-Vorgang abgeschlossen ist.";
+"Devam ettir" = "Fortsetzen";
 "Deşarj" = "Entladen";
 "Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Entladen und Kalibrierung werden erst zu Kurzbefehle hinzugefügt, wenn ihre überprüften Abläufe fertig sind.";
 "Deşarj yakında; henüz kullanılamıyor" = "Entladen folgt demnächst; noch nicht verfügbar";
@@ -355,6 +354,11 @@
 "Hafta içi" = "Wochentags";
 "Hafta sonu tam dolum" = "Vollladung am Wochenende";
 "Günde bir yeni sürüm denetle" = "Einmal täglich nach einer neuen Version suchen";
+"MagSafe ışığı kayıtlı ışık politikasına döndü." = "Das MagSafe-Licht folgt wieder der gespeicherten Lichtregel.";
+"Manuel deneme otomatik ışık ayarını duraklatır. 'Testi bitir' kayıtlı ayara döner; Cellkeep yeniden açıldığında da kendiliğinden devam eder." = "Ein manueller Test hält die automatische Lichteinstellung an. „Test beenden“ kehrt zur gespeicherten Einstellung zurück; beim nächsten Start von Cellkeep geht es auch von selbst weiter.";
+"Manuel test otomatik ışık ayarını duraklattı." = "Ein manueller Test hat die automatische Lichteinstellung angehalten.";
+"Testi bitir" = "Test beenden";
+"Uygulandı: %@. Işık birkaç saniye içinde güncellenir." = "Angewendet: %@. Das Licht ändert sich in wenigen Sekunden.";
 "Yeni sürüm çıkınca bildirim göster" = "Bei einer neuen Version benachrichtigen";
 "Güncellemek için tıklayın." = "Zum Aktualisieren klicken.";
 "Hakkında" = "Über";
@@ -465,14 +469,11 @@
 "MagSafe Işığını Ayarla" = "MagSafe-Licht festlegen";
 "MagSafe LED yeteneği salt okunur olarak denetleniyor." = "Die MagSafe-LED-Fähigkeit wird schreibgeschützt geprüft.";
 "MagSafe ışığı" = "MagSafe-Licht";
-"MagSafe ışığı sistem durumuna döndü." = "Das MagSafe-Licht ist zum Systemzustand zurückgekehrt.";
 "MagSafe ışığı zaten seçilen durumda." = "Das MagSafe-Licht ist bereits im ausgewählten Zustand.";
 "MagSafe ışığı: %@." = "MagSafe-Licht: %@.";
 "MagSafe ışığını seçili duruma getirir." = "Setzt das MagSafe-Licht auf den ausgewählten Zustand.";
-"Maksimum" = "Maximum";
 "Maksimum kapasite" = "Maximale Kapazität";
 "Maksimum kapasitenin tasarıma oranı, %" = "Maximale Kapazität im Verhältnis zum Design, %";
-"Manuel deneme otomatik ışık ayarını duraklatır. Denemeden sonra üstteki 'Uygula' ile devam ettirin. 'Başlangıca dön' önceki rengi geri yükler." = "Ein manueller Test pausiert die automatische Lichteinstellung. Setze sie danach oben mit „Anwenden“ fort. „Zurück zum Anfang“ stellt die vorherige Farbe wieder her.";
 "Menü ikonu yüklenemedi (%@); yedek çizim kullanılıyor." = "Das Menüsymbol konnte nicht geladen werden (%@); es wird eine Ersatzgrafik verwendet.";
 "Menü panelini açılışta göster" = "Menüfenster beim Start anzeigen";
 "Menü Çubuğu" = "Menüleiste";
@@ -851,8 +852,6 @@
 "Kartları sürükleyerek sıralayın; kaldırmak için eksiye basın, boyutunu sağ alt köşeden değiştirin." = "Karten zum Sortieren ziehen; mit Minus entfernen, Größe an der Ecke unten rechts ändern.";
 "Panelde olmayan bir kart ya da grafik ekle" = "Karte oder Diagramm hinzufügen, das noch fehlt";
 "Tümü panelde" = "Alle im Fenster";
-"Işık macOS'a bırakıldı; rengi macOS seçer." = "Das Licht steuert wieder macOS; macOS wählt die Farbe.";
-"Işık macOS'a bırakılıyor…" = "Licht wird an macOS zurückgegeben …";
 "Kayıtlı ışık politikası yeniden uygulanıyor…" = "Gespeicherte Lichtregel wird erneut angewendet …";
 "Test bitti; kayıtlı ışık politikası yeniden uygulandı." = "Test beendet; die gespeicherte Lichtregel gilt wieder.";
 "Işık değişti." = "Das Licht hat gewechselt.";
