@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.4
+
+- The app icon now follows the system appearance on macOS 26 and later: light, dark and tinted. Older macOS versions keep a regular icon with the same design.
+
 ## 1.2.3
 
 - General Settings now has separate GitHub links for bug reports and feature suggestions. Diagnostic files are shared only when you attach them yourself.
