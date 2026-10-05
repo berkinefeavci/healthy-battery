@@ -1,0 +1,48 @@
+{
+  "fill-specializations": [
+    {
+      "value": {
+        "linear-gradient": [
+          "display-p3:0.977,0.981,0.987,1.000",
+          "display-p3:0.879,0.894,0.913,1.000"
+        ]
+      }
+    },
+    {
+      "appearance": "dark",
+      "value": {
+        "linear-gradient": [
+          "display-p3:0.147,0.158,0.176,1.000",
+          "display-p3:0.045,0.050,0.060,1.000"
+        ]
+      }
+    }
+  ],
+  "groups": [
+    {
+      "layers": [
+        {
+          "image-name": "battery-light.svg",
+          "name": "Battery · light",
+          "hidden-specializations": [
+            { "value": false },
+            { "appearance": "dark", "value": true },
+            { "appearance": "tinted", "value": true }
+          ]
+        },
+        {
+          "image-name": "battery-dark.svg",
+          "name": "Battery · dark and mono",
+          "hidden-specializations": [
+            { "value": true },
+            { "appearance": "dark", "value": false },
+            { "appearance": "tinted", "value": false }
+          ]
+        }
+      ],
+      "shadow": { "kind": "neutral", "opacity": 0.18 },
+      "translucency": { "enabled": false, "value": 0 }
+    }
+  ],
+  "supported-platforms": { "squares": "shared" }
+}
