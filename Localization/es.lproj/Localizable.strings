@@ -861,3 +861,24 @@
 "Hata bildir" = "Informar de un error";
 "Öneri gönder" = "Sugerir una función";
 "Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "El archivo de diagnóstico solo se comparte si decides adjuntarlo.";
+/* Advanced charge (Faz 4) */
+"Deşarj oluyor" = "Descargando";
+"Deşarjı iptal et" = "Cancelar descarga";
+"Doldur etkin" = "Recarga activa";
+"Gelişmiş şarj (deneysel)" = "Carga avanzada (experimental)";
+"Hedef sınır: %%%lld" = "Límite objetivo: %lld %%";
+"Hedefe kadar deşarj et" = "Descargar hasta el objetivo";
+"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Protección térmica: pausar la carga por encima de 35 °C y reanudar por debajo de 32 °C";
+"Isı nedeniyle duraklatıldı" = "En pausa por calor";
+"Kalibrasyon sürüyor" = "Calibración en curso";
+"Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat)." = "Calibración: cargar al máximo, mantener 1 hora, descargar hasta 15, volver a cargar al máximo y restaurar el límite (24 horas como máximo).";
+"Kalibrasyonu başlat" = "Iniciar calibración";
+"Kalibrasyonu iptal et" = "Cancelar calibración";
+"Kritik seviye" = "Nivel crítico";
+"Pilden çalışıyor" = "Funcionando con batería";
+"Sınırda tutuluyor" = "Manteniendo en el límite";
+"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Reposo: detener la carga por encima del objetivo antes de dormir";
+"Uyku sırasında hedefin üstüne çıkabilir." = "Puede superar el objetivo durante el reposo.";
+"Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Durante el reposo el asistente lo libera todo por seguridad; la batería puede superar el objetivo mientras el Mac duerme.";
+"Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Rango de navegación: %lld %% (la carga se reanuda por debajo de %lld %%)";
+"Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "El asistente que detiene la carga no está instalado o verificado. Estos ajustes no tienen efecto por ahora y no escriben nada en el hardware.";

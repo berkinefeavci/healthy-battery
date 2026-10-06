@@ -861,3 +861,24 @@
 "Hata bildir" = "Signaler un bug";
 "Öneri gönder" = "Proposer une fonctionnalité";
 "Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "Un fichier de diagnostic est partagé uniquement si vous choisissez de le joindre.";
+/* Advanced charge (Faz 4) */
+"Deşarj oluyor" = "Décharge en cours";
+"Deşarjı iptal et" = "Annuler la décharge";
+"Doldur etkin" = "Recharge active";
+"Gelişmiş şarj (deneysel)" = "Charge avancée (expérimental)";
+"Hedef sınır: %%%lld" = "Limite cible : %lld %%";
+"Hedefe kadar deşarj et" = "Décharger jusqu'à la cible";
+"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Protection thermique : suspendre la charge au-dessus de 35 °C, reprendre sous 32 °C";
+"Isı nedeniyle duraklatıldı" = "Suspendu à cause de la chaleur";
+"Kalibrasyon sürüyor" = "Calibrage en cours";
+"Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat)." = "Calibrage : charger à fond, maintenir 1 heure, décharger jusqu'à 15, recharger à fond, puis la limite est rétablie (24 heures au maximum).";
+"Kalibrasyonu başlat" = "Démarrer le calibrage";
+"Kalibrasyonu iptal et" = "Annuler le calibrage";
+"Kritik seviye" = "Niveau critique";
+"Pilden çalışıyor" = "Sur batterie";
+"Sınırda tutuluyor" = "Maintenu à la limite";
+"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Mise en veille : arrêter la charge au-dessus de la cible avant de dormir";
+"Uyku sırasında hedefin üstüne çıkabilir." = "Peut dépasser la cible pendant la veille.";
+"Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Pendant la veille, l'assistant libère tout par sécurité ; la batterie peut dépasser la cible pendant que le Mac dort.";
+"Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Plage de navigation : %lld %% (la charge reprend sous %lld %%)";
+"Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "L'assistant d'arrêt de charge n'est pas installé ou vérifié. Ces réglages sont sans effet pour l'instant et n'écrivent rien sur le matériel.";

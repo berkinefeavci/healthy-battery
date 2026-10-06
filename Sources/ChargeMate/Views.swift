@@ -786,6 +786,7 @@ struct SettingsView: View {
             chargeLimitCard
             topUpCard
             advancedLockedCard
+            AdvancedChargeSettingsView(runner: AdvancedChargeRunner.shared)
         case .energy:
             EnergyUsageView()
             PowerFlowView(snapshot: battery.snapshot, connectedDevices: battery.connectedDevices).chargeCard()

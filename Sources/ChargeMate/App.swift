@@ -183,6 +183,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(refreshMenuAppearance), name: NSColor.systemColorsDidChangeNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(workspaceDidWake),
                                                           name: NSWorkspace.didWakeNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(workspaceWillSleep),
+                                                          name: NSWorkspace.willSleepNotification, object: nil)
+        // Inert until a supported ChargeInhibitBackend is injected into AdvancedChargeRunner.shared.
+        AdvancedChargeRunner.shared.start()
+        battery.snapshotObserver = { [weak battery] snapshot in
+            guard let percentage = snapshot.percentage ?? snapshot.hardwarePercentage else { return }
+            AdvancedChargeRunner.shared.update(percentage: percentage, temperatureC: snapshot.temperatureC,
+                                               externalConnected: snapshot.externalConnected, isCharging: snapshot.isCharging,
+                                               topUpActive: battery?.topUpActive ?? false)
+        }
         installApplicationMenu()
         ChartTrackingView.isPanelWindow = { $0 is MenuPanel }
         if UserDefaults.standard.bool(forKey: "showPanelAtLaunch") {
@@ -218,7 +228,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     @objc private func refreshMenuAppearance() { updateMenuBar() }
-    @objc private func workspaceDidWake() { battery.handleWake() }
+    @objc private func workspaceDidWake() {
+        AdvancedChargeRunner.shared.setSleepState(.awake)
+        battery.handleWake()
+    }
+    @objc private func workspaceWillSleep() { AdvancedChargeRunner.shared.setSleepState(.asleep) }
 
     private func updateMenuBar() {
         guard let button = statusItem?.button else { return }
@@ -364,6 +378,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         menuTimer?.invalidate()
         sleepObservation?.cancel()
         SleepInhibitionController.shared.stop()
+        AdvancedChargeRunner.shared.stop()
         scheduleRuntime?.stop()
         battery.stop()
         NSWorkspace.shared.notificationCenter.removeObserver(self)

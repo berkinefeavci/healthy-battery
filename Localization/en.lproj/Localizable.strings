@@ -861,3 +861,24 @@
 "Hata bildir" = "Report a bug";
 "Öneri gönder" = "Suggest a feature";
 "Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "A diagnostic file is shared only if you choose to attach it.";
+/* Advanced charge (Faz 4) */
+"Deşarj oluyor" = "Discharging";
+"Deşarjı iptal et" = "Cancel discharge";
+"Doldur etkin" = "Top Up active";
+"Gelişmiş şarj (deneysel)" = "Advanced charging (experimental)";
+"Hedef sınır: %%%lld" = "Target limit: %lld%%";
+"Hedefe kadar deşarj et" = "Discharge to target";
+"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Heat protection: pause charging above 35 °C, resume below 32 °C";
+"Isı nedeniyle duraklatıldı" = "Paused because of heat";
+"Kalibrasyon sürüyor" = "Calibration in progress";
+"Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat)." = "Calibration: charge to full, hold for 1 hour, discharge to 15, charge to full again, then the limit is restored (24 hours at most).";
+"Kalibrasyonu başlat" = "Start calibration";
+"Kalibrasyonu iptal et" = "Cancel calibration";
+"Kritik seviye" = "Critical level";
+"Pilden çalışıyor" = "Running on battery";
+"Sınırda tutuluyor" = "Holding at limit";
+"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Sleep behavior: stop charging above the target before sleeping";
+"Uyku sırasında hedefin üstüne çıkabilir." = "May exceed the target while asleep.";
+"Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "During sleep the helper releases everything for safety; the battery may rise above the target while the Mac sleeps.";
+"Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Sailing range: %lld%% (charging restarts below %lld%%)";
+"Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "The charge-stopping helper is not installed or not verified. These settings have no effect for now and write nothing to the hardware.";
