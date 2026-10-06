@@ -204,3 +204,19 @@ xcrun swiftc Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/Cha
   Sources/ChargeMate/Schedule.swift Sources/ChargeMate/ScheduleScheduler.swift \
   Tests/ScheduleSchedulerTests.swift -o .build/checks/schedule-scheduler-tests
 .build/checks/schedule-scheduler-tests
+
+# Faz 2 sağlık otomasyonları: saf karar türleri ve geçici dosya testleri; donanım erişimi yok.
+S=Sources/ChargeMate
+xcrun swiftc $S/HeatProtection.swift $S/PowerMode.swift $S/HelperInstallState.swift Tests/HeatProtectionTests.swift \
+  -o .build/checks/heat-protection-tests
+.build/checks/heat-protection-tests
+xcrun swiftc $S/FullChargeDwell.swift Tests/FullChargeDwellTests.swift -o .build/checks/full-charge-dwell-tests
+.build/checks/full-charge-dwell-tests
+xcrun swiftc $S/ChargeHabits.swift $S/LongTermHistory.swift $S/HeatProtection.swift $S/PowerMode.swift $S/HelperInstallState.swift \
+  Tests/ChargeHabitsTests.swift -o .build/checks/charge-habits-tests
+.build/checks/charge-habits-tests
+xcrun swiftc $S/ReadyByPlanner.swift $S/Schedule.swift $S/HeatProtection.swift $S/PowerMode.swift $S/HelperInstallState.swift \
+  Tests/ReadyByPlannerTests.swift -o .build/checks/ready-by-planner-tests
+.build/checks/ready-by-planner-tests
+# Isı koruması yalnızca mevcut yazma yolunu (BatteryMonitor.applyAutomationLimit) kullanır; doğrudan PowerUI yazması yok.
+! grep -Eq 'CMPowerLimit|SystemPowerModeService\.(apply|install)' $S/HealthAutomation.swift $S/HeatProtection.swift

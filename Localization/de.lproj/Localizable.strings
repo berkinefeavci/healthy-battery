@@ -861,3 +861,35 @@
 "Hata bildir" = "Fehler melden";
 "Öneri gönder" = "Verbesserung vorschlagen";
 "Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "Eine Diagnosedatei wird nur geteilt, wenn Sie sie selbst anhängen.";
+
+/* Faz 2: sağlık otomasyonları */
+"%%100 hazır: %@" = "%%100 bereit: %@";
+"%95 üstünde, takılıyken" = "Über 95 %, angeschlossen";
+"35 °C üstünde şarj" = "Laden über 35 °C";
+"Adaptör takılıyken pil 3 saatten uzun süre %95 üstünde kalırsa bildirim gelir." = "Bleibt der Akku angeschlossen länger als 3 Stunden über 95 %, erhalten Sie eine Benachrichtigung.";
+"Doldur şu zamanda başlar: %@ (yaklaşık %lld dk önce). Süre son şarj hızınızdan tahmin edilir; veri yoksa 2 saat öncesidir. Görev kapalı başlar; kaydederken etkinleştirin." = "Aufladen startet um %@ (etwa %lld Min. früher). Die Vorlaufzeit wird aus Ihrer letzten Ladegeschwindigkeit geschätzt, ohne Daten sind es 2 Stunden. Die Aufgabe startet deaktiviert; aktivieren Sie sie beim Sichern.";
+"Görev oluştur" = "Aufgabe erstellen";
+"Hazır olacağı zaman" = "Bereit um";
+"Henüz yeterli veri yok; Healthy Battery açık kaldıkça burada öneri görünür." = "Noch nicht genug Daten; Empfehlungen erscheinen hier, solange Healthy Battery läuft.";
+"Ortalama boşalma derinliği" = "Durchschnittliche Entladetiefe";
+"Otomatik koruma" = "Automatischer Schutz";
+"Pil %%%lld seviyesinde bekliyor, sınır %%%lld. macOS'un Optimize Şarj özelliği şarjı tutuyor olabilir (Sistem Ayarları › Pil › Pil Sağlığı). İki mekanizma birlikte çalışınca pil beklediğinizden geç dolar; ayarı buradan okuyamıyoruz, bu yalnızca gözleme dayalı bir ipucudur." = "Der Akku wartet bei %%%lld, Limit %%%lld. Das optimierte Laden von macOS hält die Ladung möglicherweise zurück (Systemeinstellungen › Batterie › Batteriezustand). Wirken beide Mechanismen zusammen, ist der Akku später voll als erwartet; die Einstellung lässt sich hier nicht auslesen, dies ist nur ein Hinweis aus beobachtetem Verhalten.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi ve Turbo kapatıldı." = "Akku %@ °C. Ladelimit vorübergehend auf %%80 gesenkt und Turbo ausgeschaltet.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi." = "Akku %@ °C. Ladelimit vorübergehend auf %%80 gesenkt.";
+"Pil 3 saattir %95 üstünde" = "Akku seit 3 Stunden über 95 %";
+"Pil adaptörde şarj olurken 35 °C'yi geçerse sınır geçici olarak %80 olur, Turbo kapanır ve bildirim gelir. 32 °C'ye inince ya da adaptör çıkınca eski ayar döner. Pil zaten %80'in altındaysa şarjı durduramaz." = "Überschreitet der Akku beim Laden am Netzteil 35 °C, wird das Limit vorübergehend 80 %, Turbo wird ausgeschaltet und Sie werden benachrichtigt. Sinkt er auf 32 °C oder wird das Netzteil getrennt, kehrt die vorherige Einstellung zurück. Liegt der Akku schon unter 80 %, kann das Laden nicht gestoppt werden.";
+"Pil sıcak: şarj sınırı %80'e çekildi" = "Akku ist heiß: Ladelimit auf 80 % gesenkt";
+"Pil sıcakken şarj oldu. Sıcaklık korumasını açın ve şarj ederken ağır işlerden kaçının." = "Der Akku wurde im heißen Zustand geladen. Aktivieren Sie den Temperaturschutz und vermeiden Sie beim Laden schwere Arbeit.";
+"Pil sık sık çok derin boşalıyor. %20'nin altına inmeden şarja takmak daha iyi." = "Der Akku wird oft sehr tief entladen. Besser anschließen, bevor er unter 20 % fällt.";
+"Pil çoğunlukla %95 üstünde bekliyor. Şarj sınırını %80'e çekmek ömrünü uzatır." = "Der Akku bleibt meist über 95 %. Ein Ladelimit von 80 % verlängert seine Lebensdauer.";
+"Sıcaklık koruması (sınırı %80'e çeker)" = "Temperaturschutz (senkt das Limit auf 80 %)";
+"Sıcaklık koruması etkin" = "Temperaturschutz aktiv";
+"Sınırı %80 yap" = "Limit auf 80 % setzen";
+"Uzun süre dolu kalmak pili yorar. Sınırı %80'e çekebilirsiniz." = "Dauerhaft voll zu bleiben belastet den Akku. Sie können das Limit auf 80 % senken.";
+"Uzun süre dolu kalırsa uyar" = "Warnen, wenn er lange voll bleibt";
+"Yalnızca Healthy Battery açıkken ölçülen süreler sayılır." = "Nur die Zeit, in der Healthy Battery läuft, wird gezählt.";
+"sa" = "Std.";
+"Şarj alışkanlıklarınız pil için iyi görünüyor." = "Ihre Ladegewohnheiten sehen gut für den Akku aus.";
+"Şarj sağlığı · son 7 gün" = "Ladezustand · letzte 7 Tage";
+"Şu saatte %100 hazır olsun" = "Zu einer Uhrzeit zu 100 % bereit";
+"Şu saatte %100 hazır olsun…" = "Zu einer Uhrzeit zu 100 % bereit…";

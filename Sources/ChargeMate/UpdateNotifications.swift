@@ -54,11 +54,13 @@ final class UpdateNotifications: NSObject, UNUserNotificationCenterDelegate {
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler(notification.request.identifier == Self.identifier ? [.banner, .sound] : [])
+        let identifier = notification.request.identifier
+        completionHandler(identifier == Self.identifier || HealthNotifications.owns(identifier) ? [.banner, .sound] : [])
     }
 
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        Task { @MainActor in HealthNotifications.shared.handle(response) }
         if response.notification.request.identifier == Self.identifier,
            response.actionIdentifier == UNNotificationDefaultActionIdentifier {
             Task { @MainActor in AppDelegate.shared?.showSettings(page: .about) }

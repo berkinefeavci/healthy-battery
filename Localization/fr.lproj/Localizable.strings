@@ -861,3 +861,35 @@
 "Hata bildir" = "Signaler un bug";
 "Öneri gönder" = "Proposer une fonctionnalité";
 "Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "Un fichier de diagnostic est partagé uniquement si vous choisissez de le joindre.";
+
+/* Faz 2: sağlık otomasyonları */
+"%%100 hazır: %@" = "%%100 prêt : %@";
+"%95 üstünde, takılıyken" = "Au-dessus de 95 %, branché";
+"35 °C üstünde şarj" = "Charge au-dessus de 35 °C";
+"Adaptör takılıyken pil 3 saatten uzun süre %95 üstünde kalırsa bildirim gelir." = "Si la batterie reste au-dessus de 95 % plus de 3 heures sur secteur, vous recevez une notification.";
+"Doldur şu zamanda başlar: %@ (yaklaşık %lld dk önce). Süre son şarj hızınızdan tahmin edilir; veri yoksa 2 saat öncesidir. Görev kapalı başlar; kaydederken etkinleştirin." = "La charge complète démarre à %@ (environ %lld min plus tôt). L'avance est estimée d'après votre vitesse de charge récente, ou 2 heures sans données. La tâche est créée désactivée ; activez-la à l'enregistrement.";
+"Görev oluştur" = "Créer la tâche";
+"Hazır olacağı zaman" = "Prête pour";
+"Henüz yeterli veri yok; Healthy Battery açık kaldıkça burada öneri görünür." = "Pas encore assez de données ; les conseils apparaissent ici tant que Healthy Battery reste ouvert.";
+"Ortalama boşalma derinliği" = "Profondeur moyenne de décharge";
+"Otomatik koruma" = "Protection automatique";
+"Pil %%%lld seviyesinde bekliyor, sınır %%%lld. macOS'un Optimize Şarj özelliği şarjı tutuyor olabilir (Sistem Ayarları › Pil › Pil Sağlığı). İki mekanizma birlikte çalışınca pil beklediğinizden geç dolar; ayarı buradan okuyamıyoruz, bu yalnızca gözleme dayalı bir ipucudur." = "La batterie attend à %%%lld %%, limite %%%lld %%. La charge optimisée de macOS retient peut-être la charge (Réglages Système › Batterie › État de la batterie). Quand les deux mécanismes agissent ensemble, la batterie se remplit plus tard que prévu ; ce réglage ne peut pas être lu ici, il s'agit donc seulement d'un indice fondé sur le comportement observé.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi ve Turbo kapatıldı." = "Batterie à %@ °C. Limite de charge abaissée temporairement à %%80 et Turbo désactivé.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi." = "Batterie à %@ °C. Limite de charge abaissée temporairement à %%80.";
+"Pil 3 saattir %95 üstünde" = "Batterie au-dessus de 95 % depuis 3 heures";
+"Pil adaptörde şarj olurken 35 °C'yi geçerse sınır geçici olarak %80 olur, Turbo kapanır ve bildirim gelir. 32 °C'ye inince ya da adaptör çıkınca eski ayar döner. Pil zaten %80'in altındaysa şarjı durduramaz." = "Si la batterie dépasse 35 °C en charge sur secteur, la limite passe temporairement à 80 %, Turbo est désactivé et vous recevez une notification. Quand elle redescend à 32 °C ou que l'adaptateur est débranché, le réglage précédent revient. Si la batterie est déjà sous 80 %, elle ne peut pas arrêter la charge.";
+"Pil sıcak: şarj sınırı %80'e çekildi" = "Batterie chaude : limite de charge abaissée à 80 %";
+"Pil sıcakken şarj oldu. Sıcaklık korumasını açın ve şarj ederken ağır işlerden kaçının." = "La batterie s'est chargée alors qu'elle était chaude. Activez la protection thermique et évitez les tâches lourdes pendant la charge.";
+"Pil sık sık çok derin boşalıyor. %20'nin altına inmeden şarja takmak daha iyi." = "La batterie se décharge souvent très profondément. Mieux vaut la brancher avant qu'elle descende sous 20 %.";
+"Pil çoğunlukla %95 üstünde bekliyor. Şarj sınırını %80'e çekmek ömrünü uzatır." = "La batterie reste surtout au-dessus de 95 %. Abaisser la limite de charge à 80 % prolonge sa durée de vie.";
+"Sıcaklık koruması (sınırı %80'e çeker)" = "Protection thermique (abaisse la limite à 80 %)";
+"Sıcaklık koruması etkin" = "Protection thermique active";
+"Sınırı %80 yap" = "Limiter à 80 %";
+"Uzun süre dolu kalmak pili yorar. Sınırı %80'e çekebilirsiniz." = "Rester pleine longtemps use la batterie. Vous pouvez abaisser la limite à 80 %.";
+"Uzun süre dolu kalırsa uyar" = "Prévenir si elle reste pleine longtemps";
+"Yalnızca Healthy Battery açıkken ölçülen süreler sayılır." = "Seul le temps mesuré pendant que Healthy Battery est ouvert est compté.";
+"sa" = "h";
+"Şarj alışkanlıklarınız pil için iyi görünüyor." = "Vos habitudes de charge semblent bonnes pour la batterie.";
+"Şarj sağlığı · son 7 gün" = "Santé de charge · 7 derniers jours";
+"Şu saatte %100 hazır olsun" = "Être à 100 % à une heure précise";
+"Şu saatte %100 hazır olsun…" = "Être à 100 % à une heure précise…";

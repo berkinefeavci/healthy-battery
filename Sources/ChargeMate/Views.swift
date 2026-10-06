@@ -785,6 +785,7 @@ struct SettingsView: View {
         case .charge:
             chargeLimitCard
             topUpCard
+            HealthSettingsCards()
             advancedLockedCard
         case .energy:
             EnergyUsageView()

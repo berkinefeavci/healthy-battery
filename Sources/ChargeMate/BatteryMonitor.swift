@@ -853,6 +853,19 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         controlQueue.sync { policyController.applyManualLimit(limit, source: .schedule) }
     }
 
+    /// Isı koruması gibi otomasyonlar için eşzamanlı yazma; ana iş parçacığı dışından çağrılmalı.
+    /// Sonuç okunan yerel durum ana kuyrukta yayınlanır, böylece sonraki karar eski değeri görmez.
+    func applyAutomationLimit(_ limit: Int, source: ChargeControlCoordinator.Source) -> ChargeControlCoordinator.Result {
+        let result = controlQueue.sync { policyController.applyManualLimit(limit, source: source) }
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.lastNativeRead = .distantPast
+            if let state = result.state { self.receiveNativeState(state) }
+            self.updatePolicyPresentation()
+        }
+        return result
+    }
+
     func startScheduledTopUp(executionID: UUID) -> ChargeControlCoordinator.Result {
         precondition(Thread.isMainThread)
         let telemetry = Self.telemetry(from: snapshot)
