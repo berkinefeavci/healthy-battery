@@ -3,7 +3,7 @@ import Combine
 import SwiftUI
 
 /// Sabit boyutlu (300×44) toast. İçerik boyutu belirlemez; uzun metin 2 satırda kısalır.
-private struct ReminderToastView: View {
+struct ReminderToastView: View {
     let text: String
     var body: some View {
         HStack(spacing: 8) {

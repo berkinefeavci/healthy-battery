@@ -451,7 +451,7 @@ private struct PercentageTextWidthKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }
 
-private struct ChargeLimitBar: View {
+struct ChargeLimitBar: View {
     @EnvironmentObject var battery: BatteryMonitor
     @State private var draggingTarget: Double?
     @State private var isDragging = false

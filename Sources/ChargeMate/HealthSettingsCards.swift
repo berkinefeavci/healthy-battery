@@ -20,7 +20,7 @@ struct HealthSettingsCards: View {
         }
     }
 
-    private var healthCard: some View {
+    var healthCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             Label("Şarj sağlığı · son 7 gün", systemImage: "heart.text.square").font(.headline)
             if let summary = automation.habitsSummary, summary.observedHours > 0 {
@@ -36,7 +36,7 @@ struct HealthSettingsCards: View {
         }.frame(maxWidth: .infinity, alignment: .leading).chargeCard()
     }
 
-    private var automationCard: some View {
+    var automationCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Otomatik koruma", systemImage: "thermometer.snowflake").font(.headline)
             TrailingToggle(title: String(localized: "Sıcaklık koruması (sınırı %80'e çeker)"), isOn: $heatProtection)
