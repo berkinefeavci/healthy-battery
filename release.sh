@@ -89,7 +89,7 @@ if $have_dev_id; then
   sign_opts+=(--options runtime --timestamp ${entitlements_args[@]+"${entitlements_args[@]}"})
 fi
 
-helper_names=(CellkeepLEDHelper CellkeepPowerModeHelper CellkeepNativeChargeHelper)
+helper_names=(CellkeepLEDHelper CellkeepPowerModeHelper CellkeepNativeChargeHelper CellkeepChargeInhibitHelper)
 for helper in "${helper_names[@]}"; do
   helper_path="$app_path/Contents/Resources/$helper"
   test -f "$helper_path"

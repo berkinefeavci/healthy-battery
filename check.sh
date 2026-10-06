@@ -256,3 +256,7 @@ xcrun swiftc $S/ReadyByPlanner.swift $S/Schedule.swift $S/HeatProtection.swift $
 .build/checks/ready-by-planner-tests
 # Isı koruması yalnızca mevcut yazma yolunu (BatteryMonitor.applyAutomationLimit) kullanır; doğrudan PowerUI yazması yok.
 ! grep -Eq 'CMPowerLimit|SystemPowerModeService\.(apply|install)' $S/HealthAutomation.swift $S/HeatProtection.swift
+# Every helper bundled by build.sh must be re-signed by release.sh, or notarization rejects the app.
+for helper in $(grep -o 'Contents/Resources/Cellkeep[A-Za-z]*Helper' build.sh | sed 's|.*/||' | sort -u); do
+  grep -E '^helper_names=\(' release.sh | grep -qw "$helper" || { echo "release.sh does not sign $helper" >&2; exit 1; }
+done
