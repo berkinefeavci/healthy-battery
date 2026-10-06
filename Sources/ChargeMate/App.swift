@@ -103,6 +103,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         // A no-op when the user turned the daily release check off.
         UpdateNotifications.shared.start()
         HealthAutomation.shared.start()
+        ReminderCenter.shared.presenter.anchor = { [weak self] in self?.statusButtonFrame }
+        ReminderCenter.shared.presenter.appPanelOpen = { [weak self] in self?.panel?.isVisible ?? false }
+        ReminderCenter.shared.start()
         DispatchQueue.global(qos: .utility).async { SystemPowerModeService.warmUpCapabilities() }
         GlobalHotKey.shared.action = { [weak self] in self?.togglePanel(nil) }
         GlobalHotKey.shared.apply(.current)
@@ -233,9 +236,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     @objc private func refreshMenuAppearance() { updateMenuBar() }
     @objc private func workspaceDidWake() {
         AdvancedChargeRunner.shared.setSleepState(.awake)
+        MainActor.assumeIsolated { ReminderCenter.shared.systemDidWake() }
         battery.handleWake()
     }
-    @objc private func workspaceWillSleep() { AdvancedChargeRunner.shared.setSleepState(.asleep) }
+    @objc private func workspaceWillSleep() {
+        AdvancedChargeRunner.shared.setSleepState(.asleep)
+        MainActor.assumeIsolated { ReminderCenter.shared.systemWillSleep() }
+    }
 
     private func updateMenuBar() {
         guard let button = statusItem?.button else { return }

@@ -254,6 +254,12 @@ xcrun swiftc $S/ChargeHabits.swift $S/LongTermHistory.swift $S/HeatProtection.sw
 xcrun swiftc $S/ReadyByPlanner.swift $S/Schedule.swift $S/HeatProtection.swift $S/PowerMode.swift $S/HelperInstallState.swift \
   Tests/ReadyByPlannerTests.swift -o .build/checks/ready-by-planner-tests
 .build/checks/ready-by-planner-tests
+xcrun swiftc $S/ReminderEngine.swift Tests/ReminderEngineTests.swift -o .build/checks/reminder-engine-tests
+.build/checks/reminder-engine-tests
+# Hatırlatma toast'u sabit boyutlu, odak almayan ve bildirim merkezine gitmeyen bir panel; içerik boyutu belirlemez.
+grep -Fq '.nonactivatingPanel' $S/ReminderToast.swift
+grep -Fq 'panel.level = .statusBar' $S/ReminderToast.swift
+! grep -Eq 'fixedSize|UNUserNotificationCenter|NSUserNotification|waitUntilExit' $S/ReminderToast.swift $S/ReminderEngine.swift
 # Isı koruması yalnızca mevcut yazma yolunu (BatteryMonitor.applyAutomationLimit) kullanır; doğrudan PowerUI yazması yok.
 ! grep -Eq 'CMPowerLimit|SystemPowerModeService\.(apply|install)' $S/HealthAutomation.swift $S/HeatProtection.swift
 # Every helper bundled by build.sh must be re-signed by release.sh, or notarization rejects the app.
