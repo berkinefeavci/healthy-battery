@@ -111,6 +111,10 @@ xcrun swiftc Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/Cha
   Tests/ChargePolicyControllerTests.swift -o .build/checks/charge-policy-controller-tests
 .build/checks/charge-policy-controller-tests
 
+xcrun swiftc -parse-as-library Sources/ChargeMate/ChargeInhibit.swift Sources/ChargeMate/AdvancedChargeEngine.swift \
+  Sources/ChargeMate/AdvancedChargeRunner.swift Tests/AdvancedChargeEngineTests.swift -o .build/checks/advanced-charge-engine-tests
+.build/checks/advanced-charge-engine-tests
+
 xcrun swiftc Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Tests/PowerModeTests.swift -o .build/checks/power-mode-tests
 .build/checks/power-mode-tests
 

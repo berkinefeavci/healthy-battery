@@ -473,6 +473,8 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     private var lastPowerModeRead = Date.distantPast
     private var lastPolicyEvaluation = Date.distantPast
     private var lastExternalConnected: Bool?
+    /// Main-thread hook for every fresh snapshot (advanced charge engine); nil keeps behaviour unchanged.
+    var snapshotObserver: ((BatterySnapshot) -> Void)?
     private var pendingPolicyTrigger: ChargePolicyTrigger = .startup
     var panelVisible = false
     var settingsVisible = false
@@ -1144,6 +1146,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 guard let self else { return }
                 self.reading = false
                 self.snapshot = value
+                self.snapshotObserver?(value)
                 if let devices { self.connectedDevices = devices }
                 self.lowPowerModeEnabled = ProcessInfo.processInfo.isLowPowerModeEnabled
                 if let powerModes {

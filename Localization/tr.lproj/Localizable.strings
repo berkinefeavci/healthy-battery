@@ -871,3 +871,24 @@
 "macOS sınırı %%%lld — Healthy Battery %%%lld istiyor" = "macOS sınırı %%%lld — Healthy Battery %%%lld istiyor";
 "macOS sınırı dışarıdan değişirse" = "macOS sınırı dışarıdan değişirse";
 "macOS'taki yeni değer otomatik olarak Healthy Battery hedefi olur." = "macOS'taki yeni değer otomatik olarak Healthy Battery hedefi olur.";
+/* Advanced charge (Faz 4) */
+"Deşarj oluyor" = "Deşarj oluyor";
+"Deşarjı iptal et" = "Deşarjı iptal et";
+"Doldur etkin" = "Doldur etkin";
+"Gelişmiş şarj (deneysel)" = "Gelişmiş şarj (deneysel)";
+"Hedef sınır: %%%lld" = "Hedef sınır: %%%lld";
+"Hedefe kadar deşarj et" = "Hedefe kadar deşarj et";
+"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür";
+"Isı nedeniyle duraklatıldı" = "Isı nedeniyle duraklatıldı";
+"Kalibrasyon sürüyor" = "Kalibrasyon sürüyor";
+"Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat)." = "Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat).";
+"Kalibrasyonu başlat" = "Kalibrasyonu başlat";
+"Kalibrasyonu iptal et" = "Kalibrasyonu iptal et";
+"Kritik seviye" = "Kritik seviye";
+"Pilden çalışıyor" = "Pilden çalışıyor";
+"Sınırda tutuluyor" = "Sınırda tutuluyor";
+"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur";
+"Uyku sırasında hedefin üstüne çıkabilir." = "Uyku sırasında hedefin üstüne çıkabilir.";
+"Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir.";
+"Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)";
+"Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz.";

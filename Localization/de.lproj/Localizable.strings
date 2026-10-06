@@ -871,3 +871,24 @@
 "macOS sınırı %%%lld — Healthy Battery %%%lld istiyor" = "macOS-Limit ist %lld %% — Healthy Battery will %lld %%";
 "macOS sınırı dışarıdan değişirse" = "Wenn das macOS-Limit außerhalb der App geändert wird";
 "macOS'taki yeni değer otomatik olarak Healthy Battery hedefi olur." = "Der neue macOS-Wert wird automatisch zum Healthy-Battery-Ziel.";
+/* Advanced charge (Faz 4) */
+"Deşarj oluyor" = "Entlädt";
+"Deşarjı iptal et" = "Entladen abbrechen";
+"Doldur etkin" = "Aufladen aktiv";
+"Gelişmiş şarj (deneysel)" = "Erweitertes Laden (experimentell)";
+"Hedef sınır: %%%lld" = "Zielgrenze: %lld %%";
+"Hedefe kadar deşarj et" = "Bis zum Ziel entladen";
+"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Hitzeschutz: Laden über 35 °C pausieren, unter 32 °C fortsetzen";
+"Isı nedeniyle duraklatıldı" = "Wegen Hitze pausiert";
+"Kalibrasyon sürüyor" = "Kalibrierung läuft";
+"Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat)." = "Kalibrierung: voll laden, 1 Stunde halten, auf 15 entladen, wieder voll laden, danach wird die Grenze wiederhergestellt (höchstens 24 Stunden).";
+"Kalibrasyonu başlat" = "Kalibrierung starten";
+"Kalibrasyonu iptal et" = "Kalibrierung abbrechen";
+"Kritik seviye" = "Kritischer Stand";
+"Pilden çalışıyor" = "Batteriebetrieb";
+"Sınırda tutuluyor" = "Wird an der Grenze gehalten";
+"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Ruhezustand: Laden über dem Ziel vor dem Einschlafen stoppen";
+"Uyku sırasında hedefin üstüne çıkabilir." = "Im Ruhezustand kann der Akku über das Ziel steigen.";
+"Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Im Ruhezustand gibt der Helfer aus Sicherheitsgründen alles frei; der Akku kann dann über das Ziel steigen.";
+"Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Segelbereich: %lld %% (Laden startet unter %lld %% neu)";
+"Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "Der Helfer zum Stoppen des Ladens ist nicht installiert oder nicht verifiziert. Diese Einstellungen haben vorerst keine Wirkung und schreiben nichts in die Hardware.";

@@ -799,6 +799,7 @@ struct SettingsView: View {
             ExternalChangeSettingsCard()
             topUpCard
             advancedLockedCard
+            AdvancedChargeSettingsView(runner: AdvancedChargeRunner.shared)
         case .energy:
             EnergyUsageView()
             PowerFlowView(snapshot: battery.snapshot, connectedDevices: battery.connectedDevices).chargeCard()
