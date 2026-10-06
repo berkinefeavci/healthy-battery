@@ -33,6 +33,10 @@ if [[ "${1:-}" == "--local-preview-sdk" ]]; then
     -o .build/local-preview/ChargeMateLEDHelper
   xcrun clang -isysroot "$sdk_path" -mmacosx-version-min=13.0 -O2 \
     Tools/PowerModeHelper.c -o .build/local-preview/ChargeMatePowerModeHelper
+  xcrun clang -isysroot "$sdk_path" -mmacosx-version-min=13.0 -O2 \
+    Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation \
+    -o .build/local-preview/ChargeMateChargeInhibitHelper
+  charge_inhibit_helper=.build/local-preview/ChargeMateChargeInhibitHelper
   helper_binary=.build/local-preview/ChargeMateLEDHelper
   power_mode_helper=.build/local-preview/ChargeMatePowerModeHelper
   asset_catalog=../app/ChargeMate.app/Contents/Resources/Assets.car
@@ -55,6 +59,9 @@ else
   xcrun clang -O2 Tools/MagSafeLEDProbe.c -framework IOKit -framework CoreFoundation \
     -o .build/release/CellkeepLEDHelper
   xcrun clang -O2 Tools/PowerModeHelper.c -o .build/release/CellkeepPowerModeHelper
+  xcrun clang -O2 Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation \
+    -o .build/release/CellkeepChargeInhibitHelper
+  charge_inhibit_helper=.build/release/CellkeepChargeInhibitHelper
   helper_binary=.build/release/CellkeepLEDHelper
   power_mode_helper=.build/release/CellkeepPowerModeHelper
   resource_bundle=.build/release/Cellkeep_Cellkeep.bundle
@@ -88,9 +95,11 @@ fi
 cp "$helper_binary" "$app_path/Contents/Resources/CellkeepLEDHelper"
 cp "$power_mode_helper" "$app_path/Contents/Resources/CellkeepPowerModeHelper"
 cp "$native_charge_helper" "$app_path/Contents/Resources/CellkeepNativeChargeHelper"
+cp "$charge_inhibit_helper" "$app_path/Contents/Resources/CellkeepChargeInhibitHelper"
 codesign --force --sign - "$app_path/Contents/Resources/CellkeepLEDHelper"
 codesign --force --sign - "$app_path/Contents/Resources/CellkeepPowerModeHelper"
 codesign --force --sign - "$app_path/Contents/Resources/CellkeepNativeChargeHelper"
+codesign --force --sign - "$app_path/Contents/Resources/CellkeepChargeInhibitHelper"
 cp Packaging/Info.plist "$app_path/Contents/Info.plist"
 # SwiftUI Text and String(localized:) look up Bundle.main, i.e. Contents/Resources/<lang>.lproj.
 rm -rf "$app_path/Contents/Resources/"*.lproj
