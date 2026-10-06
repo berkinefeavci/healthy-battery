@@ -103,6 +103,8 @@ final class AdvancedChargeRunner: ObservableObject {
 
     func setSleepState(_ state: SleepState, now: Date = Date()) {
         sleep = state
+        // Adapter mode: restore wall power before the Mac sleeps rather than relying on the helper alone.
+        if state != .awake, applied.adapterInhibited { releaseAll() }
         if state == .awake { resyncFromBackend(); reevaluate(now: now) } else { sleepMayOvershootUpdate(now: now) }
     }
 
@@ -136,6 +138,14 @@ final class AdvancedChargeRunner: ObservableObject {
         guard sleep == .awake else { return }
         if output.desired != applied { apply(output.desired, now: now) }
         else { heartbeatIfDue(now: now) }
+    }
+
+    /// Popover status line while adapter mode holds the adapter cut; nil otherwise.
+    var adapterStatusText: String? {
+        guard display == .adapterCut else { return nil }
+        let target = AdvancedChargeLimits.normalizedTarget(settings.targetLimit)
+        let resume = AdvancedChargeEngine.adapterResumeAt(target: target, sailingDelta: settings.sailingDelta)
+        return String(localized: "Adaptör kesildi — pilden çalışıyor, %\(resume) seviyesine inince açılır")
     }
 
     private func sleepMayOvershootUpdate(now: Date) {

@@ -164,6 +164,92 @@ private final class FakeBackend: ChargeInhibitBackend {
         check(run(input(50, temp: 40, settings: heat, memory: cal(.rechargeToFull))).display == .heatPaused, "heat pauses calibration charging")
         check(run(input(50, temp: 40, settings: heat, memory: cal(.dischargeToLow))).desired == cut, "heat does not stop calibration discharge")
 
+        // Adapter mode (no charge inhibit, adapter cut only)
+        let adapterCaps = ChargeInhibitCapabilities(canInhibitCharging: false, canForceDischarge: true, reason: nil)
+        var ad = AdvancedChargeSettings(); ad.targetLimit = 80; ad.adapterModeEnabled = true
+        func arun(_ pct: Int, _ settings: AdvancedChargeSettings = ad, memory: AdvancedChargeMemory = AdvancedChargeMemory(),
+                  external: Bool = true, sleep: SleepState = .awake, topUp: Bool = false, temp: Double? = 25,
+                  now: Date = t0) -> AdvancedChargeOutput {
+            run(input(pct, temp: temp, external: external, now: now, settings: settings, caps: adapterCaps,
+                      sleep: sleep, topUp: topUp, memory: memory))
+        }
+        var plain = ad; plain.adapterModeEnabled = false
+        check(arun(95, plain).desired == .released && arun(95, plain).display == .unavailable, "adapter mode off stays unavailable")
+        check(run(input(95, settings: ad, caps: .unsupported)).desired == .released, "adapter mode needs force-discharge capability")
+        check(arun(79).desired == .released && arun(79).display == .idle, "adapter below target charges")
+        let a1 = arun(80)
+        check(a1.desired == cut && a1.display == .adapterCut && a1.memory.adapterLatched, "adapter cut at target")
+        check(arun(90).desired == cut, "adapter cut above target")
+        // hysteresis: stays cut down to target-5 exclusive, releases at 75
+        var am = a1.memory
+        for pct in [79, 78, 77, 76] { let o = arun(pct, memory: am); am = o.memory; check(o.desired == cut, "adapter holds cut at \(pct)") }
+        let a2 = arun(75, memory: am)
+        check(a2.desired == .released && !a2.memory.adapterLatched, "adapter released at target-5")
+        am = a2.memory
+        check(arun(78, memory: am).desired == .released, "no re-cut inside band after release")
+        check(arun(79, memory: am).desired == .released, "no re-cut at 79")
+        check(arun(80, memory: am).desired == cut, "re-cut at target")
+        // band minimum is 5 even with a small sailing delta, larger delta widens it
+        var smallDelta = ad; smallDelta.sailingDelta = 2
+        check(AdvancedChargeEngine.adapterResumeAt(target: 80, sailingDelta: 2) == 75, "min band 5")
+        let sm2 = arun(80, smallDelta).memory
+        check(arun(76, smallDelta, memory: sm2).desired == cut && arun(75, smallDelta, memory: sm2).desired == .released, "small delta uses band 5")
+        var bigDelta = ad; bigDelta.sailingDelta = 10
+        let bm = arun(80, bigDelta).memory
+        check(arun(71, bigDelta, memory: bm).desired == cut && arun(70, bigDelta, memory: bm).desired == .released, "big delta widens band")
+        check(AdvancedChargeEngine.adapterResumeAt(target: 80, sailingDelta: 15) == 65, "delta 15")
+        // target 100 never cuts
+        var ad100 = ad; ad100.targetLimit = 100
+        check(arun(100, ad100).desired == .released, "adapter mode target 100 no cut")
+        // sleep / unplug / critical / top up
+        check(arun(85, sleep: .aboutToSleep).desired == .released && arun(85, sleep: .asleep).desired == .released, "adapter restored for sleep")
+        check(arun(85, memory: am, sleep: .asleep).memory.adapterLatched == am.adapterLatched, "sleep keeps latch state")
+        let latched = AdvancedChargeMemory(adapterLatched: true)
+        check(arun(78, memory: latched, sleep: .asleep).memory.adapterLatched, "latch survives sleep")
+        check(arun(78, memory: latched).desired == cut, "re-cut after wake inside band")
+        check(arun(90, external: false).desired == .released && arun(90, external: false).display == .onBattery, "adapter mode unplug releases")
+        check(!arun(90, memory: latched, external: false).memory.adapterLatched, "unplug clears latch")
+        check(arun(9, memory: latched).desired == .released && arun(9, memory: latched).display == .criticalLow, "adapter critical releases")
+        check(!arun(9, memory: latched).memory.adapterLatched, "critical clears latch")
+        check(arun(90, topUp: true).desired == .released && arun(90, topUp: true).display == .topUp, "adapter top up releases")
+        check(!arun(90, memory: latched, topUp: true).memory.adapterLatched, "top up clears latch")
+        // heat: no adapter action
+        var adHeat = ad; adHeat.heatProtectionEnabled = true
+        check(arun(50, adHeat, temp: 45).desired == .released && arun(50, adHeat, temp: 45).display == .idle, "adapter mode ignores heat")
+        check(arun(85, adHeat, temp: 45).desired == cut, "limit still cuts when hot")
+        // discharge and calibration keep priority
+        let adDis = AdvancedChargeMemory(discharge: DischargeRequest(requestedAt: t0))
+        check(arun(90, memory: adDis).desired == cut && arun(90, memory: adDis).display == .discharging, "adapter discharge request")
+        let adDis2 = arun(80, memory: adDis)
+        check(adDis2.memory.discharge == nil && adDis2.desired == cut && adDis2.display == .adapterCut, "discharge ends into hold")
+        let adCal = AdvancedChargeMemory(calibration: CalibrationSession(startedAt: t0, phase: .chargeToFull, holdStartedAt: nil))
+        check(arun(85, memory: adCal).desired == .released && arun(85, memory: adCal).display == .calibrating(.chargeToFull), "calibration beats adapter hold")
+        let adCal2 = AdvancedChargeMemory(calibration: CalibrationSession(startedAt: t0, phase: .dischargeToLow, holdStartedAt: nil), adapterLatched: true)
+        check(arun(50, memory: adCal2).desired == cut && arun(50, memory: adCal2).display == .calibrating(.dischargeToLow), "calibration discharge cuts")
+        check(arun(50, memory: adCal2, sleep: .asleep).desired == .released, "sleep releases calibration discharge in adapter mode")
+        check(arun(80, memory: adDis, topUp: true).desired == .released, "top up beats adapter discharge")
+        // charge-inhibit capable hardware ignores adapter setting
+        let both = run(input(85, settings: ad, caps: full))
+        check(both.desired == hold && !both.memory.adapterLatched, "inhibit-capable keeps old behaviour")
+        // old persisted data decodes
+        let oldSettings = try! JSONDecoder().decode(AdvancedChargeSettings.self, from: Data("{\"targetLimit\":70}".utf8))
+        check(oldSettings.targetLimit == 70 && !oldSettings.adapterModeEnabled, "old settings decode")
+        let oldMem = try! JSONDecoder().decode(AdvancedChargeMemory.self, from: Data("{\"limitLatched\":true,\"heatLatched\":false}".utf8))
+        check(oldMem.limitLatched && !oldMem.adapterLatched, "old memory decodes")
+
+        // Runner in adapter mode
+        let adFake = FakeBackend(); adFake.caps = adapterCaps
+        let adRunner = AdvancedChargeRunner(backend: adFake, defaults: UserDefaults(suiteName: "adapter-runner-\(UUID())")!)
+        adRunner.settings = ad
+        adRunner.update(percentage: 82, temperatureC: 25, externalConnected: true, isCharging: true, topUpActive: false, now: t0)
+        check(adFake.state == cut && adRunner.adapterStatusText?.contains("75") == true, "runner cuts adapter and reports status")
+        adRunner.setSleepState(.asleep, now: t0.addingTimeInterval(10))
+        check(adFake.state == .released, "runner restores adapter before sleep")
+        adRunner.setSleepState(.awake, now: t0.addingTimeInterval(20))
+        check(adFake.state == cut, "runner re-cuts after wake")
+        adRunner.update(percentage: 74, temperatureC: 25, externalConnected: true, isCharging: true, topUpActive: false, now: t0.addingTimeInterval(30))
+        check(adFake.state == .released && adRunner.adapterStatusText == nil, "runner restores adapter at resume level")
+
         // Runner
         let defaults = UserDefaults(suiteName: "advanced-charge-tests-\(UUID())")!
         let fake = FakeBackend()

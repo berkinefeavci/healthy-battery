@@ -924,3 +924,16 @@
 "Şarj sağlığı · son 7 gün" = "Ladezustand · letzte 7 Tage";
 "Şu saatte %100 hazır olsun" = "Zu einer Uhrzeit zu 100 % bereit";
 "Şu saatte %100 hazır olsun…" = "Zu einer Uhrzeit zu 100 % bereit…";
+"Adaptör kesildi" = "Netzteil getrennt";
+"Adaptör kesildi — pilden çalışıyor, %%%lld seviyesine inince açılır" = "Netzteil getrennt — Akkubetrieb, wieder ein bei %lld %%";
+"Adaptör modu" = "Netzteilmodus";
+"Adaptör modu (deneysel)" = "Netzteilmodus (experimentell)";
+"Başka bir şarj uygulaması açık (%@). Adaptör modu için önce onu kapatın." = "Eine andere Lade-App läuft (%@). Beenden Sie sie zuerst, um den Netzteilmodus zu nutzen.";
+"Başka bir şarj uygulaması açık; adaptör modu bekletiliyor." = "Eine andere Lade-App läuft; der Netzteilmodus pausiert.";
+"Bu Mac adaptör kesmeyi doğrulamadı." = "Dieser Mac hat das Trennen des Netzteils nicht bestätigt.";
+"Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Fiziksel test bekliyor." = "macOS erlaubt auf diesem Mac kein Stoppen des Ladevorgangs. Der Netzteilmodus trennt das Netzteil per Software, wenn der Akku das Ziel erreicht (der Mac läuft im Akkubetrieb), und schaltet es einige Punkte tiefer wieder zu. Er funktioniert nur, solange der Mac wach ist; vor dem Ruhezustand wird das Netzteil wieder verbunden, sodass der Akku im Ruhezustand bis zur macOS-Grenze über das Ziel steigen kann. Der Akku durchläuft etwa 1 flachen Zyklus pro Tag. Der physische Test steht noch aus.";
+"Hedef sınır ana sınır çubuğundan ayarlanır (%%%lld)." = "Das Ziel wird in der Hauptleiste eingestellt (%lld %%).";
+"Kuruluyor…" = "Wird installiert …";
+"Tek seferlik yönetici onayı ister." = "Fragt einmalig nach der Administratorfreigabe.";
+"Yardımcıyı kur" = "Hilfsprogramm installieren";
+"Önce şarj yardımcısını kurun." = "Installieren Sie zuerst das Lade-Hilfsprogramm.";

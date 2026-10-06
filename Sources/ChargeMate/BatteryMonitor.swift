@@ -376,10 +376,50 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     @Published private(set) var applyingLimit = false
     @Published private(set) var limitMessage: String?
     @Published private(set) var controlRecoveryRequired = false
+    /// Adapter mode (opt-in, set by the wiring controller): `chargeLimit` is the adapter target (20-100) and the
+    /// native macOS limit is only a sleep ceiling derived from it.
+    @Published private(set) var adapterModeActive = false
+    /// The user's native limit choice from before adapter mode, restored when it ends.
+    private var limitBeforeAdapterMode: Double? {
+        get { defaults.object(forKey: "limitBeforeAdapterMode") as? Double }
+        set { if let newValue { defaults.set(newValue, forKey: "limitBeforeAdapterMode") } else { defaults.removeObject(forKey: "limitBeforeAdapterMode") } }
+    }
+    /// Native sleep ceiling for an adapter target: max(80, target rounded up to 5), at most 100.
+    static func adapterCeiling(forTarget target: Int) -> Int { min(100, max(80, (target + 4) / 5 * 5)) }
+    /// Limits the main bar may select: 20-100 in steps of 5 in adapter mode, the native limits otherwise.
+    var barLimits: [Int] { adapterModeActive ? Array(stride(from: 20, through: 100, by: 5)) : nativeLimits }
+    /// The limit the native layer should hold for the current draft.
+    private var requestedNativeLimit: Int {
+        adapterModeActive ? Self.adapterCeiling(forTarget: Int(chargeLimit)) : Int(chargeLimit)
+    }
+    /// The target shown on the bar and in the toolbar.
+    var shownTarget: Int {
+        adapterModeActive ? Int(chargeLimit) : ChargeLimitDisplay.shown(native: nativeLimit, preference: chargeLimit)
+    }
     var hardwareControlAvailable: Bool {
         chargeLimit.isFinite && (0...100).contains(chargeLimit)
             && !controlRecoveryRequired && !otherControllerRunning && !applyingLimit
-            && nativeLimits.contains(Int(chargeLimit))
+            && nativeLimits.contains(requestedNativeLimit)
+    }
+
+    /// Switches adapter mode on/off. Turning it on keeps the macOS limit as a sleep ceiling; turning it off
+    /// restores the user's earlier limit (at least 80) and applies it.
+    func setAdapterMode(active: Bool) {
+        precondition(Thread.isMainThread)
+        guard active != adapterModeActive else { return }
+        if active {
+            if limitBeforeAdapterMode == nil {
+                limitBeforeAdapterMode = Double(max(80, nativeLimit ?? Int(chargeLimit)))
+            }
+            adapterModeActive = true
+        } else {
+            adapterModeActive = false
+            let saved = max(80, Int(limitBeforeAdapterMode ?? 80))
+            limitBeforeAdapterMode = nil
+            let options = nativeLimits.filter { $0 >= 80 }
+            chargeLimit = Double(options.min(by: { abs($0 - saved) < abs($1 - saved) }) ?? saved)
+        }
+        applyNativeLimit()
     }
     var topUpControlAvailable: Bool {
         if topUpActive { return !applyingLimit && !controlRecoveryRequired }
@@ -730,7 +770,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         precondition(Thread.isMainThread)
         otherControllerRunning = controllerRunning()
         guard hardwareControlAvailable else { return }
-        let requested = Int(chargeLimit)
+        let requested = requestedNativeLimit
+        // Adapter mode re-applies on every target change; skip when the ceiling already holds.
+        if adapterModeActive, committedLimit == requested, nativeLimit == requested { return }
         let request = ChargeControlCoordinator.Request(requested)
         pendingRequest = request
         cancellationRequested = false
@@ -768,7 +810,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
 
     func cancelDraftLimit() {
         precondition(Thread.isMainThread)
-        guard !applyingLimit, let saved = nativeLimit ?? committedLimit else { return }
+        guard !applyingLimit, !adapterModeActive, let saved = nativeLimit ?? committedLimit else { return }
         chargeLimit = Double(saved)
     }
 

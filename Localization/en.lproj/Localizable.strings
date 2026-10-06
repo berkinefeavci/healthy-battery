@@ -924,3 +924,16 @@
 "Şarj sağlığı · son 7 gün" = "Charge health · last 7 days";
 "Şu saatte %100 hazır olsun" = "Be 100% ready at a set time";
 "Şu saatte %100 hazır olsun…" = "Be 100% ready at a set time…";
+"Adaptör kesildi" = "Adapter cut";
+"Adaptör kesildi — pilden çalışıyor, %%%lld seviyesine inince açılır" = "Adapter cut — running on battery, restores at %lld%%";
+"Adaptör modu" = "Adapter mode";
+"Adaptör modu (deneysel)" = "Adapter mode (experimental)";
+"Başka bir şarj uygulaması açık (%@). Adaptör modu için önce onu kapatın." = "Another charging app is running (%@). Quit it first to use adapter mode.";
+"Başka bir şarj uygulaması açık; adaptör modu bekletiliyor." = "Another charging app is running; adapter mode is on hold.";
+"Bu Mac adaptör kesmeyi doğrulamadı." = "This Mac did not verify adapter cut-off.";
+"Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Fiziksel test bekliyor." = "macOS does not allow stopping charging on this Mac. Adapter mode cuts the adapter in software when the battery reaches the target (the Mac runs from the battery) and restores it a few points lower. It only works while the Mac is awake; the adapter is restored before sleep, so during sleep the battery may rise above the target up to the macOS ceiling. The battery uses about 1 shallow cycle per day. Physical testing is pending.";
+"Hedef sınır ana sınır çubuğundan ayarlanır (%%%lld)." = "The target is set on the main limit bar (%lld%%).";
+"Kuruluyor…" = "Installing…";
+"Tek seferlik yönetici onayı ister." = "Asks for administrator approval once.";
+"Yardımcıyı kur" = "Install helper";
+"Önce şarj yardımcısını kurun." = "Install the charging helper first.";

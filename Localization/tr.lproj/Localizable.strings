@@ -924,3 +924,16 @@
 "Şarj sağlığı · son 7 gün" = "Şarj sağlığı · son 7 gün";
 "Şu saatte %100 hazır olsun" = "Şu saatte %100 hazır olsun";
 "Şu saatte %100 hazır olsun…" = "Şu saatte %100 hazır olsun…";
+"Adaptör kesildi" = "Adaptör kesildi";
+"Adaptör kesildi — pilden çalışıyor, %%%lld seviyesine inince açılır" = "Adaptör kesildi — pilden çalışıyor, %%%lld seviyesine inince açılır";
+"Adaptör modu" = "Adaptör modu";
+"Adaptör modu (deneysel)" = "Adaptör modu (deneysel)";
+"Başka bir şarj uygulaması açık (%@). Adaptör modu için önce onu kapatın." = "Başka bir şarj uygulaması açık (%@). Adaptör modu için önce onu kapatın.";
+"Başka bir şarj uygulaması açık; adaptör modu bekletiliyor." = "Başka bir şarj uygulaması açık; adaptör modu bekletiliyor.";
+"Bu Mac adaptör kesmeyi doğrulamadı." = "Bu Mac adaptör kesmeyi doğrulamadı.";
+"Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Fiziksel test bekliyor." = "Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Fiziksel test bekliyor.";
+"Hedef sınır ana sınır çubuğundan ayarlanır (%%%lld)." = "Hedef sınır ana sınır çubuğundan ayarlanır (%%%lld).";
+"Kuruluyor…" = "Kuruluyor…";
+"Tek seferlik yönetici onayı ister." = "Tek seferlik yönetici onayı ister.";
+"Yardımcıyı kur" = "Yardımcıyı kur";
+"Önce şarj yardımcısını kurun." = "Önce şarj yardımcısını kurun.";

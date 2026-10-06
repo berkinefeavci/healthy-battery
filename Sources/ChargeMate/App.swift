@@ -188,6 +188,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                                                           name: NSWorkspace.willSleepNotification, object: nil)
         // Inert until a supported ChargeInhibitBackend is injected into AdvancedChargeRunner.shared.
         AdvancedChargeRunner.shared.start()
+        AdapterModeController.shared.start()
         battery.snapshotObserver = { [weak battery] snapshot in
             guard let percentage = snapshot.percentage ?? snapshot.hardwarePercentage else { return }
             AdvancedChargeRunner.shared.update(percentage: percentage, temperatureC: snapshot.temperatureC,

@@ -17,6 +17,8 @@ enum AdvancedChargeLimits {
     static let maxSailingDelta = 15
     static let defaultHeatHigh = 35.0
     static let defaultHeatLow = 32.0
+    /// Adapter mode: the adapter is restored this many points (at least) below the target.
+    static let adapterMinBand = 5
     static let calibrationLow = 15
     static let calibrationHold: TimeInterval = 3600
     static let calibrationMaxDuration: TimeInterval = 24 * 3600
@@ -37,6 +39,26 @@ struct AdvancedChargeSettings: Codable, Equatable {
     var heatPauseAbove = AdvancedChargeLimits.defaultHeatHigh
     var heatResumeBelow = AdvancedChargeLimits.defaultHeatLow
     var sleepBehaviorEnabled = false
+    /// Opt-in adapter mode: cut wall power at the target, restore it below the band. Only used when the
+    /// hardware cannot stop charging (`canInhibitCharging == false`) but can cut the adapter.
+    var adapterModeEnabled = false
+}
+
+extension AdvancedChargeSettings {
+    /// Older saved settings lack newer keys; missing keys fall back to defaults instead of failing.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        var d = AdvancedChargeSettings()
+        d.targetLimit = try c.decodeIfPresent(Int.self, forKey: .targetLimit) ?? d.targetLimit
+        d.sailingEnabled = try c.decodeIfPresent(Bool.self, forKey: .sailingEnabled) ?? d.sailingEnabled
+        d.sailingDelta = try c.decodeIfPresent(Int.self, forKey: .sailingDelta) ?? d.sailingDelta
+        d.heatProtectionEnabled = try c.decodeIfPresent(Bool.self, forKey: .heatProtectionEnabled) ?? d.heatProtectionEnabled
+        d.heatPauseAbove = try c.decodeIfPresent(Double.self, forKey: .heatPauseAbove) ?? d.heatPauseAbove
+        d.heatResumeBelow = try c.decodeIfPresent(Double.self, forKey: .heatResumeBelow) ?? d.heatResumeBelow
+        d.sleepBehaviorEnabled = try c.decodeIfPresent(Bool.self, forKey: .sleepBehaviorEnabled) ?? d.sleepBehaviorEnabled
+        d.adapterModeEnabled = try c.decodeIfPresent(Bool.self, forKey: .adapterModeEnabled) ?? d.adapterModeEnabled
+        self = d
+    }
 }
 
 enum CalibrationPhase: String, Codable, Equatable {
@@ -60,8 +82,21 @@ struct AdvancedChargeMemory: Codable, Equatable {
     var heatLatched = false
     var discharge: DischargeRequest?
     var calibration: CalibrationSession?
+    /// Adapter mode hysteresis latch (not persisted: after a restart the adapter simply comes back).
+    var adapterLatched = false
 
     var needsPersistence: Bool { discharge != nil || calibration != nil }
+}
+
+extension AdvancedChargeMemory {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(limitLatched: try c.decodeIfPresent(Bool.self, forKey: .limitLatched) ?? false,
+                  heatLatched: try c.decodeIfPresent(Bool.self, forKey: .heatLatched) ?? false,
+                  discharge: try c.decodeIfPresent(DischargeRequest.self, forKey: .discharge),
+                  calibration: try c.decodeIfPresent(CalibrationSession.self, forKey: .calibration),
+                  adapterLatched: try c.decodeIfPresent(Bool.self, forKey: .adapterLatched) ?? false)
+    }
 }
 
 enum SleepState: Equatable { case awake, aboutToSleep, asleep }
@@ -83,6 +118,8 @@ struct AdvancedChargeInput {
 enum AdvancedChargeDisplay: Equatable {
     case unavailable, idle, criticalLow, onBattery, topUp
     case holdingAtLimit, sailing, heatPaused, discharging
+    /// Adapter mode: wall power is cut, the Mac runs from the battery until the resume level.
+    case adapterCut
     case calibrating(CalibrationPhase)
 }
 
@@ -108,9 +145,12 @@ enum AdvancedChargeEngine {
                                  sleepMayOvershoot: sleepNote)
         }
 
-        guard input.capabilities.canInhibitCharging else {
+        let adapterMode = !input.capabilities.canInhibitCharging && input.capabilities.canForceDischarge
+            && settings.adapterModeEnabled
+        guard input.capabilities.canInhibitCharging || adapterMode else {
             return out(released, .unavailable, input.capabilities.reason ?? "Charge control is not available.")
         }
+        let cutAdapter = ChargeInhibitState(chargingInhibited: false, adapterInhibited: true)
 
         // Timeouts first: a stale request can never keep the adapter cut.
         if let d = memory.discharge, input.now.timeIntervalSince(d.requestedAt) > AdvancedChargeLimits.dischargeMaxDuration {
@@ -127,23 +167,32 @@ enum AdvancedChargeEngine {
         if input.percentage < ChargeInhibitSafety.criticalPercent {
             memory.limitLatched = false
             memory.heatLatched = false
+            memory.adapterLatched = false
             memory.discharge = nil
             return out(released, .criticalLow, "Battery is below the critical level; charging is always allowed.")
         }
         if !input.externalConnected {
             memory.limitLatched = false
             memory.heatLatched = false
+            memory.adapterLatched = false
             memory.discharge = nil
             return out(released, .onBattery, "Adapter is not connected.")
         }
         if input.topUpActive {
             memory.limitLatched = false
             memory.heatLatched = false
+            memory.adapterLatched = false
             return out(released, .topUp, "Top Up is active; charge inhibit is released.")
         }
 
+        if adapterMode && input.sleep != .awake {
+            // The adapter must be back before the Mac sleeps; the latch survives so it re-cuts on wake.
+            return out(released, .idle, "Adapter mode: adapter restored while the Mac sleeps.")
+        }
+
         // Heat latch (hysteresis). Missing sensor drops the latch rather than blocking charging forever.
-        if settings.heatProtectionEnabled, let t = input.temperatureC {
+        // Adapter mode has no heat action: native heat protection (Faz 2) handles it.
+        if settings.heatProtectionEnabled, !adapterMode, let t = input.temperatureC {
             if t > settings.heatPauseAbove { memory.heatLatched = true }
             else if t < settings.heatResumeBelow { memory.heatLatched = false }
         } else {
@@ -182,6 +231,20 @@ enum AdvancedChargeEngine {
                        "Charging paused: battery is warmer than \(Int(settings.heatPauseAbove)) °C.")
         }
 
+        if adapterMode {
+            guard target < 100 else {
+                memory.adapterLatched = false
+                return out(released, .idle, "No limit set.")
+            }
+            let resumeAt = adapterResumeAt(target: target, sailingDelta: settings.sailingDelta)
+            if input.percentage >= target { memory.adapterLatched = true }
+            else if memory.adapterLatched && input.percentage <= resumeAt { memory.adapterLatched = false }
+            if memory.adapterLatched {
+                return out(cutAdapter, .adapterCut, "Adapter cut at \(target)%: running on battery until \(resumeAt)%.")
+            }
+            return out(released, .idle, "Charging toward \(target)%.")
+        }
+
         // Limit with optional sailing hysteresis.
         guard target < 100 else {
             memory.limitLatched = false
@@ -201,6 +264,11 @@ enum AdvancedChargeEngine {
                        sleepNote: note)
         }
         return out(released, .idle, "Charging toward \(target)%.")
+    }
+
+    /// Level at which adapter mode restores wall power: `target - max(5, sailingDelta)`.
+    static func adapterResumeAt(target: Int, sailingDelta: Int) -> Int {
+        target - max(AdvancedChargeLimits.adapterMinBand, AdvancedChargeLimits.clampedDelta(sailingDelta))
     }
 
     /// Moves a calibration session through its phases; nil when the final recharge reached 100%.
