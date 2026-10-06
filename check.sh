@@ -260,3 +260,6 @@ xcrun swiftc $S/ReadyByPlanner.swift $S/Schedule.swift $S/HeatProtection.swift $
 for helper in $(grep -o 'Contents/Resources/Cellkeep[A-Za-z]*Helper' build.sh | sed 's|.*/||' | sort -u); do
   grep -E '^helper_names=\(' release.sh | grep -qw "$helper" || { echo "release.sh does not sign $helper" >&2; exit 1; }
 done
+# SwiftUI views read power-mode capabilities while rendering; that path must never spin the
+# run loop (waitUntilExit re-entered layout and crashed with an AttributeGraph precondition).
+grep -Fq 'static func availableModes() -> Set<SystemPowerMode> { cachedModes }' Sources/ChargeMate/PowerMode.swift
