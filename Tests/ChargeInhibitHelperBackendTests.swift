@@ -61,6 +61,21 @@ import Foundation
         let noneCaps = backend(none).capabilities()
         precondition(!noneCaps.canInhibitCharging && !noneCaps.canForceDischarge && noneCaps.reason != nil)
 
+        // This Mac: CHTE missing, CHIE present -> adapter capability without CHTE, no reason.
+        let mac = FakeHelper(); mac.responses["C\n"] = "0 0 1 1 0"
+        let macCaps = backend(mac).capabilities()
+        precondition(!macCaps.canInhibitCharging && macCaps.canForceDischarge && macCaps.reason == nil)
+        // CHIE write refused by macOS (gated): distinct reason, nothing usable.
+        let gated = FakeHelper(); gated.responses["C\n"] = "0 0 0 1 2"
+        let gatedCaps = backend(gated).capabilities()
+        precondition(!gatedCaps.canForceDischarge && gatedCaps.reason == ChargeInhibitWire.Failure.gated.errorDescription)
+        precondition(gatedCaps.reason != ChargeInhibitWire.Failure.unsupported.errorDescription)
+        gated.responses["S 0 1\n"] = "6"
+        do { _ = try backend(gated).apply(.init(chargingInhibited: false, adapterInhibited: true)); preconditionFailure() }
+        catch let failure as ChargeInhibitWire.Failure { precondition(failure == .unsupported) }
+        do { _ = try ChargeInhibitWire.state(from: "6"); preconditionFailure() }
+        catch let failure as ChargeInhibitWire.Failure { precondition(failure == .gated) }
+
         // Apply is verified against the request; a mismatching reply is an error.
         let appliedState = try backend(both).apply(.init(chargingInhibited: true, adapterInhibited: false))
         precondition(appliedState.chargingInhibited)

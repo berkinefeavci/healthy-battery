@@ -4,7 +4,7 @@ Bu testi insan çalıştırır. Kod yazan ajan hiçbir SMC yazması, kurulum ya 
 
 Güvenlik ağı: helper her başlangıçta ve her çıkışta her şeyi serbest bırakır. Test boyunca elinizin altında şarj aleti ve ikinci bir terminal bulundurun. Acil çıkış (her zaman): `sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.chargeinhibit` (SIGTERM gönderir, helper serbest bırakır).
 
-Önkoşul: Mac17,8, macOS 26, pil %80-90, adaptör takılı, AlDente/batt gibi rakip uygulama KAPALI. `./build.sh` ile `.build/Cellkeep.app` hazır. SMC probe sonucu için `docs/2026-10-06-SMC-probe.md`: bu Mac'te `CHTE` yok, `CHIE` var; bu yüzden Bölüm B (şarj durdurma) yalnızca helper `C` komutunda ilk sayı 1 dönerse yapılır.
+Önkoşul: Mac17,8, macOS 27, pil %80-90, adaptör takılı, AlDente/batt gibi rakip uygulama KAPALI. `./build.sh` ile `.build/Cellkeep.app` hazır. SMC probe sonucu için `docs/2026-10-06-SMC-probe.md`: bu Mac'te `CHTE` yok, `CHIE` var (macOS 27'de `CH0B/CH0C/CHTE/CH0I/CH0J` Apple yetkisine bağlı, `0xe00002c1`); bu yüzden Bölüm B (şarj durdurma) yalnızca helper `C` komutunda ilk sayı 1 dönerse yapılır. Asıl test Bölüm C (adaptör kesme, `CHIE`).
 
 ## 0. El ile kurulum (uygulama otomatik kurmaz)
 ```
@@ -33,7 +33,16 @@ ask 'S 0 1\n'    # adaptörü kes (pilden çalış)
 ask 'S 0 0\n'    # her şeyi serbest bırak
 ask 'H\n'        # heartbeat
 ```
-Yanıt kodları: 0 tamam, 2 geçersiz istek, 3 güvenlik kuralıyla reddedildi, 4 yazma/doğrulama başarısız (helper her şeyi serbest bıraktı), 5 bu Mac'te anahtar yok.
+Yanıt kodları: 0 tamam, 2 geçersiz istek, 3 güvenlik kuralıyla reddedildi, 4 yazma/doğrulama başarısız (helper her şeyi serbest bıraktı), 5 bu Mac'te anahtar yok, 6 macOS anahtarı yetkiye bağlamış (gated, kIOReturnNotPrivileged).
+`C` yanıtı: `0 <şarj> <adaptör> <şarj-sebep> <adaptör-sebep>`; sebep 0 tamam, 1 yok (missing), 2 gated, 3 hata. Bu Mac'te beklenen: `0 0 1 1 0`.
+
+Salt-okunur kapı kontrolü (yazma yapmaz, root gerekmez): `"$H" --check-gating`
+
+Kısa kendi testi (tek komut dizisi, önce izleme penceresini açın):
+```
+ask 'C\n'; ask 'S 0 1\n'; sleep 3; ask 'R\n'; ioreg -rn AppleSmartBattery | grep -E '"(ExternalConnected|InstantAmperage)"'; ask 'S 0 0\n'; ask 'R\n'
+```
+Beklenen: `S 0 1` -> `0 0 1`, `R` -> `0 0 1`, sonra `S 0 0` -> `0 0 0`. `S 0 1` `6` dönerse CHIE de macOS tarafından kapılanmış demektir: DURUN, çıktıyı kaydedin (bu Mac'te adaptör kesme mümkün değil).
 
 İzleme penceresi (ayrı terminal, tüm testlerde açık):
 ```
@@ -58,6 +67,10 @@ Log: `sudo log show --last 5m --predicate 'process == "io.github.berkinefeavci.c
 3. `ask 'S 0 0\n'` -> adaptör geri gelir, 10 sn içinde `ExternalConnected = Yes`, şarj yeniden başlar.
 4. Deşarj sonrası adaptör geri geliyor mu: C.1 ile pili %2-3 düşürün, sonra C.3; her şey normale dönmeli.
 
+## C2. Adaptör kesikken kablo algılama
+1. `S 0 1` etkinken `ioreg -rn AppleSmartBattery | grep ExternalConnected` (muhtemelen `No`) ve `"$H" --check-gating | grep AC-W` (bayt `> 00`, ör. `04`). Beklenen: Mac pilden çalışır (`InstantAmperage` negatif, `pmset -g batt` "Battery Power"), kablo takılı kalır, `AC-W` hâlâ `> 0`, helper serbest BIRAKMAZ (log'da `released (unplugged)` OLMAMALI).
+2. Kabloyu çekin: `AC-W` <= 0 olmalı ve 1-2 sn içinde `released (unplugged)`; `R` -> `0 0 0`. Not: kablo çekilince `AC-W` değeri ve `AdapterDetails` ne oluyor, kaydedin.
+
 ## D. Uygulama/heartbeat ölümü (watchdog, en önemli test)
 1. `S 0 1\n` (ya da B anahtarı varsa `S 1 0\n`) gönderin, HEARTBEAT GÖNDERMEYİN.
 2. Saati başlatın. En geç 60-62 sn içinde: `ask 'R\n'` -> `0 0 0`, adaptör/şarj geri. Log'da `released (watchdog)` görün. Süreyi kaydedin.
@@ -70,6 +83,8 @@ Log: `sudo log show --last 5m --predicate 'process == "io.github.berkinefeavci.c
 2. `S` ile reddedilme: kablo çıkıkken `ask 'S 0 1\n'` -> `3`.
 
 ## F. Uyku / uyanma
+(Helper hem `kIOMessageCanSystemSleep` hem `kIOMessageSystemWillSleep` gelince `CHIE=00` yazar ve ancak ondan sonra uykuya izin verir; uyanınca SMC'yi yeniden okuyup kalan inhibit varsa serbest bırakır, log: `released (wake)`.)
+0. `S 0 1` etkinken `pmset sleepnow`; uyandırınca `"$H" --check-gating` ve `R` -> adaptör `0`, Mac şarj olabiliyor.
 1. `S 0 1` etkinken `pmset sleepnow`. 20 sn sonra uyandırın. Beklenen: `R` -> `0 0 0`, log'da `released (sleep)`; Mac uyurken pilin normal şarjla uyuduğunu kapak-ışığı/akım ile doğrulayın.
 2. Uyanma sonrası otomatik yeniden inhibit olmamalı.
 3. Kapağı kapat/aç (kapak uykusu) için tekrar edin.
@@ -97,5 +112,8 @@ Sonunda `pmset -g batt` ve `ioreg -rn AppleSmartBattery | grep -E 'IsCharging|Ex
 | E kablo | | | |
 | F uyku | | | |
 | G eşikler | | | |
+
+## Uygulama ölümü kısa özeti (istenen protokol sırası)
+1. Helper'ı elle kurun (Bölüm 0). 2. %85 civarında `S 0 1` ile adaptör kesme; kablo takılıyken pilden çalıştığını (negatif amper) ve `AC-W > 0` olduğunu doğrulayın. 3. Uygulamayı/heartbeat döngüsünü öldürün: adaptör <= 60 sn içinde geri gelir. 4. Uyku: geri gelir. 5. Kablo çekme: algılanır. 6. Temizlik: `ask 'S 0 0\n'` (= `CHIE=00`), sonra Bölüm H.
 
 Hata ayıklama yazılımı için gizli açma bayrağı (yalnızca test): `defaults write io.github.berkinefeavci.cellkeep debug.chargeInhibitUnlocked -bool YES` (kapatmak için `-bool NO`). Arayüzde açma yolu yoktur.

@@ -3,12 +3,13 @@ import Foundation
 /// Wire format of `Tools/ChargeInhibitIPC.h`. Pure, so the protocol is unit-testable without a helper.
 enum ChargeInhibitWire {
     enum Failure: Error, Equatable, LocalizedError {
-        case badRequest, refused, failed, unsupported, malformed, helperMissing, helperNotTrusted, locked
+        case badRequest, refused, failed, unsupported, gated, malformed, helperMissing, helperNotTrusted, locked
         var errorDescription: String? {
             switch self {
             case .badRequest: return "Şarj durdurma yardımcısı isteği anlamadı."
             case .refused: return "Şarj durdurma güvenlik kuralıyla reddedildi (pil düşük, adaptör yok veya uyku)."
             case .failed: return "Şarj durdurma yazılamadı ya da doğrulanamadı; her şey serbest bırakıldı."
+            case .gated: return "macOS bu anahtarı özel yetkiye bağlamış (kIOReturnNotPrivileged); root olsa bile yazılamıyor."
             case .unsupported: return "Bu Mac'te doğrulanmış şarj durdurma anahtarı yok."
             case .malformed: return "Şarj durdurma yardımcısından geçersiz yanıt geldi."
             case .helperMissing: return "Şarj durdurma yardımcısı kurulu değil."
@@ -27,7 +28,7 @@ enum ChargeInhibitWire {
     }
 
     /// Splits "<status> <values…>"; throws the matching failure for a non-zero status.
-    static func values(from response: String) throws -> [Int] {
+    static func values(from response: String, allowed: ClosedRange<Int> = 0...1) throws -> [Int] {
         let fields = response.split(whereSeparator: \.isWhitespace).map(String.init)
         guard let first = fields.first, let status = Int(first) else { throw Failure.malformed }
         switch status {
@@ -36,10 +37,11 @@ enum ChargeInhibitWire {
         case 3: throw Failure.refused
         case 4: throw Failure.failed
         case 5: throw Failure.unsupported
+        case 6: throw Failure.gated
         default: throw Failure.malformed
         }
         let numbers = fields.dropFirst().compactMap { Int($0) }
-        guard numbers.count == fields.count - 1, numbers.allSatisfy({ $0 == 0 || $0 == 1 }) else { throw Failure.malformed }
+        guard numbers.count == fields.count - 1, numbers.allSatisfy({ allowed.contains($0) }) else { throw Failure.malformed }
         return numbers
     }
 
@@ -49,10 +51,12 @@ enum ChargeInhibitWire {
         return ChargeInhibitState(chargingInhibited: numbers[0] == 1, adapterInhibited: numbers[1] == 1)
     }
 
-    static func capabilities(from response: String) throws -> (charging: Bool, adapter: Bool) {
-        let numbers = try values(from: response)
-        guard numbers.count == 2 else { throw Failure.malformed }
-        return (numbers[0] == 1, numbers[1] == 1)
+    /// "0 c a" (old) or "0 c a chargingReason adapterReason" with reasons 0 ok, 1 missing, 2 gated, 3 error.
+    static func capabilities(from response: String) throws -> (charging: Bool, adapter: Bool, chargingReason: Int, adapterReason: Int) {
+        let numbers = try values(from: response, allowed: 0...3)
+        guard numbers.count == 2 || numbers.count == 4, numbers[0] <= 1, numbers[1] <= 1 else { throw Failure.malformed }
+        let reasons = numbers.count == 4 ? (numbers[2], numbers[3]) : (numbers[0] == 1 ? 0 : 1, numbers[1] == 1 ? 0 : 1)
+        return (numbers[0] == 1, numbers[1] == 1, reasons.0, reasons.1)
     }
 }
 
@@ -83,9 +87,12 @@ struct ChargeInhibitHelperBackend: ChargeInhibitBackend {
         do {
             let verified = try ChargeInhibitWire.capabilities(from: transport(ChargeInhibitWire.capabilitiesRequest))
             guard verified.charging || verified.adapter else {
+                // Gated (macOS refuses the key) is reported distinctly from missing (no such key).
+                let gated = verified.chargingReason == 2 || verified.adapterReason == 2
                 return ChargeInhibitCapabilities(canInhibitCharging: false, canForceDischarge: false,
-                                                 reason: ChargeInhibitWire.Failure.unsupported.errorDescription)
+                                                 reason: (gated ? ChargeInhibitWire.Failure.gated : .unsupported).errorDescription)
             }
+            // The adapter channel (CHIE) alone is enough; CHTE is not required.
             return ChargeInhibitCapabilities(canInhibitCharging: verified.charging, canForceDischarge: verified.adapter,
                                              reason: nil)
         } catch {

@@ -19,6 +19,7 @@ static int call(const char *key, uint32_t index, uint8_t command, uint32_t size,
     size_t outSize = 80;
     memset(out, 0, 80);
     kern_return_t result = IOConnectCallStructMethod(smc, 2, in, 80, out, &outSize);
+    if (result == kIOReturnNotPrivileged) return 0x2c1; // gated by macOS 27 entitlement
     if (result != kIOReturnSuccess) return -1;
     if (outSize != 80) return -2;
     return out[40] == 0 ? 0 : out[40];
@@ -37,7 +38,7 @@ static int info(const char *key, uint32_t *size, char type[5]) {
 static void report(const char *key) {
     uint32_t size = 0; char type[5] = {0};
     int status = info(key, &size, type);
-    if (status) { printf("%-5s  absent (status 0x%02x)\n", key, status & 0xff); return; }
+    if (status) { printf("%-5s  %s (status 0x%02x)\n", key, status == 0x2c1 ? "GATED" : "absent", status & 0xff); return; }
     uint8_t out[80];
     status = call(key, 0, CMD_READ, size, out);
     printf("%-5s  type=%-4s size=%u  ", key, type, size);

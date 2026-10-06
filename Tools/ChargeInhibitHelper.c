@@ -44,7 +44,9 @@ static int smc_call(const char *key, uint8_t command, int size, const uint8_t *p
     if (payload) memcpy(in + 48, payload, (size_t)size);
     size_t outSize = 80;
     memset(out, 0, 80);
-    if (IOConnectCallStructMethod(smcConnection, 2, in, 80, out, &outSize) != kIOReturnSuccess || outSize != 80) {
+    kern_return_t call = IOConnectCallStructMethod(smcConnection, 2, in, 80, out, &outSize);
+    if (call == kIOReturnNotPrivileged) return CI_SMC_GATED; // macOS 27 entitlement gate; connection stays usable
+    if (call != kIOReturnSuccess || outSize != 80) {
         IOServiceClose(smcConnection); smcConnection = 0; // reopen on the next call
         return -1;
     }
@@ -77,10 +79,10 @@ static int real_write(void *context, const char *key, int size, const uint8_t *b
 static CISMCOps smcOps = {real_info, real_read, real_write, NULL};
 
 // ---------------------------------------------------------------- battery
-static int read_battery(int *percent, int *adapterPresent) {
+static int read_battery(int *percent, int *adapterDetails) {
     io_service_t battery = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSmartBattery"));
     if (!battery) return -1;
-    int current = -1, maximum = -1, external = 0, adapter = 0;
+    int current = -1, maximum = -1, adapter = 0;
     CFTypeRef value;
     if ((value = IORegistryEntryCreateCFProperty(battery, CFSTR("CurrentCapacity"), kCFAllocatorDefault, 0))) {
         if (CFGetTypeID(value) == CFNumberGetTypeID()) CFNumberGetValue(value, kCFNumberIntType, &current);
@@ -88,10 +90,6 @@ static int read_battery(int *percent, int *adapterPresent) {
     }
     if ((value = IORegistryEntryCreateCFProperty(battery, CFSTR("MaxCapacity"), kCFAllocatorDefault, 0))) {
         if (CFGetTypeID(value) == CFNumberGetTypeID()) CFNumberGetValue(value, kCFNumberIntType, &maximum);
-        CFRelease(value);
-    }
-    if ((value = IORegistryEntryCreateCFProperty(battery, CFSTR("ExternalConnected"), kCFAllocatorDefault, 0))) {
-        external = CFGetTypeID(value) == CFBooleanGetTypeID() && CFBooleanGetValue(value);
         CFRelease(value);
     }
     // While the adapter is logically inhibited macOS may report ExternalConnected = No even though
@@ -103,7 +101,7 @@ static int read_battery(int *percent, int *adapterPresent) {
     IOObjectRelease(battery);
     // Apple Silicon reports CurrentCapacity as a percentage with MaxCapacity 100.
     *percent = (current >= 0 && maximum > 0) ? (int)((current * 100.0) / maximum + 0.5) : -1;
-    *adapterPresent = external || adapter;
+    *adapterDetails = adapter; // ExternalConnected is intentionally not read: see ci_cable_present
     return 0;
 }
 
@@ -121,8 +119,11 @@ static double monotonic_seconds(void) {
 
 static CIInputs current_inputs(void) {
     CIInputs inputs = {monotonic_seconds(), -1, 0, sleeping, shuttingDown};
-    int percent = -1, adapter = 0;
-    if (!read_battery(&percent, &adapter)) { inputs.batteryPercent = percent; inputs.adapterPresent = adapter; }
+    int percent = -1, details = 0, acW = 0;
+    int acReadable = ci_read_ac_w(&smcOps, &acW) == 0;
+    if (!read_battery(&percent, &details)) inputs.batteryPercent = percent;
+    CIPlugInputs plug = {acReadable, acW, details};
+    inputs.adapterPresent = ci_cable_present(&plug);
     return inputs;
 }
 
@@ -162,7 +163,9 @@ static void handle_client(int client) {
         else dprintf(client, "%d\n", CI_FAILED);
         break;
     case CI_CMD_CAPABILITIES:
-        dprintf(client, "0 %d %d\n", capabilities.charging != NULL, capabilities.adapter != NULL);
+        dprintf(client, "0 %d %d %d %d\n", ci_channel_usable(capabilities.charging, capabilities.chargingReason),
+                ci_channel_usable(capabilities.adapter, capabilities.adapterReason),
+                (int)capabilities.chargingReason, (int)capabilities.adapterReason);
         break;
     case CI_CMD_HEARTBEAT:
         ci_heartbeat(&engine, &inputs);
@@ -172,7 +175,7 @@ static void handle_client(int client) {
         CIStatus status = ci_request(&engine, &inputs, &capabilities, wanted);
         if (status == CI_OK) {
             status = ci_apply_state(&smcOps, &capabilities, engine.requested, &actual);
-            if (status != CI_OK) release_everything(CI_REASON_VERIFY_FAILED);
+            if (status != CI_OK) release_everything(CI_REASON_VERIFY_FAILED); // CI_GATED stays sticky in capabilities
         } else if (status == CI_REFUSED) {
             release_everything(CI_REASON_REQUEST); // a refused inhibit must leave nothing inhibited
         }
@@ -214,25 +217,24 @@ static int trusted_client(int socketFD) {
 // ---------------------------------------------------------------- power events and signals
 static void power_callback(void *refcon, io_service_t service, natural_t message, void *argument) {
     (void)refcon; (void)service;
+    CIPowerEvent event;
     switch (message) {
-    case kIOMessageCanSystemSleep:
-        IOAllowPowerChange(powerRoot, (intptr_t)argument);
-        break;
-    case kIOMessageSystemWillSleep:
-        sleeping = 1;
-        release_everything(CI_REASON_SLEEP); // before acknowledging, so the Mac sleeps with normal charging
-        IOAllowPowerChange(powerRoot, (intptr_t)argument);
-        break;
-    case kIOMessageSystemWillPowerOn:
-    case kIOMessageSystemHasPoweredOn:
-        sleeping = 0; // stays released; the app has to ask again
-        break;
-    case kIOMessageSystemWillPowerOff:
-        shuttingDown = 1;
-        release_everything(CI_REASON_SHUTDOWN);
-        IOAllowPowerChange(powerRoot, (intptr_t)argument);
-        break;
-    default: break;
+    case kIOMessageCanSystemSleep: event = CI_POWER_CAN_SLEEP; break;
+    case kIOMessageSystemWillSleep: event = CI_POWER_WILL_SLEEP; break;
+    case kIOMessageSystemHasPoweredOn: event = CI_POWER_HAS_POWERED_ON; break;
+    case kIOMessageSystemWillPowerOff: event = CI_POWER_WILL_POWER_OFF; break;
+    default: return;
+    }
+    CIPowerPlan plan = ci_power_plan(event);
+    if (plan.setSleeping >= 0) sleeping = plan.setSleeping;
+    if (plan.setShuttingDown) shuttingDown = 1;
+    if (plan.release) release_everything(plan.reason); // before acknowledging, so the Mac sleeps with the adapter restored
+    if (plan.acknowledge) IOAllowPowerChange(powerRoot, (intptr_t)argument);
+    if (plan.recheckAfter) {
+        // After wake nothing may stay cut off (the SMC can keep CHIE across sleep): re-read and restore.
+        CIState actual;
+        if (releasePending || ci_read_state(&smcOps, &capabilities, &actual) != CI_OK || !ci_state_is_released(actual))
+            release_everything(CI_REASON_WAKE);
     }
 }
 
@@ -254,6 +256,28 @@ static int open_server(void) {
     return server;
 }
 
+// READ-ONLY report for the human: never calls SMC_WRITE. Works without root.
+static int check_gating(void) {
+    const char *keys[] = {"CHTE", "CHIE", "CH0B", "CH0C", "CH0I", "CH0J", "AC-W", NULL};
+    for (int i = 0; keys[i]; i++) {
+        uint8_t out[80];
+        int code = smc_call(keys[i], SMC_INFO, 0, NULL, out);
+        if (code) { printf("%-5s info: %s (code 0x%x)\n", keys[i], ci_key_reason_name(ci_classify_smc_error(code)), code); continue; }
+        int size = (int)out[28]; char type[5];
+        for (int k = 0; k < 4; k++) type[k] = (char)out[35 - k];
+        type[4] = 0;
+        printf("%-5s present type=%s size=%d  ", keys[i], type, size);
+        if (size < 1 || size > CI_MAX_KEY_BYTES) { puts("read: skipped (size)"); continue; }
+        code = smc_call(keys[i], SMC_READ, size, NULL, out);
+        if (code) { printf("read: %s (code 0x%x)\n", ci_key_reason_name(ci_classify_smc_error(code)), code); continue; }
+        printf("read: ok bytes=");
+        for (int k = 0; k < size; k++) printf("%02x", out[48 + k]);
+        putchar('\n');
+    }
+    puts("(read-only: no write was attempted; write gating on CHIE is only visible through 'S' and the helper log)");
+    return 0;
+}
+
 static int self_test(void) {
     CIState state = {0, 0};
     const uint8_t off1[] = {0}, on1[] = {8};
@@ -266,6 +290,7 @@ static int self_test(void) {
 int main(int argc, char **argv) {
     if (argc == 2 && !strcmp(argv[1], "--version")) { printf("%d\n", CI_HELPER_VERSION); return 0; }
     if (argc == 2 && !strcmp(argv[1], "--self-test")) return self_test();
+    if (argc == 2 && !strcmp(argv[1], "--check-gating")) return check_gating();
     if (argc == 3 && !strcmp(argv[1], "--authorize-uid")) {
         char *tail = NULL;
         long uid = strtol(argv[2], &tail, 10);

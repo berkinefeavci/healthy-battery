@@ -5,7 +5,7 @@
 
 // ---- fake SMC ----
 typedef struct { char name[5]; int size; char type[5]; uint8_t bytes[4]; int present; } FakeKey;
-typedef struct { FakeKey keys[8]; int count; int writes; int failWrites; int ignoreWrites; char lastWritten[8][5]; } FakeSMC;
+typedef struct { FakeKey keys[8]; int count; int writes; int failWrites; int ignoreWrites; int readCode; int writeCode; char lastWritten[8][5]; } FakeSMC;
 
 static FakeKey *fake_find(FakeSMC *smc, const char *key) {
     for (int i = 0; i < smc->count; i++) if (!strcmp(smc->keys[i].name, key)) return &smc->keys[i];
@@ -19,11 +19,13 @@ static int fake_info(void *c, const char *key, int *size, char type[5]) {
     FakeKey *k = fake_find(c, key); if (!k) return 0x84; *size = k->size; strcpy(type, k->type); return 0;
 }
 static int fake_read(void *c, const char *key, int size, uint8_t *bytes) {
+    FakeSMC *rs = c; if (rs->readCode) return rs->readCode;
     FakeKey *k = fake_find(c, key); if (!k || k->size != size) return 0x84; memcpy(bytes, k->bytes, (size_t)size); return 0;
 }
 static int fake_write(void *c, const char *key, int size, const uint8_t *bytes) {
     FakeSMC *smc = c; FakeKey *k = fake_find(smc, key);
     assert(ci_write_allowed(key, size, bytes)); // the helper must never ask for anything else
+    if (smc->writeCode) return smc->writeCode;
     if (smc->failWrites) return 0xff;
     if (!k || k->size != size) return 0x84;
     smc->writes++;
@@ -34,7 +36,7 @@ static CISMCOps ops_for(FakeSMC *smc) { CISMCOps ops = {fake_info, fake_read, fa
 
 static CIInputs inputs(double now, int percent) { CIInputs i = {now, percent, 1, 0, 0}; return i; }
 static CIState state(int c, int a) { CIState s = {c, a}; return s; }
-static CICapabilities both(void) { CICapabilities c = {&CI_CHARGING_VARIANTS[0], &CI_ADAPTER_VARIANTS[0]}; return c; }
+static CICapabilities both(void) { CICapabilities c = {&CI_CHARGING_VARIANTS[0], &CI_ADAPTER_VARIANTS[0], CI_KEY_OK, CI_KEY_OK}; return c; }
 
 int main(void) {
     // Allowlist: exact keys, sizes and byte patterns only.
@@ -139,11 +141,57 @@ int main(void) {
     assert(ci_request(&engine, &now, &B, state(0, 1)) == CI_REFUSED);
 
     // Capability gating and malformed requests.
-    CICapabilities none = {NULL, NULL}; now = inputs(40, 80);
+    CICapabilities none = {NULL, NULL, CI_KEY_MISSING, CI_KEY_MISSING}; now = inputs(40, 80);
     assert(ci_request(&engine, &now, &none, state(1, 0)) == CI_UNSUPPORTED && ci_state_is_released(engine.requested));
     assert(ci_request(&engine, &now, &none, state(0, 1)) == CI_UNSUPPORTED);
     assert(ci_request(&engine, &now, &B, state(2, 0)) == CI_BAD_REQUEST);
     assert(ci_request(&engine, &now, &B, state(0, -1)) == CI_BAD_REQUEST);
+
+    // Plug detection: AC-W is primary, AdapterDetails the fallback, ExternalConnected is not an input.
+    CIPlugInputs plug = {1, 4, 0}; // adapter inhibited, ExternalConnected=No (ignored), AC-W=4, no details needed
+    assert(ci_cable_present(&plug));
+    CIPlugInputs gone = {1, 0, 0}; assert(!ci_cable_present(&gone));
+    CIPlugInputs neg = {1, -1, 0}; assert(!ci_cable_present(&neg));
+    CIPlugInputs fallback = {0, 0, 1}; assert(ci_cable_present(&fallback));
+    CIPlugInputs nothing = {0, 0, 0}; assert(!ci_cable_present(&nothing));
+    FakeSMC acw = {0}; fake_add(&acw, "AC-W", 1, "si8 "); fake_find(&acw, "AC-W")->bytes[0] = 4;
+    CISMCOps acwOps = ops_for(&acw); int acValue = 0;
+    assert(ci_read_ac_w(&acwOps, &acValue) == 0 && acValue == 4);
+    fake_find(&acw, "AC-W")->bytes[0] = 0xff; assert(ci_read_ac_w(&acwOps, &acValue) == 0 && acValue == -1);
+    FakeSMC noAcw = {0}; CISMCOps noAcwOps = ops_for(&noAcw); assert(ci_read_ac_w(&noAcwOps, &acValue) != 0);
+    // Engine: inhibited adapter + AC-W>0 (ExternalConnected=No) stays; AC-W<=0 without details releases.
+    ci_engine_init(&engine); now = inputs(0, 85); assert(ci_request(&engine, &now, &B, state(0, 1)) == CI_OK);
+    now.adapterPresent = ci_cable_present(&plug); assert(ci_tick(&engine, &now) == CI_REASON_NONE);
+    now.adapterPresent = ci_cable_present(&gone); assert(ci_tick(&engine, &now) == CI_REASON_UNPLUGGED);
+
+    // Gated vs missing.
+    assert(ci_classify_smc_error(0) == CI_KEY_OK && ci_classify_smc_error(0x84) == CI_KEY_MISSING);
+    assert(ci_classify_smc_error(CI_SMC_GATED) == CI_KEY_GATED && ci_classify_smc_error(0x86) == CI_KEY_GATED);
+    assert(ci_classify_smc_error(-1) == CI_KEY_ERROR && ci_classify_smc_error(0xff) == CI_KEY_ERROR);
+    assert(!strcmp(ci_key_reason_name(CI_KEY_GATED), "gated") && !strcmp(ci_key_reason_name(CI_KEY_MISSING), "missing"));
+    // This Mac: CHTE missing, CHIE present -> adapter only, charging "missing".
+    FakeSMC mac = {0}; fake_add(&mac, "CHIE", 1, "hex_"); CISMCOps macOps = ops_for(&mac);
+    CICapabilities macCaps = ci_resolve_capabilities(&macOps);
+    assert(!macCaps.charging && macCaps.chargingReason == CI_KEY_MISSING && macCaps.adapter && macCaps.adapterReason == CI_KEY_OK);
+    assert(!ci_channel_usable(macCaps.charging, macCaps.chargingReason) && ci_channel_usable(macCaps.adapter, macCaps.adapterReason));
+    // Read gated by the OS (0xe00002c1): reported as gated, not missing.
+    mac.readCode = CI_SMC_GATED; macCaps = ci_resolve_capabilities(&macOps);
+    assert(!macCaps.adapter && macCaps.adapterReason == CI_KEY_GATED); mac.readCode = 0;
+    // Write gated: distinct status, channel marked gated, further inhibit refused, release still attempted.
+    macCaps = ci_resolve_capabilities(&macOps); mac.writeCode = CI_SMC_GATED;
+    CIState macApplied = {0, 0};
+    assert(ci_apply_state(&macOps, &macCaps, state(0, 1), &macApplied) == CI_GATED && macCaps.adapterReason == CI_KEY_GATED);
+    now = inputs(5, 85); ci_engine_init(&engine);
+    assert(ci_request(&engine, &now, &macCaps, state(0, 1)) == CI_GATED && ci_state_is_released(engine.requested));
+    assert(ci_request(&engine, &now, &macCaps, state(0, 0)) == CI_OK);
+    mac.writeCode = 0;
+
+    // Power plan: release before acknowledging on both sleep messages; re-check after wake.
+    CIPowerPlan plan = ci_power_plan(CI_POWER_CAN_SLEEP);
+    assert(plan.release && plan.acknowledge && plan.reason == CI_REASON_SLEEP && plan.setSleeping == -1);
+    plan = ci_power_plan(CI_POWER_WILL_SLEEP); assert(plan.release && plan.acknowledge && plan.setSleeping == 1);
+    plan = ci_power_plan(CI_POWER_HAS_POWERED_ON); assert(!plan.release && plan.recheckAfter && plan.setSleeping == 0);
+    plan = ci_power_plan(CI_POWER_WILL_POWER_OFF); assert(plan.release && plan.acknowledge && plan.setShuttingDown);
 
     // Watchdog constant matches the Swift contract (ChargeInhibitSafety.watchdogTimeout / criticalPercent).
     assert(CI_WATCHDOG_SECONDS == 60.0 && CI_CRITICAL_PERCENT == 10);
