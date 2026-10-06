@@ -861,3 +861,13 @@
 "Hata bildir" = "Signaler un bug";
 "Öneri gönder" = "Proposer une fonctionnalité";
 "Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "Un fichier de diagnostic est partagé uniquement si vous choisissez de le joindre.";
+"Bitince %%%lld'a dönülecek" = "Retour à %lld %% à la fin";
+"Bitince %%%lld'e dönülecek" = "Retour à %lld %% à la fin";
+"Hedefimi geri yaz" = "Réécrire ma cible";
+"Hedefimi uygula" = "Appliquer ma cible";
+"Hedefiniz bir kez otomatik geri yazılır. Başarısız olursa ya da 10 dakika içinde yine değişirse size sorulur." = "Votre cible est réécrite une fois automatiquement. En cas d’échec ou si la limite change de nouveau en moins de 10 minutes, on vous demande.";
+"Panelde bir uyarı gösterilir; hedefi geri yazmak ya da macOS değerini kullanmak size kalır." = "Un avertissement s’affiche dans le panneau ; vous choisissez de réécrire la cible ou d’utiliser la valeur macOS.";
+"Sor" = "Demander";
+"macOS sınırı %%%lld — Healthy Battery %%%lld istiyor" = "La limite macOS est de %lld %% — Healthy Battery veut %lld %%";
+"macOS sınırı dışarıdan değişirse" = "Si la limite macOS change en dehors de l’app";
+"macOS'taki yeni değer otomatik olarak Healthy Battery hedefi olur." = "La nouvelle valeur macOS devient automatiquement la cible de Healthy Battery.";

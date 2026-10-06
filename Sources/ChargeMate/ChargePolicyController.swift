@@ -20,6 +20,8 @@ final class ChargePolicyController {
     private let rival: () -> Bool
     private let now: () -> Date
     private var persistenceRecovery = false
+    var externalChangeResponse: ExternalChangeResponse = .ask
+    private var externalGate = ExternalChangeGate()
 
     private(set) var state: ChargePolicyState = .idle
     private(set) var policy: ChargePolicy?
@@ -29,6 +31,7 @@ final class ChargePolicyController {
     var isBusy: Bool { coordinator.isBusy }
     var requiresRecovery: Bool { persistenceRecovery || coordinator.requiresRecovery || state.isRecovery }
     var topUpActive: Bool { session != nil }
+    var topUpRestoreLimit: Int? { session?.restoreLimit }
     var conflict: (expected: Int, observed: Int)? {
         guard case .pausedByConflict(let expected, let observed) = state else { return nil }
         return (expected, observed)
@@ -148,13 +151,21 @@ final class ChargePolicyController {
         let input = ChargePolicyEvaluationInput(policy: policy, session: session, nativeState: native,
                                                 telemetry: telemetry, intent: intent,
                                                 rivalRunning: rival(), coordinatorRecovery: coordinator.requiresRecovery,
-                                                now: now(), trigger: trigger)
+                                                now: now(), trigger: trigger,
+                                                externalChangeResponse: externalChangeResponse,
+                                                autoReapplyAllowed: native.map {
+                                                    externalGate.allowsAutoReapply(observed: $0.manualLimit, now: now())
+                                                } ?? false)
         let evaluated = ChargePolicyEngine.evaluate(input)
-        return execute(evaluated, telemetry: telemetry, trigger: trigger)
+        var automatic = false
+        if case .none = intent, case .write(_, .manual) = evaluated.command,
+           case .pausedByConflict = evaluated.state { automatic = true }
+        return execute(evaluated, telemetry: telemetry, trigger: trigger, automaticReapply: automatic)
     }
 
     private func execute(_ evaluated: ChargePolicyDecision, telemetry: ChargeTelemetry,
-                         trigger: ChargePolicyTrigger) -> (result: ChargeControlCoordinator.Result?, event: ChargePolicyEvent?) {
+                         trigger: ChargePolicyTrigger,
+                         automaticReapply: Bool = false) -> (result: ChargeControlCoordinator.Result?, event: ChargePolicyEvent?) {
         state = evaluated.state
         if evaluated.policy != policy, let updated = evaluated.policy {
             do { try policyStore.save(updated); policy = updated }
@@ -175,9 +186,17 @@ final class ChargePolicyController {
         guard case .write(let limit, let source) = evaluated.command else { return (nil, nil) }
         let origin = evaluated.session?.originExecutionID
         let restoring = evaluated.session?.phase == .restoring
+        if automaticReapply { externalGate.recordAutoReapply(at: now()) }
         let result = coordinator.apply(limit, source: source)
         lastResult = result
         guard result.status == .configurationVerified, let verified = result.state else {
+            if automaticReapply {
+                // One automatic attempt per external change: fall back to asking instead of looping.
+                if case .pausedByConflict(_, let observed) = evaluated.state {
+                    externalGate.recordFailure(observed: observed)
+                    if result.status != .recoveryRequired { return (result, nil) }
+                }
+            }
             var failed = evaluated.session
             failed?.phase = .recoveryRequired
             failed?.failureReason = result.message

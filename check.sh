@@ -50,7 +50,9 @@ grep -Fq 'if let message = battery.powerModeMessage' Sources/ChargeMate/PowerMod
 grep -Fq '.accessibilityLabel("Deşarj yakında; henüz kullanılamıyor")' Sources/ChargeMate/Views.swift
 grep -Fq 'Text("Doldur")' Sources/ChargeMate/Views.swift
 grep -Fq '.popoverToolbarButtonStyle(iconOnly: true).disabled(true)' Sources/ChargeMate/Views.swift
-grep -Fq 'Text("Sınır: %\(Int(battery.chargeLimit))")' Sources/ChargeMate/Views.swift
+grep -Fq 'Text("Sınır: %\(shownLimit)")' Sources/ChargeMate/Views.swift
+# Panel must show the limit macOS really enforces, never only the saved preference.
+grep -Fq 'ChargeLimitDisplay.shown(native: battery.nativeLimit' Sources/ChargeMate/Views.swift
 ! grep -Fq 'slider.horizontal.3' Sources/ChargeMate/Views.swift
 ! grep -Fq 'Image(systemName: limitEditor ? "chevron.up" : "chevron.down")' Sources/ChargeMate/Views.swift
 grep -Fq '.popoverToolbarButtonStyle(active: battery.topUpActive)' Sources/ChargeMate/Views.swift
@@ -74,7 +76,7 @@ xcrun swiftc -I .build/checks \
   Sources/ChargeMate/SMCReader.swift \
   Sources/ChargeMate/MagSafeLED.swift \
   Sources/ChargeMate/NativeChargeBackend.swift \
-  Sources/ChargeMate/ChargePolicy.swift \
+  Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift \
   Sources/ChargeMate/ChargePolicyController.swift \
   Sources/ChargeMate/ChargeControlCoordinator.swift \
   Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift \
@@ -96,16 +98,16 @@ xcrun swiftc Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/MagSafeLED.sw
 
 # Şarj politikası saf mantık ve geçici dosya testleri; donanım erişimi yok.
 xcrun swiftc Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargeControlCoordinator.swift \
-  Sources/ChargeMate/ChargePolicy.swift Tests/ChargePolicyTests.swift -o .build/checks/charge-policy-tests
+  Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Tests/ChargePolicyTests.swift -o .build/checks/charge-policy-tests
 .build/checks/charge-policy-tests
 
 xcrun swiftc Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargeControlCoordinator.swift \
-  Sources/ChargeMate/ChargePolicy.swift Tests/ChargePolicyPresentationTests.swift \
+  Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Tests/ChargePolicyPresentationTests.swift \
   -o .build/checks/charge-policy-presentation-tests
 .build/checks/charge-policy-presentation-tests
 
 xcrun swiftc Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargeControlCoordinator.swift \
-  Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ChargePolicyController.swift \
+  Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift \
   Tests/ChargePolicyControllerTests.swift -o .build/checks/charge-policy-controller-tests
 .build/checks/charge-policy-controller-tests
 
@@ -144,12 +146,12 @@ xcrun swiftc Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/Cha
   Tests/ChargeControlCoordinatorTests.swift -o .build/checks/coordinator-tests
 .build/checks/coordinator-tests
 
-xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
+xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
   Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift \
   Tests/BatteryMonitorControlTests.swift .build/checks/PowerUIBridge.o -o .build/checks/monitor-control-tests
 .build/checks/monitor-control-tests
 
-xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
+xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
   Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift \
   Tests/MeasurementQualityTests.swift .build/checks/PowerUIBridge.o -o .build/checks/measurement-quality-tests
 .build/checks/measurement-quality-tests
@@ -183,14 +185,14 @@ xcrun swiftc Sources/ChargeMate/SettingsLayout.swift Tests/SettingsLayoutTests.s
   -o .build/checks/settings-layout-tests
 .build/checks/settings-layout-tests
 
-xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
+xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
   Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift \
   Sources/ChargeMate/MenubarPreferences.swift Sources/ChargeMate/MenubarPresentation.swift \
   Tests/MenubarTests.swift .build/checks/PowerUIBridge.o -o .build/checks/menubar-tests
 .build/checks/menubar-tests "$PWD/.build/ChargeMate.app" "$PWD/.build/checks/menubar-preview.png"
 
 # Yardım/tanılama: geçici defaults ve dosyalar, sahte donanım; NSSavePanel açılmaz.
-xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
+xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
   Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift \
   Sources/ChargeMate/MenubarPreferences.swift Sources/ChargeMate/SupportModels.swift Tests/SupportCenterTests.swift \
   .build/checks/PowerUIBridge.o -o .build/checks/support-center-tests
@@ -200,7 +202,7 @@ xcrun swiftc Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstall
 .build/checks/schedule-tests
 
 xcrun swiftc Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargeControlCoordinator.swift \
-  Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift \
+  Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift \
   Sources/ChargeMate/Schedule.swift Sources/ChargeMate/ScheduleScheduler.swift \
   Tests/ScheduleSchedulerTests.swift -o .build/checks/schedule-scheduler-tests
 .build/checks/schedule-scheduler-tests

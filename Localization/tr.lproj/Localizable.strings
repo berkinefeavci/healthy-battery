@@ -861,3 +861,13 @@
 "Hata bildir" = "Hata bildir";
 "Öneri gönder" = "Öneri gönder";
 "Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır." = "Tanı dosyası yalnızca siz eklemeyi seçerseniz paylaşılır.";
+"Bitince %%%lld'a dönülecek" = "Bitince %%%lld'a dönülecek";
+"Bitince %%%lld'e dönülecek" = "Bitince %%%lld'e dönülecek";
+"Hedefimi geri yaz" = "Hedefimi geri yaz";
+"Hedefimi uygula" = "Hedefimi uygula";
+"Hedefiniz bir kez otomatik geri yazılır. Başarısız olursa ya da 10 dakika içinde yine değişirse size sorulur." = "Hedefiniz bir kez otomatik geri yazılır. Başarısız olursa ya da 10 dakika içinde yine değişirse size sorulur.";
+"Panelde bir uyarı gösterilir; hedefi geri yazmak ya da macOS değerini kullanmak size kalır." = "Panelde bir uyarı gösterilir; hedefi geri yazmak ya da macOS değerini kullanmak size kalır.";
+"Sor" = "Sor";
+"macOS sınırı %%%lld — Healthy Battery %%%lld istiyor" = "macOS sınırı %%%lld — Healthy Battery %%%lld istiyor";
+"macOS sınırı dışarıdan değişirse" = "macOS sınırı dışarıdan değişirse";
+"macOS'taki yeni değer otomatik olarak Healthy Battery hedefi olur." = "macOS'taki yeni değer otomatik olarak Healthy Battery hedefi olur.";

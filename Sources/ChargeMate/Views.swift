@@ -30,6 +30,8 @@ struct PopoverView: View {
         _limitEditor = State(initialValue: showLimitEditor)
     }
 
+    private var shownLimit: Int { ChargeLimitDisplay.shown(native: battery.nativeLimit, preference: battery.chargeLimit) }
+
     private var layout: (items: [PlacedWidget], notice: String?) {
         let preferences = UserDefaults.standard
         var legacy: [PanelWidget] = [.statusExplanation]
@@ -45,15 +47,16 @@ struct PopoverView: View {
         VStack(spacing: 0) {
             ChargeMateGlassContainer {
                 VStack(spacing: 12) {
+                    PolicyConflictBanner()
                     HStack(spacing: 7) {
                         Button {
                             withAnimation(.easeOut(duration: 0.16)) { limitEditor.toggle() }
                         } label: {
-                            Text("Sınır: %\(Int(battery.chargeLimit))")
+                            Text("Sınır: %\(shownLimit)")
                         }
                         .popoverToolbarButtonStyle(active: limitEditor)
                         .help(limitEditor ? String(localized: "Şarj hedefi düzenleyicisini kapat") : String(localized: "Şarj hedefini düzenle"))
-                        .accessibilityLabel("Şarj hedefi yüzde \(Int(battery.chargeLimit)); düzenleyiciyi \(limitEditor ? String(localized: "kapat") : String(localized: "aç"))")
+                        .accessibilityLabel("Şarj hedefi yüzde \(shownLimit); düzenleyiciyi \(limitEditor ? String(localized: "kapat") : String(localized: "aç"))")
                         Spacer(minLength: 0)
                         // Locked feature: icon only, so the usable actions keep their full labels in
                         // every language within the 360 pt panel.
@@ -83,6 +86,11 @@ struct PopoverView: View {
                         .help("Healthy Battery menüsünü aç")
                     }
                     ChargeLimitBar()
+                    if battery.topUpActive, let restore = battery.topUpRestoreLimit {
+                        Text(ChargeLimitDisplay.topUpReturnText(limit: restore))
+                            .font(.system(size: 10)).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                     if limitEditor {
                         NativeLimitControls().chargeCard()
                             .transition(.opacity.combined(with: .move(edge: .top)))
@@ -451,11 +459,15 @@ private struct ChargeLimitBar: View {
     private static let labelHeight: CGFloat = 24
     private static let pendingLineHeight: CGFloat = 14
 
-    private var target: Double { draggingTarget ?? battery.chargeLimit }
+    /// Marker shows the limit macOS really enforces; the draft only exists while dragging.
+    private var target: Double {
+        draggingTarget ?? Double(ChargeLimitDisplay.shown(native: battery.nativeLimit, preference: battery.chargeLimit))
+    }
+    private var draft: Double { draggingTarget ?? battery.chargeLimit }
     private var saved: Int? { battery.nativeLimit ?? battery.committedLimit }
     private func step(_ forward: Bool) {
         let limits = battery.nativeLimits.sorted()
-        if let next = forward ? limits.first(where: { Double($0) > target }) : limits.last(where: { Double($0) < target }) {
+        if let next = forward ? limits.first(where: { Double($0) > draft }) : limits.last(where: { Double($0) < draft }) {
             battery.chargeLimit = Double(next)
         }
     }
@@ -555,8 +567,8 @@ private struct ChargeLimitBar: View {
             }.frame(height: Self.barHeight)
             // Only takes space while a draft is pending, so the idle bar sits centered between the
             // toolbar and the next section instead of reading as glued to the top.
-            if saved != Int(target) {
-                Text("Seçilen %\(Int(target)) · uygulanmadı")
+            if saved != Int(draft) {
+                Text("Seçilen %\(Int(draft)) · uygulanmadı")
                     .font(.system(size: 10)).foregroundStyle(.secondary)
                     .frame(height: Self.pendingLineHeight, alignment: .leading)
             }
@@ -784,6 +796,7 @@ struct SettingsView: View {
             DashboardView()
         case .charge:
             chargeLimitCard
+            ExternalChangeSettingsCard()
             topUpCard
             advancedLockedCard
         case .energy:
@@ -927,6 +940,10 @@ struct SettingsView: View {
                     Text(battery.topUpActive ? String(localized: "Doldurma sürüyor") : String(localized: "Hazır")).font(.system(size: 12, weight: .semibold))
                     Text("Yüzde 100’e şarj eder, sonra önceki limite döner.")
                         .font(.caption).foregroundStyle(.secondary)
+                    if battery.topUpActive, let restore = battery.topUpRestoreLimit {
+                        Text(ChargeLimitDisplay.topUpReturnText(limit: restore))
+                            .font(.caption.weight(.medium)).foregroundStyle(.secondary)
+                    }
                 }
                 Spacer()
                 Button(battery.topUpActive ? String(localized: "İptal et") : String(localized: "Başlat")) {

@@ -447,6 +447,14 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     }
     @Published private(set) var heatActive = false
     @Published private(set) var topUpActive = false
+    @Published private(set) var topUpRestoreLimit: Int?
+    @Published var externalChangeResponse: ExternalChangeResponse {
+        didSet {
+            defaults.set(externalChangeResponse.rawValue, forKey: ExternalChangeResponse.storageKey)
+            let response = externalChangeResponse
+            controlQueue.async { [policyController] in policyController.externalChangeResponse = response }
+        }
+    }
     @Published private(set) var policyState: ChargePolicyState = .idle
     @Published private(set) var policyConflict: (expected: Int, observed: Int)?
     @Published private(set) var controlState: ControlState = .idle
@@ -510,6 +518,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         self.powerModeReader = powerModeReader
         self.powerModeWriter = powerModeWriter
         chargeLimit = Self.saved(defaults, "chargeLimit", fallback: 80, range: 20...100)
+        let storedResponse = ExternalChangeResponse(stored: defaults.string(forKey: ExternalChangeResponse.storageKey))
+        externalChangeResponse = storedResponse
+        policyController.externalChangeResponse = storedResponse
         committedLimit = policyController.policy?.desiredLimit
         sailingEnabled = defaults.bool(forKey: "sailingEnabled")
         sailingDelta = Self.saved(defaults, "sailingDelta", fallback: 5, range: 2...15)
@@ -517,6 +528,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         maxTemp = Self.saved(defaults, "maxTemp", fallback: 35, range: 25...45)
         controlRecoveryRequired = policyController.requiresRecovery
         topUpActive = policyController.topUpActive
+        topUpRestoreLimit = policyController.topUpRestoreLimit
         policyState = policyController.state
         if controlRecoveryRequired { limitMessage = String(localized: "Önceki şarj işlemi doğrulama bekliyor; macOS Batarya ayarını kontrol edin.") }
         // v0.3 stored a single target and enabled Heat by default. Keep the user's
@@ -1212,6 +1224,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         policyState = policyController.state
         policyConflict = policyController.conflict
         topUpActive = policyController.topUpActive
+        topUpRestoreLimit = policyController.topUpRestoreLimit
         controlRecoveryRequired = policyController.requiresRecovery
         if let desired = policyController.policy?.desiredLimit {
             committedLimit = desired
