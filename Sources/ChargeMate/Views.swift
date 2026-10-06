@@ -798,6 +798,7 @@ struct SettingsView: View {
             chargeLimitCard
             ExternalChangeSettingsCard()
             topUpCard
+            HealthSettingsCards()
             advancedLockedCard
             AdvancedChargeSettingsView(runner: AdvancedChargeRunner.shared)
         case .energy:

@@ -892,3 +892,35 @@
 "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir.";
 "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)";
 "Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz.";
+
+/* Faz 2: sağlık otomasyonları */
+"%%100 hazır: %@" = "%%100 hazır: %@";
+"%95 üstünde, takılıyken" = "%95 üstünde, takılıyken";
+"35 °C üstünde şarj" = "35 °C üstünde şarj";
+"Adaptör takılıyken pil 3 saatten uzun süre %95 üstünde kalırsa bildirim gelir." = "Adaptör takılıyken pil 3 saatten uzun süre %95 üstünde kalırsa bildirim gelir.";
+"Doldur şu zamanda başlar: %@ (yaklaşık %lld dk önce). Süre son şarj hızınızdan tahmin edilir; veri yoksa 2 saat öncesidir. Görev kapalı başlar; kaydederken etkinleştirin." = "Doldur şu zamanda başlar: %@ (yaklaşık %lld dk önce). Süre son şarj hızınızdan tahmin edilir; veri yoksa 2 saat öncesidir. Görev kapalı başlar; kaydederken etkinleştirin.";
+"Görev oluştur" = "Görev oluştur";
+"Hazır olacağı zaman" = "Hazır olacağı zaman";
+"Henüz yeterli veri yok; Healthy Battery açık kaldıkça burada öneri görünür." = "Henüz yeterli veri yok; Healthy Battery açık kaldıkça burada öneri görünür.";
+"Ortalama boşalma derinliği" = "Ortalama boşalma derinliği";
+"Otomatik koruma" = "Otomatik koruma";
+"Pil %%%lld seviyesinde bekliyor, sınır %%%lld. macOS'un Optimize Şarj özelliği şarjı tutuyor olabilir (Sistem Ayarları › Pil › Pil Sağlığı). İki mekanizma birlikte çalışınca pil beklediğinizden geç dolar; ayarı buradan okuyamıyoruz, bu yalnızca gözleme dayalı bir ipucudur." = "Pil %%%lld seviyesinde bekliyor, sınır %%%lld. macOS'un Optimize Şarj özelliği şarjı tutuyor olabilir (Sistem Ayarları › Pil › Pil Sağlığı). İki mekanizma birlikte çalışınca pil beklediğinizden geç dolar; ayarı buradan okuyamıyoruz, bu yalnızca gözleme dayalı bir ipucudur.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi ve Turbo kapatıldı." = "Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi ve Turbo kapatıldı.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi." = "Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi.";
+"Pil 3 saattir %95 üstünde" = "Pil 3 saattir %95 üstünde";
+"Pil adaptörde şarj olurken 35 °C'yi geçerse sınır geçici olarak %80 olur, Turbo kapanır ve bildirim gelir. 32 °C'ye inince ya da adaptör çıkınca eski ayar döner. Pil zaten %80'in altındaysa şarjı durduramaz." = "Pil adaptörde şarj olurken 35 °C'yi geçerse sınır geçici olarak %80 olur, Turbo kapanır ve bildirim gelir. 32 °C'ye inince ya da adaptör çıkınca eski ayar döner. Pil zaten %80'in altındaysa şarjı durduramaz.";
+"Pil sıcak: şarj sınırı %80'e çekildi" = "Pil sıcak: şarj sınırı %80'e çekildi";
+"Pil sıcakken şarj oldu. Sıcaklık korumasını açın ve şarj ederken ağır işlerden kaçının." = "Pil sıcakken şarj oldu. Sıcaklık korumasını açın ve şarj ederken ağır işlerden kaçının.";
+"Pil sık sık çok derin boşalıyor. %20'nin altına inmeden şarja takmak daha iyi." = "Pil sık sık çok derin boşalıyor. %20'nin altına inmeden şarja takmak daha iyi.";
+"Pil çoğunlukla %95 üstünde bekliyor. Şarj sınırını %80'e çekmek ömrünü uzatır." = "Pil çoğunlukla %95 üstünde bekliyor. Şarj sınırını %80'e çekmek ömrünü uzatır.";
+"Sıcaklık koruması (sınırı %80'e çeker)" = "Sıcaklık koruması (sınırı %80'e çeker)";
+"Sıcaklık koruması etkin" = "Sıcaklık koruması etkin";
+"Sınırı %80 yap" = "Sınırı %80 yap";
+"Uzun süre dolu kalmak pili yorar. Sınırı %80'e çekebilirsiniz." = "Uzun süre dolu kalmak pili yorar. Sınırı %80'e çekebilirsiniz.";
+"Uzun süre dolu kalırsa uyar" = "Uzun süre dolu kalırsa uyar";
+"Yalnızca Healthy Battery açıkken ölçülen süreler sayılır." = "Yalnızca Healthy Battery açıkken ölçülen süreler sayılır.";
+"sa" = "sa";
+"Şarj alışkanlıklarınız pil için iyi görünüyor." = "Şarj alışkanlıklarınız pil için iyi görünüyor.";
+"Şarj sağlığı · son 7 gün" = "Şarj sağlığı · son 7 gün";
+"Şu saatte %100 hazır olsun" = "Şu saatte %100 hazır olsun";
+"Şu saatte %100 hazır olsun…" = "Şu saatte %100 hazır olsun…";

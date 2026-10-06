@@ -892,3 +892,35 @@
 "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "During sleep the helper releases everything for safety; the battery may rise above the target while the Mac sleeps.";
 "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Sailing range: %lld%% (charging restarts below %lld%%)";
 "Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "The charge-stopping helper is not installed or not verified. These settings have no effect for now and write nothing to the hardware.";
+
+/* Faz 2: sağlık otomasyonları */
+"%%100 hazır: %@" = "%%100 ready: %@";
+"%95 üstünde, takılıyken" = "Above 95%, plugged in";
+"35 °C üstünde şarj" = "Charging above 35 °C";
+"Adaptör takılıyken pil 3 saatten uzun süre %95 üstünde kalırsa bildirim gelir." = "If the battery stays above 95% for more than 3 hours while plugged in, you get a notification.";
+"Doldur şu zamanda başlar: %@ (yaklaşık %lld dk önce). Süre son şarj hızınızdan tahmin edilir; veri yoksa 2 saat öncesidir. Görev kapalı başlar; kaydederken etkinleştirin." = "Top Up starts at %@ (about %lld min earlier). The lead time is estimated from your recent charge rate, or 2 hours if there is no data. The task starts disabled; enable it when you save.";
+"Görev oluştur" = "Create task";
+"Hazır olacağı zaman" = "Ready by";
+"Henüz yeterli veri yok; Healthy Battery açık kaldıkça burada öneri görünür." = "Not enough data yet; advice appears here as Healthy Battery stays running.";
+"Ortalama boşalma derinliği" = "Average discharge depth";
+"Otomatik koruma" = "Automatic protection";
+"Pil %%%lld seviyesinde bekliyor, sınır %%%lld. macOS'un Optimize Şarj özelliği şarjı tutuyor olabilir (Sistem Ayarları › Pil › Pil Sağlığı). İki mekanizma birlikte çalışınca pil beklediğinizden geç dolar; ayarı buradan okuyamıyoruz, bu yalnızca gözleme dayalı bir ipucudur." = "Battery is waiting at %%%lld, limit %%%lld. macOS Optimized Battery Charging may be holding the charge (System Settings › Battery › Battery Health). When both mechanisms work together the battery fills later than expected; this setting cannot be read here, so this is only a hint based on observed behavior.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi ve Turbo kapatıldı." = "Battery %@ °C. Charge limit temporarily lowered to %%80 and Turbo turned off.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi." = "Battery %@ °C. Charge limit temporarily lowered to %%80.";
+"Pil 3 saattir %95 üstünde" = "Battery above 95% for 3 hours";
+"Pil adaptörde şarj olurken 35 °C'yi geçerse sınır geçici olarak %80 olur, Turbo kapanır ve bildirim gelir. 32 °C'ye inince ya da adaptör çıkınca eski ayar döner. Pil zaten %80'in altındaysa şarjı durduramaz." = "While charging on the adapter, if the battery exceeds 35 °C the limit temporarily becomes 80%, Turbo turns off and you get a notification. When it drops to 32 °C or the adapter is unplugged, the previous setting returns. If the battery is already below 80% it cannot stop charging.";
+"Pil sıcak: şarj sınırı %80'e çekildi" = "Battery is hot: charge limit lowered to 80%";
+"Pil sıcakken şarj oldu. Sıcaklık korumasını açın ve şarj ederken ağır işlerden kaçının." = "The battery charged while hot. Turn on temperature protection and avoid heavy work while charging.";
+"Pil sık sık çok derin boşalıyor. %20'nin altına inmeden şarja takmak daha iyi." = "The battery often discharges very deeply. Plugging in before it drops below 20% is better.";
+"Pil çoğunlukla %95 üstünde bekliyor. Şarj sınırını %80'e çekmek ömrünü uzatır." = "The battery mostly sits above 95%. Lowering the charge limit to 80% extends its life.";
+"Sıcaklık koruması (sınırı %80'e çeker)" = "Temperature protection (lowers limit to 80%)";
+"Sıcaklık koruması etkin" = "Temperature protection active";
+"Sınırı %80 yap" = "Set limit to 80%";
+"Uzun süre dolu kalmak pili yorar. Sınırı %80'e çekebilirsiniz." = "Staying full for long wears the battery. You can lower the limit to 80%.";
+"Uzun süre dolu kalırsa uyar" = "Warn if it stays full for long";
+"Yalnızca Healthy Battery açıkken ölçülen süreler sayılır." = "Only time measured while Healthy Battery is running is counted.";
+"sa" = "h";
+"Şarj alışkanlıklarınız pil için iyi görünüyor." = "Your charging habits look good for the battery.";
+"Şarj sağlığı · son 7 gün" = "Charge health · last 7 days";
+"Şu saatte %100 hazır olsun" = "Be 100% ready at a set time";
+"Şu saatte %100 hazır olsun…" = "Be 100% ready at a set time…";

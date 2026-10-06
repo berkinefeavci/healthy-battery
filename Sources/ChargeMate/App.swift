@@ -102,6 +102,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         scheduleRuntime?.start()
         // A no-op when the user turned the daily release check off.
         UpdateNotifications.shared.start()
+        HealthAutomation.shared.start()
         GlobalHotKey.shared.action = { [weak self] in self?.togglePanel(nil) }
         GlobalHotKey.shared.apply(.current)
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
