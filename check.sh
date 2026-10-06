@@ -159,10 +159,18 @@ test "$(grep -l 'SMC_WRITE' Tools/*.c | tr -d '\n')" = "Tools/ChargeInhibitHelpe
 xcrun swiftc Sources/ChargeMate/ChargeInhibit.swift Sources/ChargeMate/ChargeInhibitHelperBackend.swift \
   Sources/ChargeMate/HelperInstallState.swift Tests/ChargeInhibitHelperBackendTests.swift -o .build/checks/charge-inhibit-backend-tests
 .build/checks/charge-inhibit-backend-tests
-# The feature stays locked: no view, intent or monitor may reference the helper backend or its installer.
+# Exactly ONE wiring file may reference the helper backend/installer (besides the backend file itself);
+# no view, intent, monitor or App file may.
+test "$(grep -rlE 'ChargeInhibitHelper|ChargeInhibitUnlock' Sources --include='*.swift' | sort | tr '\n' ' ')" = \
+  "Sources/ChargeMate/AdapterModeController.swift Sources/ChargeMate/ChargeInhibitHelperBackend.swift "
 ! grep -Eq 'ChargeInhibitHelper|ChargeInhibitUnlock' Sources/ChargeMate/*View*.swift Sources/ChargeMate/ChargeMateIntents.swift \
   Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/App.swift
-! grep -rq 'ChargeInhibitHelperService.install' Sources --include='*.swift' --exclude=ChargeInhibitHelperBackend.swift
+# install() is reachable only through the user-action method, and only a view button calls that method.
+test "$(grep -rl 'ChargeInhibitHelperService.install()' Sources --include='*.swift' --exclude=ChargeInhibitHelperBackend.swift | tr -d '\n')" = "Sources/ChargeMate/AdapterModeController.swift"
+test "$(grep -c 'ChargeInhibitHelperService.install()' Sources/ChargeMate/AdapterModeController.swift)" = "1"
+test "$(grep -rl 'installHelperFromUserAction()' Sources --include='*.swift' | sort | tr '\n' ' ')" = \
+  "Sources/ChargeMate/AdapterModeController.swift Sources/ChargeMate/AdvancedChargeSettingsView.swift "
+grep -Fq 'Button(adapter.installing' Sources/ChargeMate/AdvancedChargeSettingsView.swift
 
 xcrun swiftc Sources/ChargeMate/SleepBehavior.swift Tests/SleepBehaviorTests.swift \
   -framework IOKit -o .build/checks/sleep-behavior-tests

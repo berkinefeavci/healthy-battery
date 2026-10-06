@@ -15,6 +15,7 @@ struct PopoverView: View {
     @AppStorage(PanelSizeMode.storageKey) private var panelSizeMode = PanelSizeMode.normal.rawValue
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var limitEditor = false
+    @ObservedObject private var advanced = AdvancedChargeRunner.shared
     @State private var editing = false
     @State private var draft: [PlacedWidget] = []
     @State private var dragging: PanelWidget?
@@ -30,7 +31,7 @@ struct PopoverView: View {
         _limitEditor = State(initialValue: showLimitEditor)
     }
 
-    private var shownLimit: Int { ChargeLimitDisplay.shown(native: battery.nativeLimit, preference: battery.chargeLimit) }
+    private var shownLimit: Int { battery.adapterModeActive ? Int(battery.chargeLimit) : ChargeLimitDisplay.shown(native: battery.nativeLimit, preference: battery.chargeLimit) }
 
     private var layout: (items: [PlacedWidget], notice: String?) {
         let preferences = UserDefaults.standard
@@ -86,6 +87,12 @@ struct PopoverView: View {
                         .help("Healthy Battery menüsünü aç")
                     }
                     ChargeLimitBar()
+                    if let status = advanced.adapterStatusText {
+                        Text(status)
+                            .font(.system(size: 10)).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                     if battery.topUpActive, let restore = battery.topUpRestoreLimit {
                         Text(ChargeLimitDisplay.topUpReturnText(limit: restore))
                             .font(.system(size: 10)).foregroundStyle(.secondary)
@@ -461,12 +468,13 @@ private struct ChargeLimitBar: View {
 
     /// Marker shows the limit macOS really enforces; the draft only exists while dragging.
     private var target: Double {
-        draggingTarget ?? Double(ChargeLimitDisplay.shown(native: battery.nativeLimit, preference: battery.chargeLimit))
+        draggingTarget ?? Double(battery.adapterModeActive ? Int(battery.chargeLimit)
+            : ChargeLimitDisplay.shown(native: battery.nativeLimit, preference: battery.chargeLimit))
     }
     private var draft: Double { draggingTarget ?? battery.chargeLimit }
-    private var saved: Int? { battery.nativeLimit ?? battery.committedLimit }
+    private var saved: Int? { battery.adapterModeActive ? Int(battery.chargeLimit) : battery.nativeLimit ?? battery.committedLimit }
     private func step(_ forward: Bool) {
-        let limits = battery.nativeLimits.sorted()
+        let limits = battery.barLimits.sorted()
         if let next = forward ? limits.first(where: { Double($0) > draft }) : limits.last(where: { Double($0) < draft }) {
             battery.chargeLimit = Double(next)
         }
@@ -548,7 +556,7 @@ private struct ChargeLimitBar: View {
                         onBegin: { isDragging = true },
                         onChange: { fraction in
                             let proposed = min(100, max(0, fraction * 100))
-                            draggingTarget = battery.nativeLimits
+                            draggingTarget = battery.barLimits
                                 .min(by: { abs(Double($0) - proposed) < abs(Double($1) - proposed) })
                                 .map(Double.init)
                         },
@@ -632,7 +640,7 @@ private struct ChargeLimitBar: View {
         guard let draggingTarget else { return }
         let newValue = Int(draggingTarget)
         battery.chargeLimit = draggingTarget
-        if newValue != saved { battery.applyNativeLimit() }
+        if battery.adapterModeActive || newValue != saved { battery.applyNativeLimit() }
     }
 }
 

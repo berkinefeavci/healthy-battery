@@ -924,3 +924,16 @@
 "Şarj sağlığı · son 7 gün" = "Salud de carga · últimos 7 días";
 "Şu saatte %100 hazır olsun" = "Tener el 100 % a una hora";
 "Şu saatte %100 hazır olsun…" = "Tener el 100 % a una hora…";
+"Adaptör kesildi" = "Adaptador cortado";
+"Adaptör kesildi — pilden çalışıyor, %%%lld seviyesine inince açılır" = "Adaptador cortado — funciona con batería, se restablece al %lld %%";
+"Adaptör modu" = "Modo adaptador";
+"Adaptör modu (deneysel)" = "Modo adaptador (experimental)";
+"Başka bir şarj uygulaması açık (%@). Adaptör modu için önce onu kapatın." = "Otra app de carga está en ejecución (%@). Ciérrala primero para usar el modo adaptador.";
+"Başka bir şarj uygulaması açık; adaptör modu bekletiliyor." = "Otra app de carga está en ejecución; el modo adaptador queda en pausa.";
+"Bu Mac adaptör kesmeyi doğrulamadı." = "Este Mac no verificó el corte del adaptador.";
+"Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Fiziksel test bekliyor." = "macOS no permite detener la carga en este Mac. El modo adaptador corta el adaptador por software cuando la batería alcanza el objetivo (el Mac funciona con batería) y lo restablece unos puntos más abajo. Solo funciona mientras el Mac está activo; el adaptador se restablece antes de suspender, así que durante la suspensión la batería puede superar el objetivo hasta el límite de macOS. La batería usa aproximadamente 1 ciclo superficial al día. La prueba física está pendiente.";
+"Hedef sınır ana sınır çubuğundan ayarlanır (%%%lld)." = "El objetivo se ajusta en la barra principal de límite (%lld %%).";
+"Kuruluyor…" = "Instalando…";
+"Tek seferlik yönetici onayı ister." = "Pide la aprobación del administrador una sola vez.";
+"Yardımcıyı kur" = "Instalar ayudante";
+"Önce şarj yardımcısını kurun." = "Instala primero el ayudante de carga.";

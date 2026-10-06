@@ -4,6 +4,7 @@ import SwiftUI
 /// charge-inhibit backend is injected; the existing placeholder views are left untouched.
 struct AdvancedChargeSettingsView: View {
     @ObservedObject var runner: AdvancedChargeRunner
+    @ObservedObject private var adapter = AdapterModeController.shared
 
     private var supported: Bool { runner.capabilities.canInhibitCharging }
     private var canDischarge: Bool { supported && runner.capabilities.canForceDischarge }
@@ -13,9 +14,13 @@ struct AdvancedChargeSettingsView: View {
             HStack {
                 Label("Gelişmiş şarj (deneysel)", systemImage: "flask").font(.headline)
                 Spacer()
-                StatusBadge(text: statusText, color: supported ? .green : .secondary, icon: supported ? "checkmark.circle" : "lock.fill")
+                StatusBadge(text: statusText, color: (supported || adapter.active) ? .green : .secondary, icon: (supported || adapter.active) ? "checkmark.circle" : "lock.fill")
             }
-            if !supported {
+            adapterModeSection
+            Divider()
+            if adapter.active {
+                // Adapter mode status replaces the generic "locked" text.
+            } else if !supported {
                 Text(runner.capabilities.reason ?? String(localized: "Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz."))
                     .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             } else if !runner.reason.isEmpty {
@@ -23,10 +28,15 @@ struct AdvancedChargeSettingsView: View {
             }
             Divider()
             Group {
+                if adapter.active {
+                    Text("Hedef sınır ana sınır çubuğundan ayarlanır (%\(runner.settings.targetLimit)).")
+                        .font(.caption).foregroundStyle(.secondary)
+                } else {
                 Stepper(value: Binding(get: { runner.settings.targetLimit },
                                        set: { runner.settings.targetLimit = AdvancedChargeLimits.normalizedTarget($0) }),
                         in: AdvancedChargeLimits.minTarget...AdvancedChargeLimits.maxTarget, step: AdvancedChargeLimits.targetStep) {
                     Text("Hedef sınır: %\(runner.settings.targetLimit)")
+                }
                 }
                 Toggle("Yelken modu", isOn: $runner.settings.sailingEnabled)
                 if runner.settings.sailingEnabled {
@@ -67,7 +77,33 @@ struct AdvancedChargeSettingsView: View {
         .chargeCard()
     }
 
+    private var adapterModeSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Toggle("Adaptör modu (deneysel)", isOn: Binding(get: { adapter.enabled }, set: { adapter.setEnabled($0) }))
+                .disabled(adapter.installing || (!adapter.helperInstalled && !adapter.enabled))
+            Text("Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Fiziksel test bekliyor.")
+                .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            if !adapter.helperInstalled {
+                HStack {
+                    Button(adapter.installing ? String(localized: "Kuruluyor…") : String(localized: "Yardımcıyı kur")) {
+                        adapter.installHelperFromUserAction()
+                    }.disabled(adapter.installing)
+                    Text("Tek seferlik yönetici onayı ister.").font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+            if let text = runner.adapterStatusText ?? (adapter.active ? runner.reason : nil) {
+                Text(text).font(.caption).foregroundStyle(.secondary)
+            }
+            if let message = adapter.message {
+                Text(message).font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
     private var statusText: String {
+        if adapter.active {
+            return runner.display == .adapterCut ? String(localized: "Adaptör kesildi") : String(localized: "Adaptör modu")
+        }
         guard supported else { return String(localized: "Kullanılamıyor") }
         switch runner.display {
         case .unavailable: return String(localized: "Kullanılamıyor")
@@ -79,6 +115,7 @@ struct AdvancedChargeSettingsView: View {
         case .sailing: return String(localized: "Yelken")
         case .heatPaused: return String(localized: "Isı nedeniyle duraklatıldı")
         case .discharging: return String(localized: "Deşarj oluyor")
+        case .adapterCut: return String(localized: "Adaptör kesildi")
         case .calibrating: return String(localized: "Kalibrasyon sürüyor")
         }
     }
