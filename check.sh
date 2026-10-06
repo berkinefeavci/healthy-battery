@@ -142,6 +142,28 @@ xcrun clang -Wall -Wextra -Werror Tools/PowerModeHelper.c -o .build/checks/power
 .build/checks/power-mode-helper-tests --self-test
 test "$(.build/checks/power-mode-helper-tests --version)" = "2"
 
+# Faz 3 charge-inhibit helper: pure safety logic (allowlist, verify, watchdog, battery floor, unplug,
+# sleep, shutdown) runs against a fake SMC. The helper itself is only built and --self-tested here;
+# nothing in this script contacts or writes the SMC.
+xcrun clang -Wall -Wextra -Werror Tests/ChargeInhibitSafetyTests.c Tools/ChargeInhibitSafety.c -o .build/checks/charge-inhibit-safety-tests
+.build/checks/charge-inhibit-safety-tests
+xcrun clang -Wall -Wextra -Werror Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation \
+  -o .build/checks/charge-inhibit-helper
+.build/checks/charge-inhibit-helper --self-test
+test "$(.build/checks/charge-inhibit-helper --version)" = "1"
+xcrun clang -Wall -Wextra -Werror Tools/ChargeInhibitProbe.c -framework IOKit -framework CoreFoundation -o .build/checks/charge-inhibit-probe
+# The probe is read-only: no SMC write command may appear in it.
+! grep -Eq 'SMC_WRITE|CMD_WRITE|in\[42\] = 6' Tools/ChargeInhibitProbe.c
+# Only the helper writes the SMC, and only through the allowlisted ci_write_channel path.
+test "$(grep -l 'SMC_WRITE' Tools/*.c | tr -d '\n')" = "Tools/ChargeInhibitHelper.c"
+xcrun swiftc Sources/ChargeMate/ChargeInhibit.swift Sources/ChargeMate/ChargeInhibitHelperBackend.swift \
+  Sources/ChargeMate/HelperInstallState.swift Tests/ChargeInhibitHelperBackendTests.swift -o .build/checks/charge-inhibit-backend-tests
+.build/checks/charge-inhibit-backend-tests
+# The feature stays locked: no view, intent or monitor may reference the helper backend or its installer.
+! grep -Eq 'ChargeInhibitHelper|ChargeInhibitUnlock' Sources/ChargeMate/*View*.swift Sources/ChargeMate/ChargeMateIntents.swift \
+  Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/App.swift
+! grep -rq 'ChargeInhibitHelperService.install' Sources --include='*.swift' --exclude=ChargeInhibitHelperBackend.swift
+
 xcrun swiftc Sources/ChargeMate/SleepBehavior.swift Tests/SleepBehaviorTests.swift \
   -framework IOKit -o .build/checks/sleep-behavior-tests
 .build/checks/sleep-behavior-tests

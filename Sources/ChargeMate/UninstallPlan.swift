@@ -33,7 +33,11 @@ enum UninstallPlan {
                      launchDaemonPlistPath: "/Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.led.plist"),
         HelperTarget(daemonLabel: "io.github.berkinefeavci.cellkeep.powermode",
                      binaryPath: "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.powermode",
-                     launchDaemonPlistPath: "/Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.powermode.plist")
+                     launchDaemonPlistPath: "/Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.powermode.plist"),
+        // Faz 3 charge-inhibit helper; booting it out sends SIGTERM, which releases charging and the adapter.
+        HelperTarget(daemonLabel: "io.github.berkinefeavci.cellkeep.chargeinhibit",
+                     binaryPath: "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.chargeinhibit",
+                     launchDaemonPlistPath: "/Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.chargeinhibit.plist")
     ]
     static let legacyHelpers: [HelperTarget] = [
         HelperTarget(daemonLabel: "local.chargemate.led",
