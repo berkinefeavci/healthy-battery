@@ -27,7 +27,7 @@ struct HealthSettingsCards: View {
                 row(String(localized: "%95 üstünde, takılıyken"), hours(summary.hoursAtOrAbove95Plugged))
                 row(String(localized: "35 °C üstünde şarj"), hours(summary.hoursChargingAbove35))
                 row(String(localized: "Ortalama boşalma derinliği"),
-                    summary.averageDischargeDepth.map { String(format: "%%%.0f", $0) } ?? "—")
+                    summary.averageDischargeDepth.map { String(localized: "%\(Int($0.rounded()))") } ?? "—")
             }
             Text(automation.advice.text)
                 .font(.system(size: 12, weight: .medium)).fixedSize(horizontal: false, vertical: true)
