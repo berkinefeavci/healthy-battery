@@ -202,8 +202,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         installApplicationMenu()
         ChartTrackingView.isPanelWindow = { $0 is MenuPanel }
         if UserDefaults.standard.bool(forKey: "showPanelAtLaunch") {
-            DispatchQueue.main.async { [weak self] in self?.togglePanel(nil) }
+            DispatchQueue.main.async { [weak self] in self?.showPanelAtLaunch() }
         }
+    }
+
+    /// Açılışta durum öğesi menü çubuğuna yerleşene kadar bekler (en çok ~3 sn); yoksa
+    /// panel öğenin geçici çerçevesine göre ekranın sol altında açılıyordu.
+    private func showPanelAtLaunch(attempt: Int = 0) {
+        guard !panel.isVisible else { return }
+        if statusButtonFrame == nil && attempt < 30 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.showPanelAtLaunch(attempt: attempt + 1)
+            }
+            return
+        }
+        togglePanel(nil)
     }
 
     private func installApplicationMenu() {
@@ -298,9 +311,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     @objc func togglePanel(_ sender: Any?) {
         if panel.isVisible { closePanel(); return }
-        guard let button = statusItem?.button, let window = button.window else { return }
-        let anchor = window.convertToScreen(button.convert(button.bounds, to: nil))
-        let screen = (window.screen ?? NSScreen.main)?.visibleFrame ?? anchor
+        let screen = (statusItem?.button?.window?.screen ?? NSScreen.main)?.visibleFrame
+            ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+        // Öğe henüz yerleşmemişse sağ üst köşeye, menü çubuğunun hemen altına açılır.
+        let anchor = statusButtonFrame
+            ?? NSRect(x: screen.maxX - PanelSizeMode.current.width / 2 - PanelSizing.horizontalMargin,
+                      y: screen.maxY + PanelSizing.anchorGap, width: 0, height: 0)
         let mode = PanelSizeMode.current
         let content = panelContentSize(for: mode)
         let frame = PanelSizing.panelFrame(anchor: anchor, mode: mode, content: content, screen: screen)
@@ -321,9 +337,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NotificationCenter.default.post(name: .chargeMatePanelClosed, object: nil)
     }
 
+    /// Durum öğesinin ekran çerçevesi. Açılışın ilk anlarında öğe penceresi henüz menü
+    /// çubuğunda değildir (sol altta durur); o zaman nil döner, panel ve hatırlatma
+    /// baloncuğu yanlış köşeye çapalanmaz.
     private var statusButtonFrame: NSRect? {
         guard let button = statusItem?.button, let window = button.window else { return nil }
-        return window.convertToScreen(button.convert(button.bounds, to: nil))
+        let frame = window.convertToScreen(button.convert(button.bounds, to: nil))
+        guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(frame) }),
+              frame.midY > screen.frame.midY else { return nil }
+        return frame
     }
 
     private func closePanelIfOutside(at point: NSPoint) {
