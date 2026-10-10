@@ -112,7 +112,7 @@ final class AdapterModeController: ObservableObject {
         }
     }
 
-    /// Physical check of adapter mode (`AdapterSelfTest`): about two minutes, the Mac briefly runs from
+    /// Physical check of adapter mode (`AdapterSelfTest`): a few minutes, the Mac briefly runs from
     /// the battery. Runs only while nothing else drives the helper, and always ends released.
     func runSelfTest() {
         guard !selfTestRunning else { return }

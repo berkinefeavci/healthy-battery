@@ -15,6 +15,11 @@ import Foundation
         var clock: TimeInterval = 0
         var cutSince: TimeInterval?
         var lastBeat: TimeInterval = 0
+        /// > 0: the gauge republishes only this often (Mac17,8: ~55 s); readings in between are stale.
+        var gaugePeriod: TimeInterval = 0
+        var gaugeFrozen = false
+        private var published: AdapterSelfTestSample?
+        private var publishedAt: TimeInterval = -1
 
         func request(_ line: String) throws -> String {
             requests.append(line)
@@ -33,8 +38,12 @@ import Foundation
         }
 
         func sample() -> AdapterSelfTestSample? {
+            if let published, gaugeFrozen || (gaugePeriod > 0 && clock - publishedAt < gaugePeriod) { return published }
             let draining = cut && batteryFollowsCut
-            return AdapterSelfTestSample(externalConnected: plugged && !draining, amperage: draining ? -1800 : idleAmperage, percent: percent)
+            let reading = AdapterSelfTestSample(externalConnected: plugged && !draining, amperage: draining ? -1800 : idleAmperage,
+                                                percent: percent, updateTime: Int(clock) + 1)
+            published = reading; publishedAt = clock
+            return reading
         }
 
         var test: AdapterSelfTest {
@@ -53,6 +62,16 @@ import Foundation
         precondition(good.requests.filter { $0 == "S 0 1\n" }.count == 2)
         let watchdogIndex = good.requests.lastIndex(of: "S 0 1\n")!
         precondition(!good.requests[watchdogIndex...].contains("H\n"), "no heartbeat during the watchdog step")
+
+        // Real gauge: values only every 55 s, so the cut shows up late but still inside the window.
+        let laggy = Rig(); laggy.gaugePeriod = 55; laggy.idleAmperage = 5600
+        let laggyReport = laggy.test.run()
+        precondition(laggyReport.outcome == .passed, "\(laggyReport)")
+
+        // A gauge that never republishes: failed as "no fresh reading", not as "adapter mode does not work".
+        let frozen = Rig(); frozen.gaugeFrozen = true
+        let frozenReport = frozen.test.run()
+        precondition(frozenReport.outcome == .failed && frozenReport.summary.contains("yenilenmedi") && !frozen.cut, "\(frozenReport)")
 
         // macOS gates CHIE: failed, and nothing was ever cut.
         let gated = Rig(); gated.capabilities = "0 0 0 1 2"

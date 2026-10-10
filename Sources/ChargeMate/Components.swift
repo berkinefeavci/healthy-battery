@@ -1083,6 +1083,7 @@ struct EnergyUsageView: View {
                 if compact {
                     HighEnergyUsageCard(minimumPower: minimumPower)
                 } else {
+                    EnergyLeadersCard()
                     applicationCard
                 }
                 ConnectedDevicesView(compact: compact)
@@ -1116,7 +1117,7 @@ struct EnergyUsageView: View {
             if apps.isEmpty {
                 energyStateText.font(.system(size: 12)).foregroundStyle(.secondary)
             } else {
-                ForEach(apps) { app in
+                ForEach(EnergyLedger.mergedByOwner(apps)) { app in
                     EnergyAppRow(app: app)
                 }
             }
@@ -1149,6 +1150,76 @@ struct EnergyUsageView: View {
             Text("Eşik üzerinde uygulama yok")
         case .failed(let message):
             Text("Etkinlik örneklenemedi: \(message)")
+        }
+    }
+}
+
+/// "En çok enerji kullananlar": now / 7 days / 30 days, one bar per app, as a share of the period.
+/// Fixed row height and fixed trailing column; long names truncate instead of widening the card.
+struct EnergyLeadersCard: View {
+    @EnvironmentObject var battery: BatteryMonitor
+    @ObservedObject private var store = EnergyLedgerStore.shared
+    @State private var period = EnergyLedger.Period.week
+
+    private var rows: [EnergyLedger.Row] {
+        store.ledger.rows(for: period, current: battery.energyApps, now: Date())
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("En çok enerji kullananlar", systemImage: "chart.bar.xaxis")
+                    .font(.system(size: 13, weight: .semibold))
+                Spacer()
+                Picker("Dönem", selection: $period) {
+                    Text("Şimdi").tag(EnergyLedger.Period.now)
+                    Text("7 gün").tag(EnergyLedger.Period.week)
+                    Text("30 gün").tag(EnergyLedger.Period.month)
+                }
+                .pickerStyle(.segmented).labelsHidden().frame(width: 210)
+            }
+            if rows.isEmpty {
+                Text(period == .now ? "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir."
+                     : "Geçmiş birikiyor; Healthy Battery açık kaldıkça bu grafik dolar.")
+                    .font(.system(size: 12)).foregroundStyle(.secondary).frame(height: 26, alignment: .leading)
+            } else {
+                let top = rows.first?.share ?? 1
+                ForEach(rows) { row in
+                    HStack(spacing: 9) {
+                        Group {
+                            if let iconPath = row.iconPath {
+                                Image(nsImage: EnergyIconCache.icon(forPath: iconPath)).resizable().interpolation(.high)
+                            } else {
+                                Image(systemName: EnergyPresentation.symbolName(for: row.name)).foregroundStyle(.secondary)
+                            }
+                        }.frame(width: 16, height: 16)
+                        Text(row.name).lineLimit(1).truncationMode(.tail).frame(width: 150, alignment: .leading)
+                        GeometryReader { proxy in
+                            ZStack(alignment: .leading) {
+                                Capsule().fill(Color.primary.opacity(0.07))
+                                Capsule().fill(Color.green.opacity(0.75))
+                                    .frame(width: max(4, proxy.size.width * row.share / max(top, 0.0001)))
+                            }
+                        }.frame(height: 8)
+                        Text(String(localized: "%\(Int((row.share * 100).rounded()))"))
+                            .monospacedDigit().foregroundStyle(.secondary).frame(width: 40, alignment: .trailing)
+                    }
+                    .font(.system(size: 12)).frame(height: 26)
+                    .accessibilityElement(children: .combine)
+                }
+            }
+            Text(footnote).font(.system(size: 10)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .modifier(GlassSurface())
+    }
+
+    private var footnote: String {
+        switch period {
+        case .now: return String(localized: "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır.")
+        default:
+            let days = min(store.ledger.coveredDays, period.days)
+            return String(localized: "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). \(days) günlük veri.")
         }
     }
 }

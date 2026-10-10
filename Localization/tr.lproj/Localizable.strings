@@ -440,7 +440,6 @@
 "Kontrol durumu yeniden okunamadı; ayar değiştirilmedi." = "Kontrol durumu yeniden okunamadı; ayar değiştirilmedi.";
 "Kontrol gerekli" = "Kontrol gerekli";
 "Kontrol gerekli; yeni işlem durduruldu" = "Kontrol gerekli; yeni işlem durduruldu";
-"Kontrol göstergeleri ve macOS pil durumu, doğrulanmış kaynakları hazır olduğunda kullanılabilir olacak." = "Kontrol göstergeleri ve macOS pil durumu, doğrulanmış kaynakları hazır olduğunda kullanılabilir olacak.";
 "Kontrol yetenekleri" = "Kontrol yetenekleri";
 "Koyu" = "Koyu";
 "Kullanılabilir kapasite" = "Kullanılabilir kapasite";
@@ -953,7 +952,7 @@
 "Örnek göster" = "Örnek göster";
 "Örnek hatırlatma — bu ipucu 5 saniye sonra kaybolur." = "Örnek hatırlatma — bu ipucu 5 saniye sonra kaybolur.";
 "Şarjda ısınırsa" = "Şarjda ısınırsa";
-"Adaptör testi sürüyor (yaklaşık 2 dakika). Mac bu sırada kısa süre pilden çalışır." = "Adaptör testi sürüyor (yaklaşık 2 dakika). Mac bu sırada kısa süre pilden çalışır.";
+"Adaptör testi sürüyor (birkaç dakika). Mac bu sırada birkaç kez kısa süre pilden çalışır." = "Adaptör testi sürüyor (birkaç dakika). Mac bu sırada birkaç kez kısa süre pilden çalışır.";
 "Adaptör testi henüz yapılmadı." = "Adaptör testi henüz yapılmadı.";
 "Testi çalıştır" = "Testi çalıştır";
 "Testi yeniden çalıştır" = "Testi yeniden çalıştır";
@@ -972,3 +971,14 @@
 "Uygulama sustuğunda yardımcı adaptörü kendiliğinden geri açmadı." = "Uygulama sustuğunda yardımcı adaptörü kendiliğinden geri açmadı.";
 "Şarj yardımcısıyla konuşulamadı: %@" = "Şarj yardımcısıyla konuşulamadı: %@";
 "Adaptör testi geçti: kesme, geri açma ve güvenlik zamanlayıcısı çalışıyor." = "Adaptör testi geçti: kesme, geri açma ve güvenlik zamanlayıcısı çalışıyor.";
+"Pil ölçümü test süresince yenilenmedi; test daha sonra yeniden denenebilir." = "Pil ölçümü test süresince yenilenmedi; test daha sonra yeniden denenebilir.";
+"30 gün" = "30 gün";
+"7 gün" = "7 gün";
+"Şimdi" = "Şimdi";
+"Dönem" = "Dönem";
+"En çok enerji kullananlar" = "En çok enerji kullananlar";
+"Geçmiş birikiyor; Healthy Battery açık kaldıkça bu grafik dolar." = "Geçmiş birikiyor; Healthy Battery açık kaldıkça bu grafik dolar.";
+"Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir.";
+"Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır.";
+"Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri.";
+"Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır.";

@@ -356,6 +356,7 @@ enum MonitorCadence {
     static let connectedDeviceInterval: TimeInterval = 5
     static let policyInterval: TimeInterval = 30
     static let energyInterval: TimeInterval = 60
+    static let backgroundEnergyInterval: TimeInterval = 300
 
     static func shouldEvaluatePolicy(topUpActive: Bool, trigger: ChargePolicyTrigger,
                                      elapsed: TimeInterval) -> Bool {
@@ -1167,7 +1168,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         let readNative = !applyingLimit && Date().timeIntervalSince(lastNativeRead) >= 30
         let nativeGeneration = nativeObservationGeneration
         let wantsEnergy = panelVisible || settingsVisible || defaults.bool(forKey: "backgroundDashboardUpdates")
-        let readEnergy = wantsEnergy && !energyReading && Date().timeIntervalSince(lastEnergyRead) >= MonitorCadence.energyInterval
+        // Unseen, the energy history still gets a sample every 5 minutes (one short `top` run).
+        let energyInterval = wantsEnergy ? MonitorCadence.energyInterval : MonitorCadence.backgroundEnergyInterval
+        let readEnergy = !energyReading && Date().timeIntervalSince(lastEnergyRead) >= energyInterval
         let readConnectedDevices = Date().timeIntervalSince(lastConnectedDeviceRead) >= MonitorCadence.connectedDeviceInterval
         let readPowerMode = !applyingPowerMode && Date().timeIntervalSince(lastPowerModeRead) >= 15
         if readNative { lastNativeRead = Date() }
@@ -1184,6 +1187,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     case .success(let apps):
                         self.energyApps = apps
                         self.energySampleDate = Date()
+                        EnergyLedgerStore.shared.record(apps)
                         self.energySampleState = apps.isEmpty ? .empty : .ready
                     case .failure(let failure):
                         self.energySampleState = .failed(failure.message)

@@ -25,10 +25,10 @@ xcrun clang -Wall -Wextra -Werror Tests/LEDControllersTests.c -o .build/checks/l
 .build/checks/magsafe-time-tests
 
 # PowerUI writes belong only to the timeout-bounded helper process.
-! grep -q 'CMPowerLimit\.apply' Sources/ChargeMate/BatteryMonitor.swift
+! grep -q 'CMPowerLimit\.apply' Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift
 ! grep -q 'CMPowerLimit\.apply' Sources/ChargeMate/ChargeControlCoordinator.swift
 test "$(grep -rl 'CMPowerLimit\.apply' Sources | wc -l | tr -d ' ')" = "1"
-! grep -Eq 'evaluateActions|performActionWrite|#if SWIFT_PACKAGE' Sources/ChargeMate/BatteryMonitor.swift
+! grep -Eq 'evaluateActions|performActionWrite|#if SWIFT_PACKAGE' Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift
 # Source-level UI regression guard, not a substitute for a real pointer/keyboard visual test.
 # These custom focusable visualizations must not recreate the reported blue frame.
 ! grep -Eq 'strokeBorder\((focused|keyboardFocused) \? Color\.accentColor' \
@@ -82,7 +82,7 @@ xcrun swiftc -I .build/checks \
   Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift \
   Sources/ChargeMate/Schedule.swift \
   Sources/ChargeMate/ConnectedDevice.swift \
-  Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift \
+  Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift \
   Tests/ReadOnlyCheck.swift \
   .build/checks/PowerUIBridge.o -o .build/checks/read-only-check
 .build/checks/read-only-check "$@"
@@ -168,7 +168,7 @@ xcrun swiftc -parse-as-library Sources/ChargeMate/ChargeInhibit.swift Sources/Ch
 test "$(grep -rlE 'ChargeInhibitHelper|ChargeInhibitUnlock' Sources --include='*.swift' | sort | tr '\n' ' ')" = \
   "Sources/ChargeMate/AdapterModeController.swift Sources/ChargeMate/ChargeInhibitHelperBackend.swift "
 ! grep -Eq 'ChargeInhibitHelper|ChargeInhibitUnlock' Sources/ChargeMate/*View*.swift Sources/ChargeMate/ChargeMateIntents.swift \
-  Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/App.swift
+  Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift Sources/ChargeMate/App.swift
 # install() is reachable only through the user-action method, and only a view button calls that method.
 test "$(grep -rl 'ChargeInhibitHelperService.install()' Sources --include='*.swift' --exclude=ChargeInhibitHelperBackend.swift | tr -d '\n')" = "Sources/ChargeMate/AdapterModeController.swift"
 test "$(grep -c 'ChargeInhibitHelperService.install()' Sources/ChargeMate/AdapterModeController.swift)" = "1"
@@ -185,12 +185,12 @@ xcrun swiftc Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/Cha
 .build/checks/coordinator-tests
 
 xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
-  Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift \
+  Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift \
   Tests/BatteryMonitorControlTests.swift .build/checks/PowerUIBridge.o -o .build/checks/monitor-control-tests
 .build/checks/monitor-control-tests
 
 xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
-  Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift \
+  Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift \
   Tests/MeasurementQualityTests.swift .build/checks/PowerUIBridge.o -o .build/checks/measurement-quality-tests
 .build/checks/measurement-quality-tests
 
@@ -224,14 +224,14 @@ xcrun swiftc Sources/ChargeMate/SettingsLayout.swift Tests/SettingsLayoutTests.s
 .build/checks/settings-layout-tests
 
 xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
-  Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift \
+  Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift \
   Sources/ChargeMate/MenubarPreferences.swift Sources/ChargeMate/MenubarPresentation.swift \
   Tests/MenubarTests.swift .build/checks/PowerUIBridge.o -o .build/checks/menubar-tests
 .build/checks/menubar-tests "$PWD/.build/ChargeMate.app" "$PWD/.build/checks/menubar-preview.png"
 
 # Yardım/tanılama: geçici defaults ve dosyalar, sahte donanım; NSSavePanel açılmaz.
 xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
-  Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift \
+  Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift \
   Sources/ChargeMate/MenubarPreferences.swift Sources/ChargeMate/SupportModels.swift Tests/SupportCenterTests.swift \
   .build/checks/PowerUIBridge.o -o .build/checks/support-center-tests
 .build/checks/support-center-tests

@@ -7,6 +7,8 @@ struct AdapterSelfTestSample: Equatable {
     /// Battery current in mA; negative while the battery powers the Mac.
     var amperage: Int
     var percent: Int
+    /// The gauge's own publish time (AppleSmartBattery `UpdateTime`, about every 55 s on Mac17,8); 0 if unknown.
+    var updateTime = 0
 }
 
 struct AdapterSelfTestReport: Codable, Equatable {
@@ -41,7 +43,8 @@ struct AdapterSelfTest {
     static let minimumPercent = 20
     /// Below this current (mA) the battery is clearly powering the Mac.
     static let dischargingBelow = -100
-    static let observeWindow: TimeInterval = 20
+    /// Long enough for two gauge updates: current and plug state are only republished about every 55 s.
+    static let observeWindow: TimeInterval = 150
     static let pollInterval: TimeInterval = 2
     static let heartbeatEvery: TimeInterval = 10
     static let watchdogLimit: TimeInterval = 75
@@ -61,13 +64,16 @@ struct AdapterSelfTest {
             return try ChargeInhibitWire.state(from: request(ChargeInhibitWire.setRequest(
                 ChargeInhibitState(chargingInhibited: false, adapterInhibited: on))))
         }
-        /// Polls the battery until `condition` holds; sends a heartbeat every 10 s when asked.
-        func observe(heartbeat: Bool, _ condition: (AdapterSelfTestSample) -> Bool) -> (ok: Bool, last: AdapterSelfTestSample?, seconds: Int) {
+        /// Polls the battery until a reading published after the call (newer gauge `UpdateTime`) meets
+        /// `condition`; sends a heartbeat every 10 s when asked. `fresh` is false when no new reading came.
+        func observe(heartbeat: Bool, _ condition: (AdapterSelfTestSample) -> Bool)
+            -> (ok: Bool, last: AdapterSelfTestSample?, seconds: Int, fresh: Bool) {
+            let since = sample()?.updateTime ?? 0
             var waited: TimeInterval = 0, sinceBeat: TimeInterval = 0, last: AdapterSelfTestSample?
             while waited <= Self.observeWindow {
-                if let reading = sample() {
+                if let reading = sample(), since == 0 || reading.updateTime > since {
                     last = reading
-                    if condition(reading) { return (true, reading, Int(waited)) }
+                    if condition(reading) { return (true, reading, Int(waited), true) }
                 }
                 sleep(Self.pollInterval)
                 waited += Self.pollInterval
@@ -77,7 +83,7 @@ struct AdapterSelfTest {
                     _ = try? request(ChargeInhibitWire.heartbeatRequest)
                 }
             }
-            return (false, last, Int(waited))
+            return (false, last, Int(waited), last != nil)
         }
         func describe(_ s: AdapterSelfTestSample?) -> String {
             guard let s else { return "no reading" }
@@ -113,6 +119,9 @@ struct AdapterSelfTest {
             }
             let drained = observe(heartbeat: true, discharging)
             step("cut", drained.ok, "\(describe(drained.last)) after \(drained.seconds)s")
+            guard drained.fresh else {
+                return finish(.failed, String(localized: "Pil ölçümü test süresince yenilenmedi; test daha sonra yeniden denenebilir."))
+            }
             guard drained.ok else {
                 return finish(.failed, String(localized: "Adaptör kesildi göründü ama pil boşalmadı; bu Mac'te adaptör modu çalışmıyor."))
             }
@@ -139,7 +148,7 @@ struct AdapterSelfTest {
                     break
                 }
             }
-            let afterWatchdog = restored ? observe(heartbeat: false, onWallPower) : (ok: false, last: sample(), seconds: 0)
+            let afterWatchdog = restored ? observe(heartbeat: false, onWallPower) : (ok: false, last: sample(), seconds: 0, fresh: false)
             step("watchdog", restored && afterWatchdog.ok, "released after \(Int(waited))s; \(describe(afterWatchdog.last))")
             guard restored, afterWatchdog.ok else {
                 return finish(.failed, String(localized: "Uygulama sustuğunda yardımcı adaptörü kendiliğinden geri açmadı."))
@@ -165,7 +174,8 @@ enum AdapterSelfTestProbe {
               let amperage = number("InstantAmperage") ?? number("Amperage") else { return nil }
         return AdapterSelfTestSample(externalConnected: number("ExternalConnected")?.boolValue ?? false,
                                      amperage: Int(amperage.int64Value), // signed two's complement
-                                     percent: Int((Double(current) * 100 / Double(maximum)).rounded()))
+                                     percent: Int((Double(current) * 100 / Double(maximum)).rounded()),
+                                     updateTime: number("UpdateTime")?.intValue ?? 0)
     }
 }
 

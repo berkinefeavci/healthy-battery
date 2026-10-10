@@ -440,7 +440,6 @@
 "Kontrol durumu yeniden okunamadı; ayar değiştirilmedi." = "L’état du contrôle n’a pas pu être relu ; le réglage n’a pas été modifié.";
 "Kontrol gerekli" = "Vérification nécessaire";
 "Kontrol gerekli; yeni işlem durduruldu" = "Vérification nécessaire ; les nouvelles opérations sont suspendues";
-"Kontrol göstergeleri ve macOS pil durumu, doğrulanmış kaynakları hazır olduğunda kullanılabilir olacak." = "Les indicateurs de contrôle et l’état de la batterie macOS seront disponibles dès que leurs sources vérifiées seront prêtes.";
 "Kontrol yetenekleri" = "Fonctions de contrôle";
 "Koyu" = "Sombre";
 "Kullanılabilir kapasite" = "Capacité utilisable";
@@ -953,7 +952,7 @@
 "Örnek göster" = "Afficher un exemple";
 "Örnek hatırlatma — bu ipucu 5 saniye sonra kaybolur." = "Rappel d'exemple — ce conseil disparaît après 5 secondes.";
 "Şarjda ısınırsa" = "En cas de chauffe pendant la charge";
-"Adaptör testi sürüyor (yaklaşık 2 dakika). Mac bu sırada kısa süre pilden çalışır." = "Test de l’adaptateur en cours (environ 2 minutes). Le Mac fonctionne brièvement sur batterie.";
+"Adaptör testi sürüyor (birkaç dakika). Mac bu sırada birkaç kez kısa süre pilden çalışır." = "Test de l’adaptateur en cours (quelques minutes). Le Mac fonctionne plusieurs fois brièvement sur batterie.";
 "Adaptör testi henüz yapılmadı." = "Le test de l’adaptateur n’a pas encore été effectué.";
 "Testi çalıştır" = "Lancer le test";
 "Testi yeniden çalıştır" = "Relancer le test";
@@ -972,3 +971,14 @@
 "Uygulama sustuğunda yardımcı adaptörü kendiliğinden geri açmadı." = "Quand l’app s’est tue, l’assistant n’a pas rétabli l’adaptateur de lui-même.";
 "Şarj yardımcısıyla konuşulamadı: %@" = "Impossible de communiquer avec l’assistant de charge : %@";
 "Adaptör testi geçti: kesme, geri açma ve güvenlik zamanlayıcısı çalışıyor." = "Test de l’adaptateur réussi : coupure, rétablissement et minuterie de sécurité fonctionnent.";
+"Pil ölçümü test süresince yenilenmedi; test daha sonra yeniden denenebilir." = "La mesure de la batterie ne s’est pas actualisée pendant le test ; vous pourrez le relancer plus tard.";
+"30 gün" = "30 jours";
+"7 gün" = "7 jours";
+"Şimdi" = "Maintenant";
+"Dönem" = "Période";
+"En çok enerji kullananlar" = "Plus gros consommateurs d’énergie";
+"Geçmiş birikiyor; Healthy Battery açık kaldıkça bu grafik dolar." = "L’historique se constitue ; ce graphique se remplit tant que Healthy Battery est ouvert.";
+"Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "Aucune mesure pour l’instant ; la première arrive dans la minute.";
+"Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Part de la dernière mesure. Les processus auxiliaires d’une app sont regroupés sur une ligne.";
+"Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Part de l’impact énergétique total de la période (mesure macOS × durée ; pas des watts). %lld jours de données.";
+"Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Ce Mac ne permet pas de suspendre la charge sur secteur : la navigation, la pause thermique, le comportement en veille, la décharge et le calibrage ne sont donc pas affichés ici. Avec le mode adaptateur activé, la limite cible passe par lui.";

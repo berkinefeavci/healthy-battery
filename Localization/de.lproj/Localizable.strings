@@ -440,7 +440,6 @@
 "Kontrol durumu yeniden okunamadı; ayar değiştirilmedi." = "Der Steuerungszustand konnte nicht erneut gelesen werden; die Einstellung wurde nicht geändert.";
 "Kontrol gerekli" = "Prüfung nötig";
 "Kontrol gerekli; yeni işlem durduruldu" = "Prüfung nötig; neue Vorgänge sind angehalten";
-"Kontrol göstergeleri ve macOS pil durumu, doğrulanmış kaynakları hazır olduğunda kullanılabilir olacak." = "Steuerungsanzeigen und der macOS-Batteriezustand werden verfügbar, sobald ihre überprüften Quellen bereit sind.";
 "Kontrol yetenekleri" = "Steuerungsfunktionen";
 "Koyu" = "Dunkel";
 "Kullanılabilir kapasite" = "Nutzbare Kapazität";
@@ -953,7 +952,7 @@
 "Örnek göster" = "Beispiel anzeigen";
 "Örnek hatırlatma — bu ipucu 5 saniye sonra kaybolur." = "Beispielerinnerung — dieser Hinweis verschwindet nach 5 Sekunden.";
 "Şarjda ısınırsa" = "Bei Erwärmung beim Laden";
-"Adaptör testi sürüyor (yaklaşık 2 dakika). Mac bu sırada kısa süre pilden çalışır." = "Netzteiltest läuft (etwa 2 Minuten). Der Mac läuft dabei kurz mit Akku.";
+"Adaptör testi sürüyor (birkaç dakika). Mac bu sırada birkaç kez kısa süre pilden çalışır." = "Netzteiltest läuft (einige Minuten). Der Mac läuft dabei mehrmals kurz mit Akku.";
 "Adaptör testi henüz yapılmadı." = "Der Netzteiltest wurde noch nicht ausgeführt.";
 "Testi çalıştır" = "Test starten";
 "Testi yeniden çalıştır" = "Test erneut starten";
@@ -972,3 +971,14 @@
 "Uygulama sustuğunda yardımcı adaptörü kendiliğinden geri açmadı." = "Als die App verstummte, hat das Hilfsprogramm das Netzteil nicht von selbst zurückgeschaltet.";
 "Şarj yardımcısıyla konuşulamadı: %@" = "Keine Verbindung zum Lade-Hilfsprogramm: %@";
 "Adaptör testi geçti: kesme, geri açma ve güvenlik zamanlayıcısı çalışıyor." = "Netzteiltest bestanden: Abschalten, Wiederherstellen und Sicherheits-Timer funktionieren.";
+"Pil ölçümü test süresince yenilenmedi; test daha sonra yeniden denenebilir." = "Die Akkumessung wurde während des Tests nicht aktualisiert; der Test kann später wiederholt werden.";
+"30 gün" = "30 Tage";
+"7 gün" = "7 Tage";
+"Şimdi" = "Jetzt";
+"Dönem" = "Zeitraum";
+"En çok enerji kullananlar" = "Größte Energieverbraucher";
+"Geçmiş birikiyor; Healthy Battery açık kaldıkça bu grafik dolar." = "Der Verlauf baut sich auf; das Diagramm füllt sich, solange Healthy Battery läuft.";
+"Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "Noch keine Messung; die erste kommt innerhalb einer Minute.";
+"Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Anteil an der letzten Messung. Hilfsprozesse einer App werden in einer Zeile zusammengefasst.";
+"Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Anteil an der gesamten Energiewirkung des Zeitraums (macOS-Messung × Zeit; keine Watt). Daten aus %lld Tagen.";
+"Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Dieser Mac erlaubt kein Pausieren des Ladens bei angeschlossenem Netzteil; Segeln, Hitzepause, Ruhezustand, Entladen und Kalibrierung werden daher hier nicht angezeigt. Mit eingeschaltetem Netzteilmodus wird das Ziel darüber umgesetzt.";

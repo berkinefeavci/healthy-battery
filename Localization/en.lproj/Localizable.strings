@@ -440,7 +440,6 @@
 "Kontrol durumu yeniden okunamadı; ayar değiştirilmedi." = "The control state could not be read again; the setting was not changed.";
 "Kontrol gerekli" = "Check needed";
 "Kontrol gerekli; yeni işlem durduruldu" = "Check needed; new operations are stopped";
-"Kontrol göstergeleri ve macOS pil durumu, doğrulanmış kaynakları hazır olduğunda kullanılabilir olacak." = "Control indicators and macOS battery condition will become available once their verified sources are ready.";
 "Kontrol yetenekleri" = "Control capabilities";
 "Koyu" = "Dark";
 "Kullanılabilir kapasite" = "Usable capacity";
@@ -953,7 +952,7 @@
 "Örnek göster" = "Show sample";
 "Örnek hatırlatma — bu ipucu 5 saniye sonra kaybolur." = "Sample reminder — this hint disappears after 5 seconds.";
 "Şarjda ısınırsa" = "If it heats up while charging";
-"Adaptör testi sürüyor (yaklaşık 2 dakika). Mac bu sırada kısa süre pilden çalışır." = "Adapter test running (about 2 minutes). The Mac briefly runs from the battery.";
+"Adaptör testi sürüyor (birkaç dakika). Mac bu sırada birkaç kez kısa süre pilden çalışır." = "Adapter test running (a few minutes). The Mac runs from the battery a few times in between.";
 "Adaptör testi henüz yapılmadı." = "The adapter test has not run yet.";
 "Testi çalıştır" = "Run test";
 "Testi yeniden çalıştır" = "Run test again";
@@ -972,3 +971,14 @@
 "Uygulama sustuğunda yardımcı adaptörü kendiliğinden geri açmadı." = "When the app went quiet, the helper did not bring the adapter back on its own.";
 "Şarj yardımcısıyla konuşulamadı: %@" = "Could not talk to the charge helper: %@";
 "Adaptör testi geçti: kesme, geri açma ve güvenlik zamanlayıcısı çalışıyor." = "Adapter test passed: cutting, restoring and the safety timer all work.";
+"Pil ölçümü test süresince yenilenmedi; test daha sonra yeniden denenebilir." = "The battery reading did not refresh during the test; it can be run again later.";
+"30 gün" = "30 days";
+"7 gün" = "7 days";
+"Şimdi" = "Now";
+"Dönem" = "Period";
+"En çok enerji kullananlar" = "Top energy users";
+"Geçmiş birikiyor; Healthy Battery açık kaldıkça bu grafik dolar." = "History is building up; this chart fills in while Healthy Battery runs.";
+"Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "No reading yet; the first one arrives within a minute.";
+"Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Share of the latest reading. Helper processes of an app are combined into one row.";
+"Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Share of the period's total energy impact (macOS reading × time; not watts). %lld days of data.";
+"Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "This Mac does not let apps pause charging while plugged in, so sailing, heat pause, sleep behavior, discharge and calibration are not shown here. With adapter mode on, the target limit is applied through it.";

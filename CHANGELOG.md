@@ -2,7 +2,7 @@
 
 ## 1.4.2
 
-- Adapter mode tests itself. Right after the charge helper is installed (or the next time the adapter is plugged in), Healthy Battery cuts the adapter for a few seconds, checks that the battery really powers the Mac, brings the adapter back, then cuts it once more without heartbeats and checks that the helper's 60-second safety timer restores it. It takes about two minutes and always ends with the adapter on. Adapter mode can be turned on only after this test passes; the result is shown in Settings → Charge Control.
+- Adapter mode tests itself. Right after the charge helper is installed (or the next time the adapter is plugged in), Healthy Battery cuts the adapter, waits for the battery gauge to report that the battery really powers the Mac (it reports only about once a minute), brings the adapter back, then cuts it once more without heartbeats and checks that the helper's 60-second safety timer restores it. It takes a few minutes and always ends with the adapter on. Adapter mode can be turned on only after this test passes; the result is shown in Settings → Charge Control.
 - The charge helper (version 2) answers only Healthy Battery signed by the same developer. Before, any program running as your user could ask it to cut the adapter. If you installed the helper from 1.4.1, install it again from the same place.
 - While Healthy Battery itself has cut the adapter, reminders no longer treat it as the cable being pulled out.
 - Heat protection, Ready by and Optimized Charging messages showed the percent sign in front of the number ("%80") in English, German, French and Spanish. German texts now address you the same way everywhere.

@@ -20,59 +20,65 @@ struct AdvancedChargeSettingsView: View {
             Divider()
             if adapter.active {
                 // Adapter mode status replaces the generic "locked" text.
+            } else if !supported && adapter.helperInstalled {
+                Text("Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır.")
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             } else if !supported {
                 Text(runner.capabilities.reason ?? String(localized: "Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz."))
                     .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             } else if !runner.reason.isEmpty {
                 Text(runner.reason).font(.caption).foregroundStyle(.secondary)
             }
-            Divider()
-            Group {
-                if adapter.active {
-                    Text("Hedef sınır ana sınır çubuğundan ayarlanır (%\(runner.settings.targetLimit)).")
-                        .font(.caption).foregroundStyle(.secondary)
-                } else {
-                Stepper(value: Binding(get: { runner.settings.targetLimit },
-                                       set: { runner.settings.targetLimit = AdvancedChargeLimits.normalizedTarget($0) }),
-                        in: AdvancedChargeLimits.minTarget...AdvancedChargeLimits.maxTarget, step: AdvancedChargeLimits.targetStep) {
-                    Text("Hedef sınır: %\(runner.settings.targetLimit)")
-                }
-                }
-                Toggle("Yelken modu", isOn: $runner.settings.sailingEnabled)
-                if runner.settings.sailingEnabled {
-                    Stepper(value: $runner.settings.sailingDelta,
-                            in: AdvancedChargeLimits.minSailingDelta...AdvancedChargeLimits.maxSailingDelta) {
-                        Text("Yelken aralığı: %\(runner.settings.sailingDelta) (şarj %\(runner.settings.targetLimit - runner.settings.sailingDelta) altında yeniden başlar)")
+            // Without a verified charge-inhibit key these controls cannot do anything: hidden, not greyed out.
+            if supported || adapter.active {
+                Divider()
+                Group {
+                    if adapter.active {
+                        Text("Hedef sınır ana sınır çubuğundan ayarlanır (%\(runner.settings.targetLimit)).")
+                            .font(.caption).foregroundStyle(.secondary)
+                    } else {
+                    Stepper(value: Binding(get: { runner.settings.targetLimit },
+                                           set: { runner.settings.targetLimit = AdvancedChargeLimits.normalizedTarget($0) }),
+                            in: AdvancedChargeLimits.minTarget...AdvancedChargeLimits.maxTarget, step: AdvancedChargeLimits.targetStep) {
+                        Text("Hedef sınır: %\(runner.settings.targetLimit)")
+                    }
+                    }
+                    Toggle("Yelken modu", isOn: $runner.settings.sailingEnabled)
+                    if runner.settings.sailingEnabled {
+                        Stepper(value: $runner.settings.sailingDelta,
+                                in: AdvancedChargeLimits.minSailingDelta...AdvancedChargeLimits.maxSailingDelta) {
+                            Text("Yelken aralığı: %\(runner.settings.sailingDelta) (şarj %\(runner.settings.targetLimit - runner.settings.sailingDelta) altında yeniden başlar)")
+                        }
+                    }
+                    Toggle("Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür", isOn: $runner.settings.heatProtectionEnabled)
+                    Toggle("Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur", isOn: $runner.settings.sleepBehaviorEnabled)
+                    Text("Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir.")
+                        .font(.caption2).foregroundStyle(.secondary)
+                    if runner.sleepMayOvershoot {
+                        Text("Uyku sırasında hedefin üstüne çıkabilir.").font(.caption2).foregroundStyle(.orange)
                     }
                 }
-                Toggle("Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür", isOn: $runner.settings.heatProtectionEnabled)
-                Toggle("Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur", isOn: $runner.settings.sleepBehaviorEnabled)
-                Text("Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir.")
-                    .font(.caption2).foregroundStyle(.secondary)
-                if runner.sleepMayOvershoot {
-                    Text("Uyku sırasında hedefin üstüne çıkabilir.").font(.caption2).foregroundStyle(.orange)
+                .disabled(!supported)
+                Divider()
+                HStack {
+                    if runner.memory.discharge != nil {
+                        Button("Deşarjı iptal et") { runner.cancelDischarge() }
+                    } else {
+                        Button("Hedefe kadar deşarj et") { runner.requestDischarge() }.disabled(!canDischarge)
+                    }
+                    if runner.memory.calibration != nil {
+                        Button("Kalibrasyonu iptal et") { runner.cancelCalibration() }
+                    } else {
+                        Button("Kalibrasyonu başlat") { runner.startCalibration() }.disabled(!canDischarge)
+                    }
+                    Spacer()
                 }
-            }
-            .disabled(!supported)
-            Divider()
-            HStack {
-                if runner.memory.discharge != nil {
-                    Button("Deşarjı iptal et") { runner.cancelDischarge() }
-                } else {
-                    Button("Hedefe kadar deşarj et") { runner.requestDischarge() }.disabled(!canDischarge)
+                if let error = runner.lastError {
+                    Text(error).font(.caption).foregroundStyle(.red)
                 }
-                if runner.memory.calibration != nil {
-                    Button("Kalibrasyonu iptal et") { runner.cancelCalibration() }
-                } else {
-                    Button("Kalibrasyonu başlat") { runner.startCalibration() }.disabled(!canDischarge)
-                }
-                Spacer()
+                Text("Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat).")
+                    .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
-            if let error = runner.lastError {
-                Text(error).font(.caption).foregroundStyle(.red)
-            }
-            Text("Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat).")
-                .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
         }
         .chargeCard()
     }
@@ -106,7 +112,7 @@ struct AdvancedChargeSettingsView: View {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 if adapter.selfTestRunning {
                     ProgressView().controlSize(.small)
-                    Text("Adaptör testi sürüyor (yaklaşık 2 dakika). Mac bu sırada kısa süre pilden çalışır.")
+                    Text("Adaptör testi sürüyor (birkaç dakika). Mac bu sırada birkaç kez kısa süre pilden çalışır.")
                 } else if let report = adapter.selfTestReport {
                     Image(systemName: report.outcome == .passed ? "checkmark.circle.fill"
                           : report.outcome == .failed ? "xmark.octagon.fill" : "clock")
