@@ -6,6 +6,9 @@
 - The charge helper (version 2) answers only Healthy Battery signed by the same developer. Before, any program running as your user could ask it to cut the adapter. If you installed the helper from 1.4.1, install it again from the same place.
 - While Healthy Battery itself has cut the adapter, reminders no longer treat it as the cable being pulled out.
 - Heat protection, Ready by and Optimized Charging messages showed the percent sign in front of the number ("%80") in English, German, French and Spanish. German texts now address you the same way everywhere.
+- New "Top energy users" card on the Energy page: which apps used the most energy now, over the last 7 days and over 30 days. Healthy Battery samples energy every 5 minutes in the background for it and keeps 35 days.
+- The energy list shows each app once; helper processes are combined into their app.
+- Menu bar settings no longer list right-click actions and metrics that do not work yet, and the advanced charge card hides controls this Mac cannot use.
 
 ## 1.4.1
 
