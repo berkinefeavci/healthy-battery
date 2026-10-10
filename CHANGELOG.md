@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.4.2
+
+- Adapter mode tests itself. Right after the charge helper is installed (or the next time the adapter is plugged in), Healthy Battery cuts the adapter, waits for the battery gauge to report that the battery really powers the Mac (it reports only about once a minute), brings the adapter back, then cuts it once more without heartbeats and checks that the helper's 60-second safety timer restores it. It takes a few minutes and always ends with the adapter on. Adapter mode can be turned on only after this test passes; the result is shown in Settings → Charge Control.
+- The charge helper (version 2) answers only Healthy Battery signed by the same developer. Before, any program running as your user could ask it to cut the adapter. If you installed the helper from 1.4.1, install it again from the same place.
+- While Healthy Battery itself has cut the adapter, reminders no longer treat it as the cable being pulled out.
+- Heat protection, Ready by and Optimized Charging messages showed the percent sign in front of the number ("%80") in English, German, French and Spanish. German texts now address you the same way everywhere.
+- New "Top energy users" card on the Energy page: which apps used the most energy now, over the last 7 days and over 30 days. Healthy Battery samples energy every 5 minutes in the background for it and keeps 35 days.
+- The energy list shows each app once; helper processes are combined into their app.
+- Menu bar settings no longer list right-click actions and metrics that do not work yet, and the advanced charge card hides controls this Mac cannot use.
+
+## 1.4.1
+
+Everything since 1.2.3. Versions 1.2.4 to 1.4.0 were not published on their own.
+
+- The panel shows the charge limit macOS is really using. If it is changed outside Healthy Battery (System Settings, a shortcut, another app), a banner says so, for example "macOS limit 80% — Healthy Battery wants 100%", with "Apply my target" and "Use the macOS value". Before, the panel kept showing the app's own target while macOS stopped at a different one.
+- Settings → Charge Control: choose what happens when the limit is changed outside the app: Ask (default), Write my target back, or Adopt the macOS value.
+- Top Up says which limit it goes back to when it finishes.
+- Heat protection (off by default): while charging above 35 °C, the limit drops to 80% and Turbo is turned off; below 32 °C everything goes back.
+- A notification when the Mac stays above 95% on power for more than 3 hours, with one click back to 80%. On by default.
+- Ready by: schedule a Top Up so the battery is full at a chosen time.
+- Charging habits card: time spent full, time charging while warm and average discharge depth over the last 7 days, with a short tip.
+- Small reminders under the menu bar icon that disappear after 5 seconds: battery at 40% and 20%, charging while warm, plugged in while full, and a monthly calibration reminder (off by default). They never go to Notification Center. Settings → General → Reminders.
+- Adapter mode (experimental, off by default): on Macs where macOS no longer lets apps pause charging, the Mac runs from the battery at the target and the adapter comes back 5 points lower, only while awake. It needs a new helper, installed once with an administrator password, which always gives power back after 60 seconds without the app, on unplug, on sleep and below 10%. It has not been tested on hardware yet.
+- Fixed a crash that closed the panel on its own: the Schedule rows ran `pmset` on every redraw.
+- With "Show panel at launch" on, the panel opened in the bottom-left corner. It now opens under the menu bar icon.
+- English showed discharge depth as "%29" instead of "29%".
+- The app icon follows the system appearance on macOS 26 and later: light, dark and tinted. Older macOS versions keep a regular icon with the same design.
+
 ## 1.2.3
 
 - General Settings now has separate GitHub links for bug reports and feature suggestions. Diagnostic files are shared only when you attach them yourself.

@@ -75,16 +75,15 @@ struct MenubarSettingsView: View {
                         }
                     }
                 }
-                ForEach(groups, id: \.self) { group in
+                // Only what can be shown today: a metric without a verified source is left out, not greyed out.
+                ForEach(groups.filter { !catalogIDs($0).isEmpty }, id: \.self) { group in
                     VStack(alignment: .leading, spacing: 9) {
                         Text(groupTitle(group)).font(.headline)
-                        MenubarCatalogScroller(ids: MenubarMetric.allCases.filter { $0.group == group && $0 != .percentage }.map(\.rawValue)) { id in
+                        MenubarCatalogScroller(ids: catalogIDs(group)) { id in
                             if let metric = MenubarMetric(rawValue: id) { metricButton(metric) }
                         }
                     }
                 }
-                Text("Kontrol göstergeleri ve macOS pil durumu, doğrulanmış kaynakları hazır olduğunda kullanılabilir olacak.")
-                    .font(.caption).foregroundStyle(.secondary)
                 Divider()
                 HStack {
                     Spacer()
@@ -98,7 +97,7 @@ struct MenubarSettingsView: View {
                 Stepper("Öğeler arası boşluk: \(preferences.spacing) pt", value: binding(\.spacing), in: 0...20)
                 Stepper("Menüyü yenile: \(preferences.interval) saniye", value: binding(\.interval), in: 2...20)
                 Picker("Sağ tık", selection: binding(\.rightClick)) {
-                    ForEach(MenubarRightClick.allCases) { action in Text(action.title).tag(action).disabled(!action.supported) }
+                    ForEach(MenubarRightClick.allCases.filter { $0.supported || $0 == preferences.rightClick }) { action in Text(action.title).tag(action) }
                 }
                 Text("Yenileme aralığı sensör örneklemesini değiştirmez. Geniş menülerde sağdaki öğeler +N altında toplanır; tüm değerler açıklamada bulunur.")
                     .font(.caption).foregroundStyle(.secondary)
@@ -110,6 +109,11 @@ struct MenubarSettingsView: View {
         }
     }
 
+    private func catalogIDs(_ group: String) -> [String] {
+        MenubarMetric.allCases.filter {
+            $0.group == group && $0 != .percentage && ($0.unavailableReason == nil || preferences.metrics.contains($0))
+        }.map(\.rawValue)
+    }
     private func groupTitle(_ group: String) -> String {
         switch group {
         case "Sağlık": return String(localized: "Batarya sağlığı")

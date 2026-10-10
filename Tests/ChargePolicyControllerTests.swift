@@ -161,6 +161,54 @@ private final class ControllerFakeNative {
             check(fake.writtenLimits == [100, 80], "repeated refresh does not duplicate restore")
         }
 
+        do {
+            let (fake, controller, policyStore, _) = harness("auto-reapply", limit: 90)
+            try policyStore.save(.init(desiredLimit: 80, enabled: true))
+            controller.externalChangeResponse = .reapply
+            _ = controller.evaluate(telemetry: telemetry(), trigger: .telemetry)
+            check(fake.writtenLimits == [80] && controller.state == .maintainingLimit(80),
+                  "auto reapply writes the target once")
+            fake.limit = 90
+            _ = controller.evaluate(telemetry: telemetry(), trigger: .telemetry)
+            check(fake.writtenLimits == [80] && controller.state == .pausedByConflict(expected: 80, observed: 90),
+                  "second external change within 10 minutes falls back to asking")
+        }
+
+        do {
+            let (fake, controller, policyStore, _) = harness("auto-reapply-fail", limit: 90)
+            try policyStore.save(.init(desiredLimit: 80, enabled: true))
+            controller.externalChangeResponse = .reapply
+            fake.rejectNextWrite = true
+            _ = controller.evaluate(telemetry: telemetry(), trigger: .telemetry)
+            let attempts = fake.writtenLimits.count
+            _ = controller.evaluate(telemetry: telemetry(), trigger: .telemetry)
+            check(attempts == 1 && fake.writtenLimits.count == 1, "failed auto reapply is not retried in a loop")
+        }
+
+        do {
+            let (fake, controller, policyStore, _) = harness("auto-adopt", limit: 90)
+            try policyStore.save(.init(desiredLimit: 80, enabled: true))
+            controller.externalChangeResponse = .adopt
+            _ = controller.evaluate(telemetry: telemetry(), trigger: .telemetry)
+            check(fake.writtenLimits.isEmpty && controller.policy?.desiredLimit == 90
+                  && controller.state == .maintainingLimit(90), "auto adopt takes the macOS value without writing")
+            check(policyStore.load().value?.desiredLimit == 90, "auto adopt persists the adopted target")
+        }
+
+        do {
+            let (fake, controller, policyStore, _) = harness("ask-default", limit: 90)
+            try policyStore.save(.init(desiredLimit: 80, enabled: true))
+            _ = controller.evaluate(telemetry: telemetry(), trigger: .telemetry)
+            check(fake.writtenLimits.isEmpty && controller.state == .pausedByConflict(expected: 80, observed: 90),
+                  "default response asks and writes nothing")
+        }
+
+        do {
+            let (_, controller, _, _) = harness("restore-limit", limit: 85)
+            _ = controller.startTopUp(telemetry: telemetry())
+            check(controller.topUpRestoreLimit == 85, "top up exposes the limit it will return to")
+        }
+
         print("Charge policy controller: \(assertions) assertions passed; fake backend and temporary stores only.")
     }
 }

@@ -248,6 +248,34 @@ private final class FakeNative {
         until { coldCancelResult != nil }
         check(coldCancelResult?.status == .configurationVerified && !coldMonitor.topUpActive && native.limit == 80,
               "cold Shortcut cancel restores committed target")
+
+        // Adapter mode: the main limit is the target (20-100); macOS keeps a sleep ceiling.
+        check(BatteryMonitor.adapterCeiling(forTarget: 20) == 80 && BatteryMonitor.adapterCeiling(forTarget: 75) == 80
+              && BatteryMonitor.adapterCeiling(forTarget: 80) == 80 && BatteryMonitor.adapterCeiling(forTarget: 81) == 85
+              && BatteryMonitor.adapterCeiling(forTarget: 87) == 90 && BatteryMonitor.adapterCeiling(forTarget: 100) == 100,
+              "adapter ceiling is max(80, target rounded up to 5)")
+        check(monitor.barLimits == [80, 85, 90, 95, 100] && !monitor.adapterModeActive, "bar keeps native limits by default")
+        until { !monitor.applyingLimit }
+        monitor.chargeLimit = 60
+        monitor.setAdapterMode(active: true)
+        until { !monitor.applyingLimit && monitor.committedLimit == 80 }
+        check(monitor.adapterModeActive && monitor.barLimits.first == 20 && monitor.barLimits.count == 17
+              && monitor.shownTarget == 60 && monitor.chargeLimit == 60 && native.limit == 80,
+              "adapter mode opens 20-100 bar and holds an 80 ceiling")
+        check(monitor.policyConflict == nil, "adapter ceiling is the policy desired value: no conflict")
+        monitor.chargeLimit = 87
+        monitor.applyNativeLimit()
+        until { !monitor.applyingLimit && native.limit == 90 }
+        check(monitor.shownTarget == 87 && monitor.committedLimit == 90, "ceiling follows target up to 90")
+        let writesBefore = native.writeCount
+        monitor.applyNativeLimit()
+        check(native.writeCount == writesBefore && !monitor.applyingLimit, "unchanged ceiling is not rewritten")
+        monitor.cancelDraftLimit()
+        check(monitor.chargeLimit == 87, "draft cancel does not clobber adapter target")
+        monitor.setAdapterMode(active: false)
+        until { !monitor.applyingLimit && native.limit == 80 }
+        check(!monitor.adapterModeActive && monitor.chargeLimit == 80 && monitor.barLimits == [80, 85, 90, 95, 100],
+              "leaving adapter mode restores the previous native limit")
         print("BatteryMonitor production integration: \(assertions) assertions passed; isolated defaults/history and fake hardware.")
     }
 }
