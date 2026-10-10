@@ -1624,7 +1624,7 @@ struct HistoryRangePicker: View {
                     hours = range.0
                 } label: {
                     Text(range.1)
-                        .font(.system(size: 11, weight: selected ? .semibold : .medium))
+                        .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(selected ? Color.primary : Color.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background {

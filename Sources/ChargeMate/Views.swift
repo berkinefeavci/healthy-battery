@@ -792,10 +792,12 @@ struct SettingsView: View {
                 Image(systemName: page.icon).frame(width: 18)
                 Text(page.title)
                 Spacer(minLength: 0)
-            }.font(.system(size: 12, weight: selection == page ? .medium : .regular))
+            }.font(.system(size: 12, weight: .medium))
                 .padding(.horizontal, 12).padding(.vertical, 8)
                 .foregroundStyle(selection == page ? Color.accentColor : Color.primary)
                 .background(selection == page ? Color.primary.opacity(0.08) : Color.clear, in: RoundedRectangle(cornerRadius: 9))
+                // The whole row is the target, not just the icon and title (a clear background takes no clicks).
+                .contentShape(RoundedRectangle(cornerRadius: 9))
         }.buttonStyle(.plain).hoverSurface()
     }
     @ViewBuilder private var pageContent: some View {
