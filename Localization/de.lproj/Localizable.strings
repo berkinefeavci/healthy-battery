@@ -121,7 +121,7 @@
 "Batarya yüzdesi" = "Batterieprozentsatz";
 "Batarya özellikleri" = "Batterieeigenschaften";
 "Bataryadan çalışmayı zorlar; güvenli bataryadan çalışma kontrolü henüz doğrulanmadı." = "Erzwingt Batteriebetrieb; eine sichere Steuerung des Batteriebetriebs wurde noch nicht überprüft.";
-"Bataryadan çalışıyor" = "Batteriebetrieb";
+"Bataryadan çalışıyor" = "Akkubetrieb";
 "Bağlantı" = "Verbindung";
 "Bağlı" = "Verbunden";
 "Bağlı cihazlar" = "Verbundene Geräte";
@@ -885,16 +885,16 @@
 "Kalibrasyonu başlat" = "Kalibrierung starten";
 "Kalibrasyonu iptal et" = "Kalibrierung abbrechen";
 "Kritik seviye" = "Kritischer Stand";
-"Pilden çalışıyor" = "Batteriebetrieb";
+"Pilden çalışıyor" = "Akkubetrieb";
 "Sınırda tutuluyor" = "Wird an der Grenze gehalten";
 "Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Ruhezustand: Laden über dem Ziel vor dem Einschlafen stoppen";
 "Uyku sırasında hedefin üstüne çıkabilir." = "Im Ruhezustand kann der Akku über das Ziel steigen.";
-"Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Im Ruhezustand gibt der Helfer aus Sicherheitsgründen alles frei; der Akku kann dann über das Ziel steigen.";
+"Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Im Ruhezustand gibt das Hilfsprogramm aus Sicherheitsgründen alles frei; der Akku kann dann über das Ziel steigen.";
 "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Segelbereich: %lld %% (Laden startet unter %lld %% neu)";
-"Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "Der Helfer zum Stoppen des Ladens ist nicht installiert oder nicht verifiziert. Diese Einstellungen haben vorerst keine Wirkung und schreiben nichts in die Hardware.";
+"Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "Das Hilfsprogramm zum Stoppen des Ladens ist nicht installiert oder nicht verifiziert. Diese Einstellungen haben vorerst keine Wirkung und schreiben nichts in die Hardware.";
 
 /* Faz 2: sağlık otomasyonları */
-"%%100 hazır: %@" = "%%100 bereit: %@";
+"%%100 hazır: %@" = "100 %% bereit: %@";
 "%95 üstünde, takılıyken" = "Über 95 %, angeschlossen";
 "35 °C üstünde şarj" = "Laden über 35 °C";
 "Adaptör takılıyken pil 3 saatten uzun süre %95 üstünde kalırsa bildirim gelir." = "Bleibt der Akku angeschlossen länger als 3 Stunden über 95 %, erhalten Sie eine Benachrichtigung.";
@@ -904,9 +904,9 @@
 "Henüz yeterli veri yok; Healthy Battery açık kaldıkça burada öneri görünür." = "Noch nicht genug Daten; Empfehlungen erscheinen hier, solange Healthy Battery läuft.";
 "Ortalama boşalma derinliği" = "Durchschnittliche Entladetiefe";
 "Otomatik koruma" = "Automatischer Schutz";
-"Pil %%%lld seviyesinde bekliyor, sınır %%%lld. macOS'un Optimize Şarj özelliği şarjı tutuyor olabilir (Sistem Ayarları › Pil › Pil Sağlığı). İki mekanizma birlikte çalışınca pil beklediğinizden geç dolar; ayarı buradan okuyamıyoruz, bu yalnızca gözleme dayalı bir ipucudur." = "Der Akku wartet bei %%%lld, Limit %%%lld. Das optimierte Laden von macOS hält die Ladung möglicherweise zurück (Systemeinstellungen › Batterie › Batteriezustand). Wirken beide Mechanismen zusammen, ist der Akku später voll als erwartet; die Einstellung lässt sich hier nicht auslesen, dies ist nur ein Hinweis aus beobachtetem Verhalten.";
-"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi ve Turbo kapatıldı." = "Akku %@ °C. Ladelimit vorübergehend auf %%80 gesenkt und Turbo ausgeschaltet.";
-"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi." = "Akku %@ °C. Ladelimit vorübergehend auf %%80 gesenkt.";
+"Pil %%%lld seviyesinde bekliyor, sınır %%%lld. macOS'un Optimize Şarj özelliği şarjı tutuyor olabilir (Sistem Ayarları › Pil › Pil Sağlığı). İki mekanizma birlikte çalışınca pil beklediğinizden geç dolar; ayarı buradan okuyamıyoruz, bu yalnızca gözleme dayalı bir ipucudur." = "Der Akku wartet bei %lld %%, Limit %lld %%. Das optimierte Laden von macOS hält die Ladung möglicherweise zurück (Systemeinstellungen › Batterie › Batteriezustand). Wirken beide Mechanismen zusammen, ist der Akku später voll als erwartet; die Einstellung lässt sich hier nicht auslesen, dies ist nur ein Hinweis aus beobachtetem Verhalten.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi ve Turbo kapatıldı." = "Akku %@ °C. Ladelimit vorübergehend auf 80 %% gesenkt und Turbo ausgeschaltet.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi." = "Akku %@ °C. Ladelimit vorübergehend auf 80 %% gesenkt.";
 "Pil 3 saattir %95 üstünde" = "Akku seit 3 Stunden über 95 %";
 "Pil adaptörde şarj olurken 35 °C'yi geçerse sınır geçici olarak %80 olur, Turbo kapanır ve bildirim gelir. 32 °C'ye inince ya da adaptör çıkınca eski ayar döner. Pil zaten %80'in altındaysa şarjı durduramaz." = "Überschreitet der Akku beim Laden am Netzteil 35 °C, wird das Limit vorübergehend 80 %, Turbo wird ausgeschaltet und Sie werden benachrichtigt. Sinkt er auf 32 °C oder wird das Netzteil getrennt, kehrt die vorherige Einstellung zurück. Liegt der Akku schon unter 80 %, kann das Laden nicht gestoppt werden.";
 "Pil sıcak: şarj sınırı %80'e çekildi" = "Akku ist heiß: Ladelimit auf 80 % gesenkt";
@@ -921,7 +921,7 @@
 "Yalnızca Healthy Battery açıkken ölçülen süreler sayılır." = "Nur die Zeit, in der Healthy Battery läuft, wird gezählt.";
 "sa" = "Std.";
 "Şarj alışkanlıklarınız pil için iyi görünüyor." = "Ihre Ladegewohnheiten sehen gut für den Akku aus.";
-"Şarj sağlığı · son 7 gün" = "Ladezustand · letzte 7 Tage";
+"Şarj sağlığı · son 7 gün" = "Ladeverhalten · letzte 7 Tage";
 "Şu saatte %100 hazır olsun" = "Zu einer Uhrzeit zu 100 % bereit";
 "Şu saatte %100 hazır olsun…" = "Zu einer Uhrzeit zu 100 % bereit…";
 "Adaptör kesildi" = "Netzteil getrennt";
@@ -947,9 +947,9 @@
 "Pil %20'ye inince" = "Wenn der Akku auf 20 % sinkt";
 "Pil %40 — fırsat varsa şarja tak." = "Akku 40 % — bei Gelegenheit anschließen.";
 "Pil %40'a inince" = "Wenn der Akku auf 40 % sinkt";
-"Pil dolu — bir süre pille kullanabilirsin." = "Akku ist voll — du kannst eine Weile im Akkubetrieb arbeiten.";
+"Pil dolu — bir süre pille kullanabilirsin." = "Akku ist voll — Sie können eine Weile im Akkubetrieb arbeiten.";
 "Pil ısınıyor — havalandırmayı kontrol et, yumuşak yüzeyden kaldır." = "Akku erwärmt sich — Belüftung prüfen, von weichem Untergrund nehmen.";
-"Yataktaysan altına sert bir şey koy." = "Im Bett? Leg etwas Hartes darunter.";
+"Yataktaysan altına sert bir şey koy." = "Im Bett? Legen Sie etwas Hartes darunter.";
 "Örnek göster" = "Beispiel anzeigen";
 "Örnek hatırlatma — bu ipucu 5 saniye sonra kaybolur." = "Beispielerinnerung — dieser Hinweis verschwindet nach 5 Sekunden.";
 "Şarjda ısınırsa" = "Bei Erwärmung beim Laden";
