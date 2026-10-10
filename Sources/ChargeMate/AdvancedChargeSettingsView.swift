@@ -81,8 +81,9 @@ struct AdvancedChargeSettingsView: View {
         VStack(alignment: .leading, spacing: 6) {
             Toggle("Adaptör modu (deneysel)", isOn: Binding(get: { adapter.enabled }, set: { adapter.setEnabled($0) }))
                 .disabled(adapter.installing || (!adapter.helperInstalled && !adapter.enabled))
-            Text("Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Fiziksel test bekliyor.")
+            Text("Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Yardımcı kurulunca adaptör kesme bu Mac'te otomatik olarak test edilir.")
                 .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            selfTestRow
             if !adapter.helperInstalled {
                 HStack {
                     Button(adapter.installing ? String(localized: "Kuruluyor…") : String(localized: "Yardımcıyı kur")) {
@@ -97,6 +98,32 @@ struct AdvancedChargeSettingsView: View {
             if let message = adapter.message {
                 Text(message).font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
             }
+        }
+    }
+
+    @ViewBuilder private var selfTestRow: some View {
+        if adapter.helperInstalled {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                if adapter.selfTestRunning {
+                    ProgressView().controlSize(.small)
+                    Text("Adaptör testi sürüyor (yaklaşık 2 dakika). Mac bu sırada kısa süre pilden çalışır.")
+                } else if let report = adapter.selfTestReport {
+                    Image(systemName: report.outcome == .passed ? "checkmark.circle.fill"
+                          : report.outcome == .failed ? "xmark.octagon.fill" : "clock")
+                        .foregroundStyle(report.outcome == .passed ? Color.green : report.outcome == .failed ? Color.red : Color.secondary)
+                    Text(report.summary)
+                } else {
+                    Text("Adaptör testi henüz yapılmadı.")
+                }
+                Spacer(minLength: 8)
+                if !adapter.selfTestRunning {
+                    Button(adapter.selfTestReport == nil ? String(localized: "Testi çalıştır") : String(localized: "Testi yeniden çalıştır")) {
+                        adapter.runSelfTest()
+                    }
+                    .disabled(adapter.active)
+                }
+            }
+            .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
         }
     }
 

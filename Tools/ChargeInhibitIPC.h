@@ -16,7 +16,7 @@
 #define CI_SOCKET_PATH "/var/run/" CI_LABEL ".sock"
 #define CI_STATE_DIR "/Library/Application Support/CellkeepChargeInhibit"
 #define CI_CLIENT_FILE CI_STATE_DIR "/client"
-#define CI_HELPER_VERSION 1
+#define CI_HELPER_VERSION 2
 
 typedef enum { CI_CMD_INVALID = 0, CI_CMD_READ, CI_CMD_CAPABILITIES, CI_CMD_SET, CI_CMD_HEARTBEAT } CICommand;
 

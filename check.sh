@@ -147,10 +147,10 @@ test "$(.build/checks/power-mode-helper-tests --version)" = "2"
 # nothing in this script contacts or writes the SMC.
 xcrun clang -Wall -Wextra -Werror Tests/ChargeInhibitSafetyTests.c Tools/ChargeInhibitSafety.c -o .build/checks/charge-inhibit-safety-tests
 .build/checks/charge-inhibit-safety-tests
-xcrun clang -Wall -Wextra -Werror Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation \
+xcrun clang -Wall -Wextra -Werror Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation -framework Security \
   -o .build/checks/charge-inhibit-helper
 .build/checks/charge-inhibit-helper --self-test
-test "$(.build/checks/charge-inhibit-helper --version)" = "1"
+test "$(.build/checks/charge-inhibit-helper --version)" = "2"
 xcrun clang -Wall -Wextra -Werror Tools/ChargeInhibitProbe.c -framework IOKit -framework CoreFoundation -o .build/checks/charge-inhibit-probe
 # The probe is read-only: no SMC write command may appear in it.
 ! grep -Eq 'SMC_WRITE|CMD_WRITE|in\[42\] = 6' Tools/ChargeInhibitProbe.c
@@ -159,6 +159,10 @@ test "$(grep -l 'SMC_WRITE' Tools/*.c | tr -d '\n')" = "Tools/ChargeInhibitHelpe
 xcrun swiftc Sources/ChargeMate/ChargeInhibit.swift Sources/ChargeMate/ChargeInhibitHelperBackend.swift \
   Sources/ChargeMate/HelperInstallState.swift Tests/ChargeInhibitHelperBackendTests.swift -o .build/checks/charge-inhibit-backend-tests
 .build/checks/charge-inhibit-backend-tests
+xcrun swiftc -parse-as-library Sources/ChargeMate/ChargeInhibit.swift Sources/ChargeMate/ChargeInhibitHelperBackend.swift \
+  Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/AdapterSelfTest.swift Tests/AdapterSelfTestTests.swift \
+  -o .build/checks/adapter-self-test-tests
+.build/checks/adapter-self-test-tests
 # Exactly ONE wiring file may reference the helper backend/installer (besides the backend file itself);
 # no view, intent, monitor or App file may.
 test "$(grep -rlE 'ChargeInhibitHelper|ChargeInhibitUnlock' Sources --include='*.swift' | sort | tr '\n' ' ')" = \

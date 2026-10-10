@@ -202,7 +202,7 @@ enum ChargeInhibitHelperService {
     static let label = "io.github.berkinefeavci.cellkeep.chargeinhibit"
     static let helperPath = "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.chargeinhibit"
     static let socketPath = "/var/run/io.github.berkinefeavci.cellkeep.chargeinhibit.sock"
-    static let minimumHelperVersion = 1
+    static let minimumHelperVersion = 2 // 2: callers must be the signed app
     static let bundledHelperName = "CellkeepChargeInhibitHelper"
 
     static func installed() -> Bool {

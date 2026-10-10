@@ -16,6 +16,10 @@ final class AdapterModeController: ObservableObject {
     @Published private(set) var active = false
     @Published private(set) var installing = false
     @Published private(set) var message: String?
+    @Published private(set) var selfTestRunning = false
+    @Published private(set) var selfTestReport = AdapterSelfTestStore.load()
+
+    var selfTestPassed: Bool { selfTestReport?.outcome == .passed }
 
     private let defaults: UserDefaults
     private let runner: AdvancedChargeRunner
@@ -42,7 +46,14 @@ final class AdapterModeController: ObservableObject {
         battery.$chargeLimit.removeDuplicates().sink { [weak self] _ in
             DispatchQueue.main.async { self?.syncTarget() }
         }.store(in: &cancellables)
+        runner.$display.removeDuplicates().sink { [weak self] _ in
+            DispatchQueue.main.async { self?.syncCutFlag() }
+        }.store(in: &cancellables)
+        battery.$snapshot.map(\.externalConnected).removeDuplicates().sink { [weak self] plugged in
+            if plugged { DispatchQueue.main.async { self?.runPendingSelfTest() } }
+        }.store(in: &cancellables)
         reconcile()
+        runPendingSelfTest()
     }
 
     func refreshHelperState() { helperInstalled = ChargeInhibitHelperService.installed() }
@@ -59,6 +70,12 @@ final class AdapterModeController: ObservableObject {
             }
             guard helperInstalled else {
                 message = String(localized: "Önce şarj yardımcısını kurun.")
+                return
+            }
+            guard selfTestPassed else {
+                message = selfTestRunning ? String(localized: "Adaptör testi sürüyor; bitince açabilirsiniz.")
+                    : String(localized: "Adaptör modu, otomatik adaptör testi geçince açılabilir.")
+                if !selfTestRunning { runSelfTest() }
                 return
             }
         }
@@ -87,6 +104,47 @@ final class AdapterModeController: ObservableObject {
                 self.installing = false
                 self.message = failure
                 self.refreshHelperState()
+                if failure == nil {
+                    self.selfTestReport = nil // a fresh helper gets a fresh physical test
+                    self.runPendingSelfTest()
+                }
+            }
+        }
+    }
+
+    /// Physical check of adapter mode (`AdapterSelfTest`): about two minutes, the Mac briefly runs from
+    /// the battery. Runs only while nothing else drives the helper, and always ends released.
+    func runSelfTest() {
+        guard !selfTestRunning else { return }
+        message = nil
+        refreshHelperState()
+        guard helperInstalled else {
+            message = String(localized: "Önce şarj yardımcısını kurun.")
+            return
+        }
+        guard kind == .none else {
+            message = String(localized: "Test için önce adaptör modunu kapatın.")
+            return
+        }
+        let rivals = ChargeControllerDetector.current()
+        guard rivals.isEmpty else {
+            message = String(localized: "Başka bir şarj uygulaması açık (\(rivals.joined(separator: ", "))). Adaptör modu için önce onu kapatın.")
+            return
+        }
+        selfTestRunning = true
+        syncCutFlag()
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+        DispatchQueue.global(qos: .utility).async {
+            var report = AdapterSelfTest(request: { try ChargeInhibitHelperService.request($0) },
+                                         sample: AdapterSelfTestProbe.live).run()
+            report.model = ChargeMateDiagnostics.machineModel()
+            report.system = ProcessInfo.processInfo.operatingSystemVersionString
+            report.appVersion = version
+            AdapterSelfTestStore.save(report)
+            DispatchQueue.main.async {
+                self.selfTestRunning = false
+                self.selfTestReport = report
+                self.syncCutFlag()
             }
         }
     }
@@ -118,6 +176,22 @@ final class AdapterModeController: ObservableObject {
             active = nowActive
             battery.setAdapterMode(active: nowActive)
         }
+    }
+
+    /// Installing the helper is the go-ahead: the test runs on its own (after install, at launch or when
+    /// the adapter is plugged in) until it has a real result. A failed test is only re-run by the user.
+    private func runPendingSelfTest() {
+        guard !selfTestRunning, selfTestReport == nil || selfTestReport?.outcome == .skipped else { return }
+        refreshHelperState()
+        guard helperInstalled, kind == .none, ChargeControllerDetector.current().isEmpty else { return }
+        runSelfTest()
+    }
+
+    /// Tells the rest of the app that a missing adapter is our own doing, so it is not treated as an unplug.
+    private func syncCutFlag() {
+        let display = runner.display
+        battery.adapterCutByApp = selfTestRunning || display == .adapterCut || display == .discharging
+            || display == .calibrating(.dischargeToLow)
     }
 
     private func syncTarget() {

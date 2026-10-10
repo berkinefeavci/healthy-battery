@@ -153,7 +153,8 @@ final class ReminderCenter {
     private func observe(_ snapshot: BatterySnapshot) {
         guard snapshot.available else { return }
         let sample = ReminderSample(percentage: snapshot.percentage ?? snapshot.hardwarePercentage,
-                                    externalConnected: snapshot.externalConnected, isCharging: snapshot.isCharging,
+                                    externalConnected: snapshot.externalConnected || battery.adapterCutByApp,
+                                    isCharging: snapshot.isCharging,
                                     temperatureC: snapshot.temperatureC, limit: battery.nativeLimit)
         let result = ReminderEngine.step(state, sample: sample, settings: .load(defaults), now: Date())
         let changed = result.state != state

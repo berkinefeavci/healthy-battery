@@ -379,6 +379,8 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     /// Adapter mode (opt-in, set by the wiring controller): `chargeLimit` is the adapter target (20-100) and the
     /// native macOS limit is only a sleep ceiling derived from it.
     @Published private(set) var adapterModeActive = false
+    /// True while Healthy Battery itself cut the adapter (adapter mode, discharge, self-test): the cable is still in.
+    @Published var adapterCutByApp = false
     /// The user's native limit choice from before adapter mode, restored when it ends.
     private var limitBeforeAdapterMode: Double? {
         get { defaults.object(forKey: "limitBeforeAdapterMode") as? Double }
