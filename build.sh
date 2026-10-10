@@ -75,6 +75,9 @@ fi
 # builds (Xcode 27, local) keep these steps mandatory, CI only proves compile + tests.
 ci_optional() { if [ -n "${CI:-}" ]; then echo "UYARI (CI): $1 bulunamadı, atlanıyor" >&2; return 0; fi; return 1; }
 if [ ! -f "$asset_catalog" ]; then ci_optional "Assets.car" || { test -f "$asset_catalog"; }; asset_catalog=""; fi
+# Start from an empty bundle: a file left by a build of another branch (say, a helper that
+# release.sh does not sign there) would otherwise ship and fail notarization.
+rm -rf "$app_path"
 mkdir -p "$app_path/Contents/MacOS" "$app_path/Contents/Resources"
 cp "$executable" "$app_path/Contents/MacOS/Cellkeep"
 # App icon: Packaging/AppIcon.icon (Icon Composer). actool compiles it together with the asset
