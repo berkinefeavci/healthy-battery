@@ -41,7 +41,8 @@ struct EnergyLedger: Codable, Equatable {
     /// One row per owner app (helpers folded into their `.app`), else per process name.
     static func grouped(_ apps: [EnergyApp]) -> [String: Entry] {
         var result: [String: Entry] = [:]
-        for app in apps where app.power > 0 {
+        // `top` is our own sampler; counting it would blame the measurement on the user.
+        for app in apps where app.power > 0 && app.name != "top" {
             let key = app.iconPath ?? "process:" + app.name
             let name = app.iconPath.flatMap { EnergyPresentation.ownerAppName(fromExecutablePath: $0) }
                 ?? EnergyPresentation.displayName(for: app.name)
