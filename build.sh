@@ -33,6 +33,10 @@ if [[ "${1:-}" == "--local-preview-sdk" ]]; then
     -o .build/local-preview/ChargeMateLEDHelper
   xcrun clang -isysroot "$sdk_path" -mmacosx-version-min=13.0 -O2 \
     Tools/PowerModeHelper.c -o .build/local-preview/ChargeMatePowerModeHelper
+  xcrun clang -isysroot "$sdk_path" -mmacosx-version-min=13.0 -O2 \
+    Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation \
+    -o .build/local-preview/ChargeMateChargeInhibitHelper
+  charge_inhibit_helper=.build/local-preview/ChargeMateChargeInhibitHelper
   helper_binary=.build/local-preview/ChargeMateLEDHelper
   power_mode_helper=.build/local-preview/ChargeMatePowerModeHelper
   asset_catalog=../app/ChargeMate.app/Contents/Resources/Assets.car
@@ -55,6 +59,9 @@ else
   xcrun clang -O2 Tools/MagSafeLEDProbe.c -framework IOKit -framework CoreFoundation \
     -o .build/release/CellkeepLEDHelper
   xcrun clang -O2 Tools/PowerModeHelper.c -o .build/release/CellkeepPowerModeHelper
+  xcrun clang -O2 Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation \
+    -o .build/release/CellkeepChargeInhibitHelper
+  charge_inhibit_helper=.build/release/CellkeepChargeInhibitHelper
   helper_binary=.build/release/CellkeepLEDHelper
   power_mode_helper=.build/release/CellkeepPowerModeHelper
   resource_bundle=.build/release/Cellkeep_Cellkeep.bundle
@@ -70,22 +77,29 @@ ci_optional() { if [ -n "${CI:-}" ]; then echo "UYARI (CI): $1 bulunamadı, atla
 if [ ! -f "$asset_catalog" ]; then ci_optional "Assets.car" || { test -f "$asset_catalog"; }; asset_catalog=""; fi
 mkdir -p "$app_path/Contents/MacOS" "$app_path/Contents/Resources"
 cp "$executable" "$app_path/Contents/MacOS/Cellkeep"
-# Assets.car yalnızca katalogda app icon dışında görsel varsa üretilir (SwiftPM app icon'u
-# actool'a --app-icon olarak geçmediği için tek başına AppIcon.appiconset boş çıktı verir).
-# Bu yüzden kopyalama koşullu; app icon ayrıca .icns + CFBundleIconFile ile sağlanır.
-[ -n "$asset_catalog" ] && cp "$asset_catalog" "$app_path/Contents/Resources/Assets.car"
+# App icon: Packaging/AppIcon.icon (Icon Composer). actool compiles it together with the asset
+# catalog into one Assets.car holding the light, dark and tinted icon, plus AppIcon.icns for
+# macOS 13–15. actool resolves relative paths against its own daemon, so every path is absolute.
+rm -f "$app_path/Contents/Resources/Assets.car" "$app_path/Contents/Resources/AppIcon.icns"
+xcrun actool "$PWD/Sources/ChargeMate/Resources/Assets.xcassets" "$PWD/Packaging/AppIcon.icon" \
+  --compile "$PWD/$app_path/Contents/Resources" \
+  --output-format human-readable-text --notices --warnings \
+  --output-partial-info-plist "$PWD/.build/AppIcon-info.plist" \
+  --app-icon AppIcon --platform macosx \
+  --minimum-deployment-target 13.0 --target-device mac || true
+if [ ! -s "$app_path/Contents/Resources/AppIcon.icns" ] || [ ! -s "$app_path/Contents/Resources/Assets.car" ]; then
+  ci_optional "AppIcon (Icon Composer needs Xcode 26 or newer)" || { echo "HATA: app icon derlenemedi" >&2; exit 1; }
+  rm -f "$app_path/Contents/Resources/Assets.car" "$app_path/Contents/Resources/AppIcon.icns"
+  [ -n "$asset_catalog" ] && cp "$asset_catalog" "$app_path/Contents/Resources/Assets.car"
+fi
 cp "$helper_binary" "$app_path/Contents/Resources/CellkeepLEDHelper"
 cp "$power_mode_helper" "$app_path/Contents/Resources/CellkeepPowerModeHelper"
 cp "$native_charge_helper" "$app_path/Contents/Resources/CellkeepNativeChargeHelper"
+cp "$charge_inhibit_helper" "$app_path/Contents/Resources/CellkeepChargeInhibitHelper"
 codesign --force --sign - "$app_path/Contents/Resources/CellkeepLEDHelper"
 codesign --force --sign - "$app_path/Contents/Resources/CellkeepPowerModeHelper"
 codesign --force --sign - "$app_path/Contents/Resources/CellkeepNativeChargeHelper"
-if [ -f Sources/ChargeMate/Resources/AppIcon.icns ]; then
-  cp Sources/ChargeMate/Resources/AppIcon.icns "$app_path/Contents/Resources/AppIcon.icns"
-else
-  echo "HATA: Sources/ChargeMate/Resources/AppIcon.icns bulunamadı" >&2
-  exit 1
-fi
+codesign --force --sign - "$app_path/Contents/Resources/CellkeepChargeInhibitHelper"
 cp Packaging/Info.plist "$app_path/Contents/Info.plist"
 # SwiftUI Text and String(localized:) look up Bundle.main, i.e. Contents/Resources/<lang>.lproj.
 rm -rf "$app_path/Contents/Resources/"*.lproj

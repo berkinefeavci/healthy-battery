@@ -111,7 +111,17 @@ enum SystemPowerModeService {
         return modes
     }
 
-    static func availableModes() -> Set<SystemPowerMode> {
+    /// Hardware capability; it does not change while the app runs. SwiftUI views read this
+    /// during rendering, so it must never spin the run loop (waitUntilExit does, and the
+    /// re-entrant layout crashed the app with an AttributeGraph precondition failure).
+    static func availableModes() -> Set<SystemPowerMode> { cachedModes }
+
+    /// Call once at launch off the main thread so the first view render finds it ready.
+    static func warmUpCapabilities() { _ = cachedModes }
+
+    private static let cachedModes: Set<SystemPowerMode> = readAvailableModes()
+
+    private static func readAvailableModes() -> Set<SystemPowerMode> {
         let process = Process()
         let pipe = Pipe()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
@@ -119,9 +129,9 @@ enum SystemPowerModeService {
         process.standardOutput = pipe
         process.standardError = pipe
         guard (try? process.run()) != nil else { return [.automatic] }
-        process.waitUntilExit()
-        guard process.terminationStatus == 0,
-              let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) else {
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        while process.isRunning { usleep(2_000) }
+        guard process.terminationStatus == 0, let output = String(data: data, encoding: .utf8) else {
             return [.automatic]
         }
         return parseCapabilities(output)

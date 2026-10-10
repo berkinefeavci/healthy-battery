@@ -156,6 +156,34 @@ import Foundation
         try sessionStore.clear()
         check(sessionStore.load().value == nil, "verified completion clears session")
 
+        // External-change preference: engine behaviour and loop guard.
+        var autoInput = input(native: native90)
+        autoInput.externalChangeResponse = .reapply
+        decision = ChargePolicyEngine.evaluate(autoInput)
+        check(decision.command == .write(limit: 80, source: .manual), "reapply preference writes the target")
+        autoInput.autoReapplyAllowed = false
+        decision = ChargePolicyEngine.evaluate(autoInput)
+        check(decision.command == .none && decision.state == .pausedByConflict(expected: 80, observed: 90),
+              "blocked auto reapply falls back to asking")
+        autoInput = input(native: native90)
+        autoInput.externalChangeResponse = .adopt
+        decision = ChargePolicyEngine.evaluate(autoInput)
+        check(decision.command == .none && decision.policy?.desiredLimit == 90 && decision.state == .maintainingLimit(90),
+              "adopt preference takes the macOS value")
+        var gate = ExternalChangeGate()
+        check(gate.allowsAutoReapply(observed: 90, now: now), "fresh gate allows one reapply")
+        gate.recordAutoReapply(at: now)
+        check(!gate.allowsAutoReapply(observed: 90, now: now.addingTimeInterval(599)), "gate blocks within 10 minutes")
+        check(gate.allowsAutoReapply(observed: 90, now: now.addingTimeInterval(601)), "gate reopens after 10 minutes")
+        gate.recordFailure(observed: 90)
+        check(!gate.allowsAutoReapply(observed: 90, now: now.addingTimeInterval(9_999)), "failed value never retried")
+        check(gate.allowsAutoReapply(observed: 85, now: now.addingTimeInterval(9_999)), "a different external value is a new change")
+        check(ExternalChangeResponse(stored: nil) == .ask && ExternalChangeResponse(stored: "bogus") == .ask
+              && ExternalChangeResponse(stored: "adopt") == .adopt, "stored response defaults to ask")
+        check(ChargeLimitDisplay.shown(native: 80, preference: 100) == 80
+              && ChargeLimitDisplay.shown(native: nil, preference: 100) == 100, "panel shows real native limit")
+        check(ChargeLimitDisplay.topUpReturnText(limit: 80).contains("80") , "top up return text mentions the limit")
+
         print("Charge policy: \(count) assertions passed; pure logic and temporary stores only.")
     }
 }

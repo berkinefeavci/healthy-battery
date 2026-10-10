@@ -7,7 +7,7 @@ final class ChargeControlCoordinator {
     }
 
     enum Source: String, Codable {
-        case manual, topUp, restore, schedule, shortcut, wakeRecovery
+        case manual, topUp, restore, schedule, shortcut, wakeRecovery, heatProtection
     }
 
     final class Request {
