@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- The power-mode and MagSafe light helpers (version 3) answer only Healthy Battery signed by the same developer, like the charge helper since 1.4.2. Before, any program running as your user could change the power mode or the light. Both ask for the administrator password once more, the next time you change the power mode or set up the light.
+- A dismissed administrator prompt is no longer shown as a failure. Uninstall says which steps did not finish instead of always reporting success, and keeps the app open when something is left.
+- The in-app updater checks the downloaded app against an explicit Developer ID requirement (your installed app's team and bundle id) and follows download redirects only to GitHub's own hosts.
+- Schedule: "Run as new execution" in the history now really runs the action again (limit, Top Up or power mode) and shows the real result. Pause charging, calibration and discharge to a target cannot run, so they are no longer offered; "Add task" starts from Top Up and the two calibration templates are gone. Tasks saved earlier with those actions still load and show as unsupported. The page text now says what runs.
+- Failures are no longer swallowed: a Top Up that did not start, a limit that macOS refused (also with the limit editor closed) and a long-term history file that could not be saved show their reason. Helper and policy error messages follow the app language.
+- Heat protection is one switch (Settings → Charge Control → Automatic protection); the locked "Soon" row, the unused heat/sailing/maximum-temperature preferences and the unused "sleep behaviour" advanced setting are gone. Discharge and calibration buttons appear only on Macs that can use them. The MagSafe "by state" policy, which could not be selected, is removed.
+- The history range (1 / 6 / 24 h) now applies to the charts at rest, on square cards too; hovering only adds the axes.
+- An Edit menu makes ⌘C, ⌘V, ⌘X, ⌘Z and ⌘A work in text fields. The onboarding button opens the Dashboard, the Shortcuts page counts the actions that can really run, and the Dashboard status dot follows the real state.
+- Lower background cost: the 24-hour history is saved at most every 2 minutes (and when you quit or the Mac sleeps) instead of every 30 seconds, without re-reading and re-encoding the whole file each time; unchanged values no longer wake the interface. A crash can lose up to two minutes of chart points.
+- Docs: SECURITY.md lists all three helpers, the manual uninstall removes the charge helper too, and the Homebrew instructions agree.
+
 ## 1.4.2
 
 - Adapter mode tests itself. Right after the charge helper is installed (or the next time the adapter is plugged in), Healthy Battery cuts the adapter, waits for the battery gauge to report that the battery really powers the Mac (it reports only about once a minute), brings the adapter back, then cuts it once more without heartbeats and checks that the helper's 60-second safety timer restores it. It takes a few minutes and always ends with the adapter on. Adapter mode can be turned on only after this test passes; the result is shown in Settings → Charge Control.
