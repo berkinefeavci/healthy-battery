@@ -23,6 +23,11 @@ enum ChargeMateApp {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         IdentityMigration.runIfNeeded(oldSupportDirectory: support.appendingPathComponent("ChargeMate"),
                                        newSupportDirectory: support.appendingPathComponent("Cellkeep"))
+        // History, schedules and journals live here; nobody but this user needs to read or traverse it.
+        let dataDirectory = support.appendingPathComponent("Cellkeep")
+        try? FileManager.default.createDirectory(at: dataDirectory, withIntermediateDirectories: true,
+                                                 attributes: [.posixPermissions: 0o700])
+        try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: dataDirectory.path)
         let app = NSApplication.shared
         let delegate = AppDelegate()
         app.delegate = delegate
