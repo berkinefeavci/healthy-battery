@@ -343,6 +343,83 @@ private final class FakeNative {
             check(working.limitMessage != nil && working.limitFailureMessage == nil,
                   "a verified limit write is a message, not a failure line")
         }
+        // Publish only on change: with unchanged hardware, a refresh wakes SwiftUI once (the snapshot carries a
+        // fresh timestamp and must be published), not once per property it re-assigned.
+        do {
+            let fake = FakeNative()
+            let quiet = try isolatedMonitor("publish-counts", fake: fake)
+            providedSnapshot.available = true
+            providedSnapshot.sampledAt = Date()
+            quiet.start()
+            defer { quiet.stop() }
+            until { quiet.nativeLimit == 90 }
+            var settled = 0
+            let settleWatch = quiet.$snapshot.sink { _ in settled += 1 }
+            for _ in 0..<3 { let before = settled; quiet.refresh(); until { settled > before } }
+            settleWatch.cancel()
+            var emissions = 0
+            let watch = quiet.objectWillChange.sink { emissions += 1 }
+            let rounds = 4
+            for _ in 0..<rounds {
+                let before = emissions
+                quiet.refresh()
+                until { emissions > before }
+                _ = RunLoop.main.run(mode: .default, before: Date().addingTimeInterval(0.05))
+            }
+            watch.cancel()
+            check(emissions <= rounds, "an unchanged refresh wakes the views once, not once per re-assigned property (\(emissions) in \(rounds))")
+        }
+        // History file: encoded points are reused, the JSON stays the same object JSONEncoder writes, and the
+        // decode-before-replace guard still protects a file this session did not write.
+        do {
+            let base = Date(timeIntervalSince1970: 1_800_000_000)
+            var snapshot = BatterySnapshot(); snapshot.available = true; snapshot.percentage = 71; snapshot.sampledAt = base
+            let points = (0..<40).map { BatteryMonitor.historyPoint(snapshot, now: base.addingTimeInterval(Double($0) * 30)) }
+            let archive = HistoryArchive(schemaVersion: 2, measurements: points, limitEvents: [LimitEvent(date: base, value: 80)])
+            let cache = HistoryEncodingCache()
+            func object(_ data: Data) throws -> NSDictionary { try JSONSerialization.jsonObject(with: data) as! NSDictionary }
+            check(try object(cache.encode(archive)) == object(JSONEncoder().encode(archive)),
+                  "cached encoding is the same JSON object as JSONEncoder's")
+            let grown = HistoryArchive(schemaVersion: 2, measurements: points + [BatteryMonitor.historyPoint(snapshot, now: base.addingTimeInterval(1_200))],
+                                       limitEvents: [])
+            check(try object(cache.encode(grown)) == object(JSONEncoder().encode(grown)), "second write with one new point is identical")
+            let trimmed = HistoryArchive(schemaVersion: 2, measurements: Array(points.suffix(5)), limitEvents: [])
+            check(try object(cache.encode(trimmed)) == object(JSONEncoder().encode(trimmed)), "points that left the window are dropped")
+            check(try object(cache.encode(HistoryArchive(schemaVersion: 2, measurements: [], limitEvents: [])))
+                  == object(JSONEncoder().encode(HistoryArchive(schemaVersion: 2, measurements: [], limitEvents: []))), "empty archive")
+            let decoded = try JSONDecoder().decode(HistoryArchive.self, from: cache.encode(archive))
+            check(decoded.measurements.count == 40 && decoded.limitEvents == archive.limitEvents, "cached JSON decodes back")
+
+            let writeRoot = root.appendingPathComponent("history-write")
+            try FileManager.default.createDirectory(at: writeRoot, withIntermediateDirectories: true)
+            let file = writeRoot.appendingPathComponent("history.json")
+            try Data("not json".utf8).write(to: file)
+            var refused = false
+            do { try archive.write(file) } catch { refused = true }
+            let untouched = try Data(contentsOf: file) == Data("not json".utf8)
+            check(refused && untouched, "an unreadable file this session did not write is never overwritten")
+            try archive.write(file, verifyPrior: false, encodingCache: cache)
+            check(try HistoryArchive.read(file, now: base.addingTimeInterval(1_200)).measurements.count == 40, "session-owned file is rewritten without the guard")
+        }
+        // Persistence is throttled (MonitorCadence.historySaveInterval) but the first point of a session is saved at
+        // once, a quiet monitor leaves the file alone on stop, and stop() writes points still only in memory.
+        check(MonitorCadence.historySaveInterval == 120, "history is saved at most every two minutes")
+        do {
+            let fake = FakeNative()
+            let saving = try isolatedMonitor("history-saving", fake: fake)
+            let file = root.appendingPathComponent("history-saving").appendingPathComponent("history.json")
+            providedSnapshot.available = true
+            providedSnapshot.percentage = 64
+            providedSnapshot.sampledAt = Date()
+            saving.start()
+            until { FileManager.default.fileExists(atPath: file.path) }
+            let first = try HistoryArchive.read(file)
+            check(first.measurements.count == 1 && first.measurements[0].percentage == 64, "first point of a session is saved at once")
+            let modified = try FileManager.default.attributesOfItem(atPath: file.path)[.modificationDate] as! Date
+            saving.stop()
+            let afterStop = try FileManager.default.attributesOfItem(atPath: file.path)[.modificationDate] as! Date
+            check(afterStop == modified, "stop() does not rewrite a file with nothing new in it")
+        }
         // The long-term summary file failing to save is shown too (it used to be dropped with `try?`).
         do {
             let fake = FakeNative()

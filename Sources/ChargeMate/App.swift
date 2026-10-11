@@ -271,6 +271,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         battery.handleWake()
     }
     @objc private func workspaceWillSleep() {
+        battery.flushHistory()
         AdvancedChargeRunner.shared.setSleepState(.asleep)
         MainActor.assumeIsolated { ReminderCenter.shared.systemWillSleep() }
     }
