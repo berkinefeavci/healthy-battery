@@ -9,7 +9,7 @@ labels: bug
 
 **macOS version** (e.g. 15.1):
 
-**Cellkeep version** (Settings → About):
+**Healthy Battery version** (Settings → About):
 
 **What happened:**
 

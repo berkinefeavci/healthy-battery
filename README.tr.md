@@ -40,7 +40,7 @@
 - **Kaynağa göre güç modları.** Otomatik / Yüksek Güç (Turbo) / Tasarruf, "pilde" ve "adaptörde" ayrı ayrı izlenir; macOS'un kendi `pmset` güç profillerine, dar kapsamlı ve izin listeli bir yardımcı üzerinden yazılır.
 - **Uyku davranışı.** İsteğe bağlı: adaptör bağlıyken ve hedefin altında şarj olurken, Healthy Battery genel (public) bir macOS boşta-uyku assertion'ı tutarak Mac'inizin uykuya geçmek yerine şarj olmaya devam etmesini sağlar. 8 saatlik güvenlik sınırı vardır; kapak kapatma veya ekran uykusuna hiç dokunmaz. Uyku sırasında şarjı kendiliğinden duraklatmaz — bkz. Sınırlamalar.
 - **MagSafe LED denetimi.** İmzalı, dar kapsamlı ve yalnızca bilinen tek bir SMC anahtarına yazan bir ayrıcalıklı yardımcı üzerinden manuel Sistem / Yeşil / Turuncu / Kapalı denetimi, artı her zaman kapalı veya saatli bir politika.
-- **Zamanlamalar (Schedules).** Bir sınır uygulama, güç modu değiştirme ve benzeri için tekrarlı veya tek seferlik eylemler; filtrelenebilir çalıştırma geçmişiyle.
+- **Zamanlamalar (Schedules).** Bir sınır uygulama, Doldur başlatma, güç modu değiştirme için tekrarlı veya tek seferlik eylemler; filtrelenebilir çalıştırma geçmişi ve eylemi gerçekten yeniden çalıştıran bir yeniden deneme ile.
 - **Apple Kısayolları (Shortcuts) eylemleri.** Pil yüzdesi, sıcaklık ve durum okuma; sınır uygulama, Doldur başlatma/iptal etme, güç modu değiştirme veya MagSafe LED ayarlama için sekiz App Intent.
 - **Çıkış ile yüksek enerjili uygulamalar.** Enerji listesi yardımcı süreçleri sahibi uygulama altında toplar, gerçek ikonu gösterir ve listeden doğrudan bir uygulamayı kapatmanıza izin verir.
 - **Uygulama içinden güncelleme.** Healthy Battery günde en fazla bir kez GitHub'dan son sürüm numarasını sorar ve yeni sürüm çıkınca bir bildirim gösterir; ikisi de Ayarlar → Hakkında'dan kapatılabilir. **Güncelle**'ye basınca o sürümü indirir; sağlama değerini, Developer ID imzasını ve Apple onayını doğruladıktan sonra kendini değiştirip yeniden açılır. Hiçbir veri gönderilmez; bkz. [PRIVACY.md](PRIVACY.md).
@@ -67,7 +67,7 @@ Bunlar arayüzde kilitli olarak ve **"Yakında"** etiketiyle görünür. Bunlar 
 1. En son `.dmg` dosyasını [Releases](../../releases)'tan indirin. Yayınlanan sürümler Developer ID ile imzalanır ve Apple tarafından notarize edilir.
 2. Açın ve `Healthy Battery.app` dosyasını Applications'a sürükleyin.
 3. `./build.sh` ile kendiniz derlediğiniz bir kopya yalnızca geçici (ad-hoc) imzalıdır; ilk açılışta macOS uyarı verir — Sistem Ayarları → Gizlilik ve Güvenlik'ten izin verin.
-4. Ayrıcalıklı bir yardımcı gerektiren bir özelliği (güç modu değiştirme veya MagSafe LED denetimi) ilk kullandığınızda, macOS o yardımcı için bir kez yönetici onayı ister. Healthy Battery parola saklamaz.
+4. Ayrıcalıklı bir yardımcı gerektiren bir özelliği (güç modu değiştirme, MagSafe LED denetimi veya adaptör modu) ilk kullandığınızda, macOS o yardımcı için bir kez yönetici onayı ister. Healthy Battery parola saklamaz.
 
 ### Homebrew ile
 
@@ -100,10 +100,13 @@ Elle kaldırma:
    ```sh
    sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.powermode 2>/dev/null
    sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.led 2>/dev/null
+   sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.chargeinhibit 2>/dev/null
    sudo rm -f /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.powermode.plist
    sudo rm -f /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.led.plist
+   sudo rm -f /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.chargeinhibit.plist
    sudo rm -f /Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.powermode
    sudo rm -f /Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.led
+   sudo rm -f /Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.chargeinhibit
    ```
 4. Healthy Battery kaldırılırken macOS şarj sınırınızı değiştirmez — sınır bir Healthy Battery süreci değil, bir macOS ayarıdır. İsterseniz Sistem Ayarları → Batarya'dan kendiniz kapatın.
 

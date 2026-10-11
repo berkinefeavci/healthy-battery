@@ -40,7 +40,7 @@
 - **Power modes per source.** Automatic / High Power (Turbo) / Low Power (Battery Saver), tracked separately for "on battery" and "on adapter," backed by macOS's own `pmset` power profiles through a narrowly scoped, allowlisted helper.
 - **Sleep behavior.** Optional: while charging below your target with the adapter connected, Healthy Battery holds a public macOS idle-sleep assertion so your Mac keeps charging instead of going to sleep. It has an 8-hour safety cutoff and never touches lid-close or screen sleep. It does not pause charging by itself during sleep — see Limitations.
 - **MagSafe LED control.** Manual System / Green / Orange / Off control, plus an always-off or scheduled-hours policy, via a signed, narrowly scoped privileged helper that only writes one known SMC key.
-- **Schedules.** Recurring or one-off actions (apply a limit, switch power mode, and more) with a filterable execution history.
+- **Schedules.** Recurring or one-off actions (apply a limit, start Top Up, switch power mode) with a filterable execution history and a retry that really re-runs the action.
 - **Apple Shortcuts actions.** Eight App Intents to read battery percentage, temperature, and status, and to apply a limit, start/cancel Top Up, switch power mode, or set the MagSafe LED.
 - **High-energy apps, with Quit.** The energy list groups helper processes under their owning app, shows a real icon, and lets you quit an app straight from the list.
 - **Updates from inside the app.** Healthy Battery asks GitHub for the latest release number at most once a day and shows one notification when a new version is out; both can be turned off in Settings → About. Press **Update** and it downloads that release, checks its checksum, Developer ID signature and Apple notarization, then replaces itself and relaunches. Nothing is sent; see [PRIVACY.md](PRIVACY.md).
@@ -67,7 +67,7 @@ These are shown in the UI as locked and marked **"Yakında"** (Coming soon). The
 1. Download the latest `.dmg` from [Releases](../../releases). Release builds are signed with Developer ID and notarized by Apple.
 2. Open it and drag `Healthy Battery.app` to Applications.
 3. A build you made yourself with `./build.sh` is only ad-hoc signed; macOS will warn about it on first launch — open System Settings → Privacy & Security and allow it.
-4. The first time you use a feature that needs a privileged helper (power-mode switching or MagSafe LED control), macOS will ask for administrator approval once for that helper. No password is stored by Healthy Battery.
+4. The first time you use a feature that needs a privileged helper (power-mode switching, MagSafe LED control or adapter mode), macOS will ask for administrator approval once for that helper. No password is stored by Healthy Battery.
 
 ### With Homebrew
 
@@ -100,10 +100,13 @@ Manual alternative:
    ```sh
    sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.powermode 2>/dev/null
    sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.led 2>/dev/null
+   sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.chargeinhibit 2>/dev/null
    sudo rm -f /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.powermode.plist
    sudo rm -f /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.led.plist
+   sudo rm -f /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.chargeinhibit.plist
    sudo rm -f /Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.powermode
    sudo rm -f /Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.led
+   sudo rm -f /Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.chargeinhibit
    ```
 4. If you uninstall manually, your macOS charge limit stays as it was: it is a macOS setting. Change it in System Settings → Battery if you want to.
 
