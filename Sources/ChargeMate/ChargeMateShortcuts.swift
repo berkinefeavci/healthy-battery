@@ -139,23 +139,3 @@ struct ChargeMateShortcutReader {
         return snapshot.state
     }
 }
-
-enum ChargeMateShortcutCommand: Equatable {
-    case setChargeLimit(Int)
-    case startTopUp
-    case cancelTopUp
-    case setPowerMode(ChargeMateShortcutPowerMode)
-    case setMagSafe(ChargeMateShortcutMagSafeOutput)
-}
-
-struct ChargeMateShortcutCommandRunner {
-    let supportedLimits: () -> Set<Int>
-    let execute: (ChargeMateShortcutCommand) throws -> String
-
-    func run(_ command: ChargeMateShortcutCommand) throws -> String {
-        if case .setChargeLimit(let value) = command, !supportedLimits().contains(value) {
-            throw ChargeMateShortcutError.unsupportedChargeLimit(value)
-        }
-        return try execute(command)
-    }
-}

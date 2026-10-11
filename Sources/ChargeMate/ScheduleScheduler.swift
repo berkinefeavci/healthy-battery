@@ -62,8 +62,6 @@ struct ScheduleExecutionRecord: Codable, Identifiable, Equatable {
     var status: ScheduleExecutionStatus
     var failureReason: String?
     var operationID: UUID?
-
-    var idempotencyKey: String { "\(taskID.uuidString)|\(plannedAt.timeIntervalSince1970)" }
 }
 
 struct ScheduleExecutionLoadResult {

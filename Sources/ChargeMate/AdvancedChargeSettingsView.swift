@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Experimental settings for the advanced charge engine. Everything is disabled until a verified
-/// charge-inhibit backend is injected; the existing placeholder views are left untouched.
+/// Experimental settings for the advanced charge engine and adapter mode. Controls that need a verified
+/// charge-inhibit key appear only when this Mac has one (or while adapter mode runs); nothing here writes to
+/// the hardware without the helper.
 struct AdvancedChargeSettingsView: View {
     @ObservedObject var runner: AdvancedChargeRunner
     @ObservedObject private var adapter = AdapterModeController.shared

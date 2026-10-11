@@ -191,7 +191,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                                                           name: NSWorkspace.didWakeNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(workspaceWillSleep),
                                                           name: NSWorkspace.willSleepNotification, object: nil)
-        // Inert until a supported ChargeInhibitBackend is injected into AdvancedChargeRunner.shared.
+        // The runner stays inert (unsupported backend) until adapter mode injects the helper backend.
         AdvancedChargeRunner.shared.start()
         AdapterModeController.shared.start()
         battery.snapshotObserver = { [weak battery] snapshot in
@@ -251,7 +251,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     @objc private func openDashboard() { showSettings(page: .dashboard) }
-    @objc private func openChargeSettings() { showSettings(page: .charge) }
 
     @objc private func statusItemClicked(_ sender: Any?) {
         guard NSApp.currentEvent?.type == .rightMouseUp else { togglePanel(sender); return }

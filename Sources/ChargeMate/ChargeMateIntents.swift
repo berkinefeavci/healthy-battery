@@ -339,7 +339,7 @@ private enum ChargeMateShortcutService {
 
     static func setPowerMode(_ mode: SystemPowerMode) async throws -> String {
         guard SystemPowerModeService.availableModes().contains(mode) else {
-            throw ChargeMateShortcutError.commandFailed("\(mode.title) bu Mac'te desteklenmiyor.")
+            throw ChargeMateShortcutError.commandFailed(String(localized: "\(mode.title) bu Mac'te desteklenmiyor."))
         }
         switch SystemPowerModeService.applyInstalled(mode) {
         case .success(let confirmed): return String(localized: "\(confirmed.title) seçildi.")

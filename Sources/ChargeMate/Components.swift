@@ -2,43 +2,6 @@ import SwiftUI
 
 let controlNotice = String(localized: "macOS limiti açıkça Uygula’ya bastığınızda kaydedilir. Başka bir şarj uygulaması açıkken değişiklik yapılamaz.")
 
-enum HistoryCoverage {
-    /// Saf, test edilebilir kapsam metni üretici. Uydurma veri yok: eksik ölçüm metinde açıkça belirtilir.
-    static func durationText(_ seconds: Double) -> String {
-        guard seconds.isFinite, seconds > 0 else { return "—" }
-        let minutes = Int((seconds / 60).rounded(.down))
-        if minutes < 60 { return String(localized: "\(max(1, minutes)) dk") }
-        let hours = seconds / 3600
-        if hours < 24 {
-            let language = Bundle.main.preferredLocalizations.first ?? "tr"
-            let text = String(format: "%.1f", min(hours, 23.9))
-            return String(localized: "\(language == "en" ? text : text.replacingOccurrences(of: ".", with: ",")) sa")
-        }
-        return String(localized: "\(24) sa")
-    }
-    static func text(count: Int, oldestDate: Date?, now: Date, rangeHours: Int) -> String {
-        guard count > 0, let oldest = oldestDate else { return String(localized: "Ölçüm toplanıyor…") }
-        let span = min(max(0, now.timeIntervalSince(oldest)), Double(rangeHours) * 3600)
-        guard count >= 5 else { return String(localized: "Ölçüm toplanıyor… (ölçüm: \(count))") }
-        let base = String(localized: "Kapsam: son \(durationText(span)) · \(count) ölçüm")
-        if span < Double(rangeHours) * 3600 - 60 {
-            return String(localized: "\(base) · Veri toplama sürüyor — 24 saate kadar birikecek")
-        }
-        return base
-    }
-}
-
-struct DraftBadge: View {
-    var detail: String
-    var body: some View {
-        Label("Taslak", systemImage: "pencil.tip")
-            .font(.system(size: 9, weight: .medium)).foregroundStyle(.orange)
-            .padding(.horizontal, 6).padding(.vertical, 2)
-            .background(.orange.opacity(0.14), in: Capsule())
-            .help(detail)
-    }
-}
-
 struct StatusBadge: View {
     let text: String
     let color: Color
@@ -265,10 +228,6 @@ struct WidgetResizeHandle: View {
 func watts(_ value: Double?) -> String {
     guard let value, value.isFinite else { return "—" }
     return String(format: "%.1f W", value)
-}
-func decimal(_ value: Double?, unit: String) -> String {
-    guard let value, value.isFinite else { return "—" }
-    return String(format: "%.2f %@", value, unit)
 }
 
 /// Pill/capsule silhouette shared by every chip/button in this file.

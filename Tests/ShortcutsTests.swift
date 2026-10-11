@@ -85,25 +85,6 @@ import Foundation
                                               externalConnected: false) == .discharging,
               "battery operation resolves to discharging")
 
-        var commands: [ChargeMateShortcutCommand] = []
-        let runner = ChargeMateShortcutCommandRunner(
-            supportedLimits: { [80, 85, 90, 95, 100] },
-            execute: { commands.append($0); return "ok" }
-        )
-        expects(.unsupportedChargeLimit(79), "unsupported target never reaches writer") {
-            _ = try runner.run(.setChargeLimit(79))
-        }
-        check(commands.isEmpty, "unsupported target writer zero")
-        check(try runner.run(.setChargeLimit(85)) == "ok", "supported limit returns writer result")
-        check(commands == [.setChargeLimit(85)], "supported limit dispatches exactly once")
-        _ = try runner.run(.startTopUp)
-        _ = try runner.run(.cancelTopUp)
-        _ = try runner.run(.setPowerMode(.lowPower))
-        _ = try runner.run(.setMagSafe(.off))
-        check(commands == [.setChargeLimit(85), .startTopUp, .cancelTopUp,
-                           .setPowerMode(.lowPower), .setMagSafe(.off)],
-              "commands preserve typed values and order")
-
         // The "actions ready" count follows what can really run: reads always, controls only with their prerequisite.
         check(ChargeMateShortcutReadiness.total == 8, "eight shortcut actions in total")
         check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: true, powerModeHelperInstalled: true,

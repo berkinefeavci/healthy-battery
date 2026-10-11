@@ -21,8 +21,8 @@ enum MagSafeLEDRawCodec {
     }
 }
 
-/// Crash-aware ownership for a future privileged LED backend. Production deliberately does
-/// not construct this coordinator until the physical protocol and helper are approved.
+/// Crash-aware ownership of a manual LED test: remembers the colour from before the test in a journal, so the
+/// original policy is restored after a crash or a forgotten "Testi bitir". Built by `MagSafeLEDHardwareService`.
 final class MagSafeLEDControlCoordinator {
     struct Backend {
         let supportedOutputs: Set<MagSafeLEDOutput>

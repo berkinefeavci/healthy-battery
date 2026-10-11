@@ -141,69 +141,9 @@ struct ChargeInhibitHelperBackend: ChargeInhibitBackend {
     }
 }
 
-/// Owns the 20 s heartbeat while something is inhibited. It never starts on its own: `hold` is
-/// called only by a feature that wants to inhibit, and only while the backend reports a capability.
-/// If the heartbeat cannot be delivered, the helper's 60 s watchdog releases everything.
-final class ChargeInhibitHeartbeat {
-    private let backend: ChargeInhibitBackend
-    private let interval: TimeInterval
-    private var timer: DispatchSourceTimer?
-    private let queue = DispatchQueue(label: "io.github.berkinefeavci.cellkeep.chargeinhibit.heartbeat")
-    private let lock = NSLock() // guards `timer`; never queue.sync, the failure path stops from the queue itself
-    /// Called (on the heartbeat queue) when a heartbeat fails; the timer is stopped first.
-    var onFailure: ((Error) -> Void)?
-
-    init(backend: ChargeInhibitBackend, interval: TimeInterval = ChargeInhibitSafety.heartbeatInterval) {
-        self.backend = backend
-        self.interval = interval
-    }
-
-    var isRunning: Bool { lock.lock(); defer { lock.unlock() }; return timer != nil }
-
-    /// Applies `state`; keeps a heartbeat running while it is not the released state.
-    @discardableResult
-    func hold(_ state: ChargeInhibitState) throws -> ChargeInhibitState {
-        let wantsInhibit = state.chargingInhibited || state.adapterInhibited
-        if wantsInhibit {
-            let capabilities = backend.capabilities()
-            guard capabilities.canInhibitCharging || capabilities.canForceDischarge else {
-                throw ChargeInhibitWire.Failure.unsupported
-            }
-        }
-        let applied = try backend.apply(state)
-        if applied.chargingInhibited || applied.adapterInhibited { start() } else { stop() }
-        return applied
-    }
-
-    func release() { _ = try? hold(.released); stop() }
-
-    /// One heartbeat; returns false (and stops the timer) when it could not be delivered.
-    @discardableResult
-    func beat() -> Bool {
-        do { try backend.heartbeat(); return true }
-        catch { stop(); onFailure?(error); return false }
-    }
-
-    private func start() {
-        lock.lock(); defer { lock.unlock() }
-        guard timer == nil else { return }
-        let source = DispatchSource.makeTimerSource(queue: queue)
-        source.schedule(deadline: .now() + interval, repeating: interval)
-        source.setEventHandler { [weak self] in self?.beat() }
-        source.resume()
-        timer = source
-    }
-
-    func stop() {
-        lock.lock(); defer { lock.unlock() }
-        timer?.cancel()
-        timer = nil
-    }
-}
-
 /// Installs/queries the root helper. Mirrors `SystemPowerModeService` (one admin prompt, root-owned
-/// copy checked before it runs). Nothing calls `install()` automatically: it is exposed for the
-/// future, explicit "Şarj durdurmayı etkinleştir" action only. Removal is part of `UninstallPlan`.
+/// copy checked before it runs). Nothing calls `install()` automatically: only the "Yardımcıyı kur" button
+/// does, through `AdapterModeController`. Removal is part of `UninstallPlan`.
 enum ChargeInhibitHelperService {
     static let label = "io.github.berkinefeavci.cellkeep.chargeinhibit"
     static let helperPath = "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.chargeinhibit"

@@ -25,7 +25,6 @@
 "%@ kaldır" = "%@ kaldır";
 "%@ profili: %@" = "%@ profili: %@";
 "%@ puan" = "%@ puan";
-"%@ sa" = "%@ sa";
 "%@ saati" = "%@ saati";
 "%@ seçildi." = "%@ seçildi.";
 "%@ uygulamasını kapat" = "%@ uygulamasını kapat";
@@ -33,7 +32,6 @@
 "%@ · %@ ekle" = "%@ · %@ ekle";
 "%@ · %@ · %@" = "%@ · %@ · %@";
 "%@ · Tıklayarak kaldır; sürükleyerek sırala" = "%@ · Tıklayarak kaldır; sürükleyerek sırala";
-"%@ · Veri toplama sürüyor — 24 saate kadar birikecek" = "%@ · Veri toplama sürüyor — 24 saate kadar birikecek";
 "%@ · anlık güç ölçülemiyor" = "%@ · anlık güç ölçülemiyor";
 "%@ İşlem: %@" = "%@ İşlem: %@";
 "%@, %@, %@" = "%@, %@, %@";
@@ -41,7 +39,6 @@
 "%lld bozuk görev atlandı; özgün dosya yedeklendi." = "%lld bozuk görev atlandı; özgün dosya yedeklendi.";
 "%lld bozuk çalışma kaydı atlandı; özgün dosya yedeklendi." = "%lld bozuk çalışma kaydı atlandı; özgün dosya yedeklendi.";
 "%lld cihaz" = "%lld cihaz";
-"%lld dk" = "%lld dk";
 "%lld gerçek ölçüm · Veri birikiyor" = "%lld gerçek ölçüm · Veri birikiyor";
 "%lld günlük kayıt" = "%lld günlük kayıt";
 "%lld kayıt" = "%lld kayıt";
@@ -393,7 +390,6 @@
 "Kapasite, döngü, sıcaklık ve güç özeti" = "Kapasite, döngü, sıcaklık ve güç özeti";
 "Kapat" = "Kapat";
 "Kapatılıyor…" = "Kapatılıyor…";
-"Kapsam: son %@ · %lld ölçüm" = "Kapsam: son %@ · %lld ölçüm";
 "Kararlı Healthy Battery durum adını döndürür." = "Kararlı Healthy Battery durum adını döndürür.";
 "Kararlı otomasyon durum adı" = "Kararlı otomasyon durum adı";
 "Kare" = "Kare";
@@ -579,7 +575,6 @@
 "Tasarruf" = "Tasarruf";
 "Tasarım" = "Tasarım";
 "Tasarım kapasitesi" = "Tasarım kapasitesi";
-"Taslak" = "Taslak";
 "Taslak hedef: %%%lld · henüz uygulanmadı" = "Taslak hedef: %%%lld · henüz uygulanmadı";
 "Tekrar" = "Tekrar";
 "Telefon" = "Telefon";
@@ -740,7 +735,6 @@
 "Ölçülen toplam sistem tüketimi, W" = "Ölçülen toplam sistem tüketimi, W";
 "Ölçüm geçmişindeki döngü sayısı" = "Ölçüm geçmişindeki döngü sayısı";
 "Ölçüm toplanıyor…" = "Ölçüm toplanıyor…";
-"Ölçüm toplanıyor… (ölçüm: %lld)" = "Ölçüm toplanıyor… (ölçüm: %lld)";
 "Ölçümleri oku" = "Ölçümleri oku";
 "Önce aşağıdaki 'Işık denetimini etkinleştir' ile ışık yardımcısını kurun veya güncelleyin; yönetici şifresi bir kez istenir." = "Önce aşağıdaki 'Işık denetimini etkinleştir' ile ışık yardımcısını kurun veya güncelleyin; yönetici şifresi bir kez istenir.";
 "Önceden etkinleştirilmiş Healthy Battery LED denetimiyle MagSafe ışığını değiştirir." = "Önceden etkinleştirilmiş Healthy Battery LED denetimiyle MagSafe ışığını değiştirir.";
@@ -1005,3 +999,4 @@
 "%lld / %lld eylem hazır" = "%lld / %lld eylem hazır";
 "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir." = "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir.";
 "Şarj Kontrolü bölümünden düzenleyin." = "Şarj Kontrolü bölümünden düzenleyin.";
+"%@ bu Mac'te desteklenmiyor." = "%@ bu Mac'te desteklenmiyor.";

@@ -287,12 +287,6 @@ enum ChargePolicyEngine {
     }
 }
 
-enum ChargePolicyPresentationAction: Equatable {
-    case reapplyChargeMateTarget
-    case adoptMacOSValue
-    case acknowledgeRecovery
-}
-
 extension ChargePolicyState {
     var title: String {
         switch self {
@@ -303,14 +297,6 @@ extension ChargePolicyState {
         case .topUpRestoring(let limit): return String(localized: "Önceki limite dönülüyor: %\(limit)")
         case .pausedByConflict(_, let observed): return String(localized: "macOS limiti dışarıdan %\(observed) yapıldı")
         case .recoveryRequired: return String(localized: "Kontrol gerekli; yeni işlem durduruldu")
-        }
-    }
-
-    var availableActions: [ChargePolicyPresentationAction] {
-        switch self {
-        case .pausedByConflict: return [.reapplyChargeMateTarget, .adoptMacOSValue]
-        case .recoveryRequired: return [.acknowledgeRecovery]
-        default: return []
         }
     }
 

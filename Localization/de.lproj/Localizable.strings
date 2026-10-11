@@ -25,7 +25,6 @@
 "%@ kaldır" = "%@ entfernen";
 "%@ profili: %@" = "Profil %@: %@";
 "%@ puan" = "%@ Punkte";
-"%@ sa" = "%@ Std.";
 "%@ saati" = "%@ Stunde";
 "%@ seçildi." = "%@ ausgewählt.";
 "%@ uygulamasını kapat" = "%@ beenden";
@@ -33,7 +32,6 @@
 "%@ · %@ ekle" = "%@ · %@ hinzufügen";
 "%@ · %@ · %@" = "%@ · %@ · %@";
 "%@ · Tıklayarak kaldır; sürükleyerek sırala" = "%@ · Zum Entfernen klicken; zum Umsortieren ziehen";
-"%@ · Veri toplama sürüyor — 24 saate kadar birikecek" = "%@ · Daten werden noch gesammelt – bis zu 24 Stunden";
 "%@ · anlık güç ölçülemiyor" = "%@ · Momentanleistung nicht messbar";
 "%@ İşlem: %@" = "%@ Vorgang: %@";
 "%@, %@, %@" = "%@, %@, %@";
@@ -41,7 +39,6 @@
 "%lld bozuk görev atlandı; özgün dosya yedeklendi." = "%lld beschädigte Aufgaben übersprungen; die Originaldatei wurde gesichert.";
 "%lld bozuk çalışma kaydı atlandı; özgün dosya yedeklendi." = "%lld beschädigte Ausführungseinträge übersprungen; die Originaldatei wurde gesichert.";
 "%lld cihaz" = "%lld Geräte";
-"%lld dk" = "%lld Min.";
 "%lld gerçek ölçüm · Veri birikiyor" = "%lld echte Messwerte · Daten werden gesammelt";
 "%lld günlük kayıt" = "%lld Tage erfasst";
 "%lld kayıt" = "%lld Einträge";
@@ -393,7 +390,6 @@
 "Kapasite, döngü, sıcaklık ve güç özeti" = "Übersicht über Kapazität, Zyklen, Temperatur und Leistung";
 "Kapat" = "Schließen";
 "Kapatılıyor…" = "Wird beendet …";
-"Kapsam: son %@ · %lld ölçüm" = "Abdeckung: letzte %@ · %lld Messwerte";
 "Kararlı Healthy Battery durum adını döndürür." = "Gibt den stabilen Healthy Battery-Zustandsnamen zurück.";
 "Kararlı otomasyon durum adı" = "Stabiler Zustandsname für Automationen";
 "Kare" = "Quadratisch";
@@ -579,7 +575,6 @@
 "Tasarruf" = "Stromsparmodus";
 "Tasarım" = "Design";
 "Tasarım kapasitesi" = "Designkapazität";
-"Taslak" = "Entwurf";
 "Taslak hedef: %%%lld · henüz uygulanmadı" = "Entwurfsziel: %lld %% · noch nicht angewendet";
 "Tekrar" = "Wiederholen";
 "Telefon" = "Telefon";
@@ -740,7 +735,6 @@
 "Ölçülen toplam sistem tüketimi, W" = "Gemessener Gesamtverbrauch des Systems, W";
 "Ölçüm geçmişindeki döngü sayısı" = "Zyklenzahl im Messverlauf";
 "Ölçüm toplanıyor…" = "Messwerte werden gesammelt …";
-"Ölçüm toplanıyor… (ölçüm: %lld)" = "Messwerte werden gesammelt … (Messwerte: %lld)";
 "Ölçümleri oku" = "Messwerte lesen";
 "Önce aşağıdaki 'Işık denetimini etkinleştir' ile ışık yardımcısını kurun veya güncelleyin; yönetici şifresi bir kez istenir." = "Installiere oder aktualisiere zuerst den Licht-Helfer unten mit „Lichtsteuerung aktivieren“; das Administratorpasswort wird einmal abgefragt.";
 "Önceden etkinleştirilmiş Healthy Battery LED denetimiyle MagSafe ışığını değiştirir." = "Ändert das MagSafe-Licht über Healthy Batterys zuvor aktivierte LED-Steuerung.";
@@ -1005,3 +999,4 @@
 "%lld / %lld eylem hazır" = "%lld von %lld Aktionen bereit";
 "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir." = "Lesezugriffe sind immer bereit. Limit und Top Up brauchen die von macOS angebotenen Limits; Energiemodus und MagSafe-Licht brauchen ihren installierten Helfer.";
 "Şarj Kontrolü bölümünden düzenleyin." = "Bearbeite es im Bereich Ladesteuerung.";
+"%@ bu Mac'te desteklenmiyor." = "%@ wird auf diesem Mac nicht unterstützt.";

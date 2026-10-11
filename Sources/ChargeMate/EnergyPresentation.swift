@@ -99,16 +99,6 @@ enum EnergyPresentation {
         return String(arg.dropFirst(prefix.count))
     }
 
-    /// The row label for a process `top` may have truncated: an owner app name plus what it is doing,
-    /// e.g. `Dia · bir web sayfası çalışıyor`. Falls back to the existing system-process mapping/raw
-    /// name when no owner `.app` could be determined, and to just the owner name when the role
-    /// (launch arguments) could not be read.
-    static func helperDisplayName(ownerAppName: String?, role: String?, rawProcessName: String) -> String {
-        guard let owner = ownerAppName, !owner.isEmpty else { return displayName(for: rawProcessName) }
-        guard let role else { return owner }
-        return "\(owner) · \(role)"
-    }
-
     // MARK: - Quit-button eligibility
 
     /// Bundle identifier Finder always reports; never offered a Quit button even though it has a

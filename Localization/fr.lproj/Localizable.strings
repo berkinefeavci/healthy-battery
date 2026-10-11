@@ -25,7 +25,6 @@
 "%@ kaldır" = "Supprimer %@";
 "%@ profili: %@" = "Profil %@ : %@";
 "%@ puan" = "%@ points";
-"%@ sa" = "%@ h";
 "%@ saati" = "Heure de %@";
 "%@ seçildi." = "%@ sélectionné.";
 "%@ uygulamasını kapat" = "Quitter %@";
@@ -33,7 +32,6 @@
 "%@ · %@ ekle" = "Ajouter %@ · %@";
 "%@ · %@ · %@" = "%@ · %@ · %@";
 "%@ · Tıklayarak kaldır; sürükleyerek sırala" = "%@ · Cliquez pour supprimer ; faites glisser pour réorganiser";
-"%@ · Veri toplama sürüyor — 24 saate kadar birikecek" = "%@ · Collecte de données en cours — jusqu’à 24 heures";
 "%@ · anlık güç ölçülemiyor" = "%@ · puissance instantanée non mesurable";
 "%@ İşlem: %@" = "%@ Opération : %@";
 "%@, %@, %@" = "%@, %@, %@";
@@ -41,7 +39,6 @@
 "%lld bozuk görev atlandı; özgün dosya yedeklendi." = "%lld tâches corrompues ignorées ; le fichier d’origine a été sauvegardé.";
 "%lld bozuk çalışma kaydı atlandı; özgün dosya yedeklendi." = "%lld enregistrements d’exécution corrompus ignorés ; le fichier d’origine a été sauvegardé.";
 "%lld cihaz" = "%lld appareils";
-"%lld dk" = "%lld min";
 "%lld gerçek ölçüm · Veri birikiyor" = "%lld mesures réelles · Données en cours d’accumulation";
 "%lld günlük kayıt" = "%lld jours enregistrés";
 "%lld kayıt" = "%lld enregistrements";
@@ -393,7 +390,6 @@
 "Kapasite, döngü, sıcaklık ve güç özeti" = "Résumé de la capacité, des cycles, de la température et de la puissance";
 "Kapat" = "Fermer";
 "Kapatılıyor…" = "Fermeture…";
-"Kapsam: son %@ · %lld ölçüm" = "Couverture : %@ dernières · %lld mesures";
 "Kararlı Healthy Battery durum adını döndürür." = "Renvoie le nom d’état stable de Healthy Battery.";
 "Kararlı otomasyon durum adı" = "Nom d’état stable pour les automatisations";
 "Kare" = "Carré";
@@ -579,7 +575,6 @@
 "Tasarruf" = "Économie d’énergie";
 "Tasarım" = "Conception";
 "Tasarım kapasitesi" = "Capacité nominale";
-"Taslak" = "Brouillon";
 "Taslak hedef: %%%lld · henüz uygulanmadı" = "Cible provisoire : %lld %% · pas encore appliquée";
 "Tekrar" = "Répétition";
 "Telefon" = "Téléphone";
@@ -740,7 +735,6 @@
 "Ölçülen toplam sistem tüketimi, W" = "Consommation totale mesurée du système, W";
 "Ölçüm geçmişindeki döngü sayısı" = "Nombre de cycles dans l’historique des mesures";
 "Ölçüm toplanıyor…" = "Collecte des mesures…";
-"Ölçüm toplanıyor… (ölçüm: %lld)" = "Collecte des mesures… (mesures : %lld)";
 "Ölçümleri oku" = "Lire les mesures";
 "Önce aşağıdaki 'Işık denetimini etkinleştir' ile ışık yardımcısını kurun veya güncelleyin; yönetici şifresi bir kez istenir." = "Installez ou mettez d’abord à jour l’assistant de voyant avec « Activer le contrôle du voyant » ci-dessous ; le mot de passe administrateur est demandé une fois.";
 "Önceden etkinleştirilmiş Healthy Battery LED denetimiyle MagSafe ışığını değiştirir." = "Modifie le voyant MagSafe via le contrôle LED de Healthy Battery activé au préalable.";
@@ -1005,3 +999,4 @@
 "%lld / %lld eylem hazır" = "%lld actions prêtes sur %lld";
 "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir." = "Les lectures sont toujours prêtes. La limite et Top Up nécessitent les limites proposées par macOS ; le mode d’énergie et le voyant MagSafe nécessitent leur assistant installé.";
 "Şarj Kontrolü bölümünden düzenleyin." = "Modifiez-la dans la section Contrôle de la charge.";
+"%@ bu Mac'te desteklenmiyor." = "%@ n’est pas pris en charge sur ce Mac.";
