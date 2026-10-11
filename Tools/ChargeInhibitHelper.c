@@ -19,6 +19,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "ChargeInhibitIPC.h"
+#include "ClientSignature.h"
 
 // ---------------------------------------------------------------- SMC (AppleSMC, 80-byte struct)
 enum { SMC_WRITE = 6, SMC_READ = 5, SMC_INFO = 9 };
@@ -203,53 +204,6 @@ static int authorize_uid(uid_t uid) {
     return result;
 }
 
-// A Developer ID helper answers only the Healthy Battery app signed by its own team, on top of the uid
-// check: another program of the same user cannot cut the adapter. A local ad-hoc helper has no team and
-// keeps the uid check alone. A team without a usable requirement refuses everyone (fail closed).
-#define CI_APP_IDENTIFIER "io.github.berkinefeavci.cellkeep"
-static SecRequirementRef clientRequirement;
-static int signatureMode; // 0 ad-hoc helper: uid only · 1 enforce · -1 broken: refuse
-
-static void load_client_requirement(void) {
-    SecCodeRef self = NULL; SecStaticCodeRef staticSelf = NULL; CFDictionaryRef info = NULL;
-    signatureMode = -1;
-    if (SecCodeCopySelf(kSecCSDefaultFlags, &self) == errSecSuccess &&
-        SecCodeCopyStaticCode(self, kSecCSDefaultFlags, &staticSelf) == errSecSuccess &&
-        SecCodeCopySigningInformation(staticSelf, kSecCSSigningInformation, &info) == errSecSuccess) {
-        CFTypeRef team = CFDictionaryGetValue(info, kSecCodeInfoTeamIdentifier);
-        if (!team) signatureMode = 0;
-        else if (CFGetTypeID(team) == CFStringGetTypeID()) {
-            CFStringRef text = CFStringCreateWithFormat(NULL, NULL,
-                CFSTR("identifier \"" CI_APP_IDENTIFIER "\" and anchor apple generic and certificate leaf[subject.OU] = \"%@\""), team);
-            if (text && SecRequirementCreateWithString(text, kSecCSDefaultFlags, &clientRequirement) == errSecSuccess) signatureMode = 1;
-            if (text) CFRelease(text);
-        }
-    }
-    if (info) CFRelease(info);
-    if (staticSelf) CFRelease(staticSelf);
-    if (self) CFRelease(self);
-    if (signatureMode < 0) fprintf(stderr, "charge-inhibit: own signature unreadable; refusing all clients\n");
-}
-
-static int client_signature_ok(int socketFD) {
-    if (signatureMode == 0) return 1;
-    if (signatureMode < 0 || !clientRequirement) return 0;
-    audit_token_t token; socklen_t length = sizeof(token);
-    if (getsockopt(socketFD, SOL_LOCAL, LOCAL_PEERTOKEN, &token, &length) || length != sizeof(token)) return 0;
-    CFDataRef data = CFDataCreate(NULL, (const UInt8 *)&token, sizeof(token));
-    if (!data) return 0;
-    const void *keys[] = {kSecGuestAttributeAudit}, *values[] = {data};
-    CFDictionaryRef attributes = CFDictionaryCreate(NULL, keys, values, 1, &kCFTypeDictionaryKeyCallBacks,
-                                                    &kCFTypeDictionaryValueCallBacks);
-    CFRelease(data);
-    SecCodeRef code = NULL;
-    int ok = attributes && SecCodeCopyGuestWithAttributes(NULL, attributes, kSecCSDefaultFlags, &code) == errSecSuccess &&
-        SecCodeCheckValidity(code, kSecCSDefaultFlags, clientRequirement) == errSecSuccess;
-    if (code) CFRelease(code);
-    if (attributes) CFRelease(attributes);
-    return ok;
-}
-
 static int trusted_client(int socketFD) {
     uid_t uid = 0, gid = 0, expected = 0;
     if (getpeereid(socketFD, &uid, &gid)) return 0;
@@ -259,7 +213,7 @@ static int trusted_client(int socketFD) {
     int trusted = !fstat(fd, &state) && S_ISREG(state.st_mode) && state.st_uid == 0 && !(state.st_mode & 022) &&
         state.st_size == (off_t)sizeof(expected) && read(fd, &expected, sizeof(expected)) == sizeof(expected) && expected == uid;
     close(fd);
-    return trusted && client_signature_ok(socketFD);
+    return trusted && cs_client_ok(socketFD);
 }
 
 // ---------------------------------------------------------------- power events and signals
@@ -331,7 +285,8 @@ static int self_test(void) {
     const uint8_t off1[] = {0}, on1[] = {8};
     if (ci_parse_request("S 1 0\n", &state) != CI_CMD_SET || ci_parse_request("W CHIE 08\n", &state) != CI_CMD_INVALID ||
         !ci_write_allowed("CHIE", 1, on1) || ci_write_allowed("BCLM", 1, off1) || ci_write_allowed("CHIE", 1, (const uint8_t[]){9})) return 1;
-    puts("Charge inhibit helper: fixed allowlist assertions passed; no SMC access.");
+    if (cs_self_test()) return 1;
+    puts("Charge inhibit helper: fixed allowlist and caller-requirement assertions passed; no SMC access.");
     return 0;
 }
 
@@ -347,7 +302,7 @@ int main(int argc, char **argv) {
     if (argc != 2 || strcmp(argv[1], "--daemon") || geteuid() != 0) return 2;
 
     ci_engine_init(&engine);
-    load_client_requirement();
+    cs_load_requirement("charge-inhibit");
     capabilities = ci_resolve_capabilities(&smcOps);
     release_everything(CI_REASON_START); // fail-safe default at every start
     int server = open_server();

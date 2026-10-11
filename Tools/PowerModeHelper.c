@@ -10,6 +10,11 @@
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "ClientSignature.h"
+
+// Bumped whenever the installed root helper must be replaced; the app compares `--version`.
+// 3: a Developer ID helper answers only the app signed by its own team (ClientSignature.h).
+#define POWER_MODE_HELPER_VERSION 3
 
 #define HELPER_PATH "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.powermode"
 #define SOCKET_PATH "/var/run/io.github.berkinefeavci.cellkeep.powermode.sock"
@@ -52,7 +57,7 @@ static int trusted_client(int socket_fd) {
     int trusted = !fstat(fd, &state) && S_ISREG(state.st_mode) && state.st_uid == 0 && !(state.st_mode & 022) &&
         state.st_size == (off_t)sizeof(expected) && read(fd, &expected, sizeof(expected)) == sizeof(expected) && expected == uid;
     close(fd);
-    return trusted;
+    return trusted && cs_client_ok(socket_fd);
 }
 
 static int apply_mode(char source, int mode) {
@@ -106,7 +111,7 @@ static void serve(int server) {
 
 int main(int argc, char **argv) {
     if (argc == 2 && !strcmp(argv[1], "--version")) {
-        puts("2");
+        printf("%d\n", POWER_MODE_HELPER_VERSION);
         return 0;
     }
     if (argc == 2 && !strcmp(argv[1], "--self-test")) {
@@ -119,7 +124,8 @@ int main(int argc, char **argv) {
             valid_request("M 1\n", &source, &mode) || valid_request("M B 1 extra\n", &source, &mode) ||
             strcmp(source_flag('B'), "-b") || strcmp(source_flag('C'), "-c") ||
             strcmp(source_flag('A'), "-a") || source_flag('X')) return 1;
-        puts("Power mode helper: fixed allowlist assertions passed; no system write.");
+        if (cs_self_test()) return 1;
+        puts("Power mode helper: fixed allowlist and caller-requirement assertions passed; no system write.");
         return 0;
     }
     if (argc == 3 && !strcmp(argv[1], "--authorize-uid")) {
@@ -128,6 +134,7 @@ int main(int argc, char **argv) {
         return *argv[2] && !*tail && uid >= 0 && uid <= INT_MAX ? authorize_uid((uid_t)uid) : 2;
     }
     if (argc != 2 || strcmp(argv[1], "--daemon") || geteuid() != 0) return 2;
+    cs_load_requirement("power-mode");
     int server = open_server();
     if (server < 0) return 4;
     for (;;) serve(server);

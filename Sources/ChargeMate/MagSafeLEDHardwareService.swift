@@ -11,8 +11,9 @@ final class MagSafeLEDHardwareService {
     static let legacyLaunchDaemonLabel = "local.chargemate.led"
     private static let legacySocketPath = "/var/run/local.chargemate.led.sock"
     /// Matches LED_HELPER_VERSION in Tools/LEDControllers.h. Version 2 also backs off for Battery
-    /// Toolkit, BatFi and batt, not just AlDente; older helpers show as not installed so the user reinstalls.
-    private static let minimumHelperVersion = 2
+    /// Toolkit, BatFi and batt, not just AlDente; version 3 answers only the app signed by its own team.
+    /// Older helpers show as not installed so the user reinstalls.
+    private static let minimumHelperVersion = 3
 
     enum ServiceError: Error, LocalizedError {
         case helperMissing

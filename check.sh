@@ -138,9 +138,14 @@ xcrun swiftc Sources/ChargeMate/IdentityMigration.swift Tests/IdentityMigrationT
 
 xcrun swiftc Sources/ChargeMate/UninstallPlan.swift Tests/UninstallPlanTests.swift -o .build/checks/uninstall-plan-tests
 .build/checks/uninstall-plan-tests
-xcrun clang -Wall -Wextra -Werror Tools/PowerModeHelper.c -o .build/checks/power-mode-helper-tests
+xcrun clang -Wall -Wextra -Werror Tools/PowerModeHelper.c -framework CoreFoundation -framework Security -o .build/checks/power-mode-helper-tests
 .build/checks/power-mode-helper-tests --self-test
-test "$(.build/checks/power-mode-helper-tests --version)" = "2"
+test "$(.build/checks/power-mode-helper-tests --version)" = "3"
+# MagSafe LED helper: build + caller-requirement self-test (no SMC access in --self-test).
+xcrun clang -Wall -Wextra -Werror Tools/MagSafeLEDProbe.c -framework IOKit -framework CoreFoundation -framework Security \
+  -o .build/checks/led-helper
+.build/checks/led-helper --self-test
+test "$(.build/checks/led-helper --version)" = "3"
 
 # Faz 3 charge-inhibit helper: pure safety logic (allowlist, verify, watchdog, battery floor, unplug,
 # sleep, shutdown) runs against a fake SMC. The helper itself is only built and --self-tested here;

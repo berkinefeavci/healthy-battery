@@ -76,7 +76,8 @@ struct SystemPowerModeProfiles: Equatable {
 enum SystemPowerModeService {
     static let helperPath = "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.powermode"
     private static let socketPath = "/var/run/io.github.berkinefeavci.cellkeep.powermode.sock"
-    private static let minimumHelperVersion = 2
+    /// Matches POWER_MODE_HELPER_VERSION in Tools/PowerModeHelper.c. 3: callers must be the signed app.
+    private static let minimumHelperVersion = 3
     /// Root helper/daemon identity installed by versions of this app published as "ChargeMate".
     static let legacyHelperPath = "/Library/PrivilegedHelperTools/com.chargemate.powermode"
     static let legacyLaunchDaemonLabel = "local.chargemate.powermode"
