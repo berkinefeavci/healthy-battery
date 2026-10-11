@@ -80,10 +80,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         Self.shared = self
         ChargeMateAppShortcuts.updateAppShortcutParameters()
         if UserDefaults.standard.object(forKey: MenubarPreferences.storageKey) == nil { menuPreferences.save() }
-        if !UserDefaults.standard.bool(forKey: "chartHoverOverviewMigrationV1") {
-            UserDefaults.standard.set(ChartRange.defaultHours, forKey: "historyHours")
-            UserDefaults.standard.set(true, forKey: "chartHoverOverviewMigrationV1")
-        }
         battery.start()
         DispatchQueue.global(qos: .utility).async { MagSafeLEDHardwareService.resumeIfPausedByTest() }
         sleepObservation = battery.$snapshot

@@ -1598,7 +1598,7 @@ private struct AnimatedHistoryPlot: View, Animatable {
     }
 
     var body: some View {
-        let idleHours = ChartRange.idleHours(isHealth: metric == .health)
+        let idleHours = ChartRange.idleHours(selectedHours: selectedHours, isHealth: metric == .health)
         let animatedHours = ChartRange.animatedHours(selectedHours: selectedHours, progress: progress, idleHours: idleHours)
         let labelHours = ChartRange.displayHours(selectedHours: selectedHours, hovering: progress > 0.5, idleHours: idleHours)
         let data = ChartData(samples: samples, now: now, hours: animatedHours,
@@ -1613,7 +1613,7 @@ private struct AnimatedHistoryPlot: View, Animatable {
 struct HistoryRangePicker: View {
     @AppStorage("historyHours") private var hours = ChartRange.defaultHours
     @Environment(\.colorScheme) private var scheme
-    private let ranges = [1, 6, 24].map { ($0, String(localized: "\($0) sa")) }
+    private let ranges = ChartRange.options.map { ($0, String(localized: "\($0) sa")) }
 
     // One plain segmented capsule: glass chips inside a stroked capsule read as clutter.
     var body: some View {

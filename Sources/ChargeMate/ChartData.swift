@@ -3,23 +3,26 @@ import CoreGraphics
 
 enum ChartRange {
     static let defaultHours = 1
+    /// The ranges the picker offers (hours of history shown).
+    static let options = [1, 6, 24]
 
-    static func idleHours(isHealth: Bool) -> Int { isHealth ? 24 : defaultHours }
+    /// A stored value that is not one of the options (older or damaged preferences) falls back to the default.
+    static func normalized(_ hours: Int) -> Int { options.contains(hours) ? hours : defaultHours }
 
-    static func displayHours(selectedHours: Int, hovering: Bool) -> Int {
-        hovering ? selectedHours : defaultHours
+    /// The range a chart shows at rest: the one chosen in the picker. The health chart always shows the whole
+    /// 24 hours, because its points are hourly medians and a shorter window would leave one dot.
+    static func idleHours(selectedHours: Int, isHealth: Bool) -> Int {
+        isHealth ? options.last! : normalized(selectedHours)
     }
 
-    static func animatedHours(selectedHours: Int, progress: Double) -> Double {
-        animatedHours(selectedHours: selectedHours, progress: progress, idleHours: defaultHours)
-    }
-
+    /// Hovering adds the detail layer (axes and labels); it never changes the range, so the range at rest and
+    /// under the pointer are the same. `idleHours` already carries the picker's choice.
     static func displayHours(selectedHours: Int, hovering: Bool, idleHours: Int) -> Int {
-        hovering ? max(idleHours, selectedHours) : idleHours
+        hovering ? max(idleHours, normalized(selectedHours)) : idleHours
     }
 
     static func animatedHours(selectedHours: Int, progress: Double, idleHours: Int) -> Double {
-        let target = Double(max(idleHours, selectedHours))
+        let target = Double(max(idleHours, normalized(selectedHours)))
         let value = min(1, max(0, progress))
         return Double(idleHours) + (target - Double(idleHours)) * value
     }

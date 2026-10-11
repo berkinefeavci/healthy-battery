@@ -3,20 +3,27 @@ import CoreGraphics
 
 @main struct ChartDataCheck {
     static func main() {
-        precondition(ChartRange.defaultHours == 1)
-        precondition(ChartRange.displayHours(selectedHours: 1, hovering: false) == 1)
-        precondition(ChartRange.displayHours(selectedHours: 6, hovering: false) == 1)
-        precondition(ChartRange.displayHours(selectedHours: 24, hovering: false) == 1)
-        precondition(ChartRange.displayHours(selectedHours: 6, hovering: true) == 6)
-        precondition(ChartRange.displayHours(selectedHours: 24, hovering: true) == 24)
-        precondition(ChartRange.animatedHours(selectedHours: 24, progress: 0) == 1)
-        precondition(ChartRange.animatedHours(selectedHours: 24, progress: 0.5) == 12.5)
-        precondition(ChartRange.animatedHours(selectedHours: 24, progress: 1) == 24)
-        precondition(ChartRange.animatedHours(selectedHours: 6, progress: 2) == 6)
-        precondition(ChartRange.idleHours(isHealth: false) == 1)
-        precondition(ChartRange.idleHours(isHealth: true) == 24)
+        precondition(ChartRange.defaultHours == 1 && ChartRange.options == [1, 6, 24])
+        // The picker's choice applies at rest, for every chart but health (always the full 24 h).
+        for selected in ChartRange.options {
+            precondition(ChartRange.idleHours(selectedHours: selected, isHealth: false) == selected)
+            precondition(ChartRange.idleHours(selectedHours: selected, isHealth: true) == 24)
+            let idle = ChartRange.idleHours(selectedHours: selected, isHealth: false)
+            // Hovering reveals axes and labels but never moves the range.
+            precondition(ChartRange.displayHours(selectedHours: selected, hovering: false, idleHours: idle) == selected)
+            precondition(ChartRange.displayHours(selectedHours: selected, hovering: true, idleHours: idle) == selected)
+            for progress in [0.0, 0.5, 1.0] {
+                precondition(ChartRange.animatedHours(selectedHours: selected, progress: progress, idleHours: idle) == Double(selected))
+            }
+        }
+        precondition(ChartRange.idleHours(selectedHours: 6, isHealth: true) == 24)
         precondition(ChartRange.animatedHours(selectedHours: 1, progress: 0, idleHours: 24) == 24)
         precondition(ChartRange.animatedHours(selectedHours: 6, progress: 1, idleHours: 24) == 24)
+        // Stored values that are not an option (damaged or older preferences) never produce an empty window.
+        for bad in [0, -3, 12, 48, Int.max] {
+            precondition(ChartRange.normalized(bad) == 1)
+            precondition(ChartRange.idleHours(selectedHours: bad, isHealth: false) == 1)
+        }
         precondition(ChartPresentation.detailOpacity(-1) == 0)
         precondition(ChartPresentation.detailOpacity(0) == 0)
         precondition(ChartPresentation.detailOpacity(0.5) == 0.5)
