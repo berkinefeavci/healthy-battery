@@ -655,8 +655,6 @@
 "Yeni görev" = "Nueva tarea";
 "Yeni sürüm var: %@" = "Nueva versión disponible: %@";
 "Yeni sürüm var: %@ · Güncelle" = "Nueva versión disponible: %@ · Actualizar";
-"Yeni çalışma %@ kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi." = "Se guardó una nueva ejecución con el ID %@. El ajuste del sistema no se modificó porque no hay un escritor verificado.";
-"Yeni çalışma kaydedilemedi: %@" = "No se pudo guardar la nueva ejecución: %@";
 "Yeni çalışma olarak dene" = "Probar como nueva ejecución";
 "Yeniden başlatılıyor…" = "Reiniciando…";
 "Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur." = "Reintentar no cambia el registro anterior; crea un nuevo ID de ejecución.";
@@ -684,7 +682,6 @@
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Cargar al 100 % y restaurar el límite anterior";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Carga al 100 % y luego vuelve al límite anterior.";
 "Yüzdeyi göster" = "Mostrar porcentaje";
-"Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez." = "El planificador está listo; el bloqueo de seguridad de ejecución está cerrado. Ninguna tarea cambia un ajuste de macOS sin un escritor del sistema verificado.";
 "aç" = "abrir";
 "ağ bağlantıları" = "conexiones de red";
 "bilinmiyor" = "desconocido";
@@ -778,7 +775,6 @@
 "Öğeler arası boşluk: %lld pt" = "Espacio entre elementos: %lld pt";
 "Öğeleri sürükleyin; sıralama ve kaldırma seçenekleri için sağ tıklayın. Değişiklikler anında kaydedilir." = "Arrastra los elementos; haz clic derecho para reordenar o eliminar. Los cambios se guardan al instante.";
 "İki haftada bir" = "Cada dos semanas";
-"İki haftalık kalibrasyon" = "Calibración quincenal";
 "İki uygulama aynı şarj sınırını yazarsa birbirini bozar; bu yüzden düğmeler kilitli." = "Si dos apps escriben el mismo límite de carga se interfieren, por eso los botones están bloqueados.";
 "İmza bu uygulamanın geliştiricisine ait değil." = "La firma no pertenece al desarrollador de esta app.";
 "İmza ve Apple onayı doğrulanıyor…" = "Verificando firma y notarización de Apple…";
@@ -997,3 +993,8 @@
 "Şarj limiti %%100'e sıfırlanamadı: %@" = "No se pudo restablecer el límite de carga al 100 %%: %@";
 "Uygulama verileri silinemedi: %@" = "No se pudieron eliminar los datos de la app: %@";
 "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:" = "Se quitaron los auxiliares y servicios, pero algunos pasos no se completaron:";
+"Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz." = "Las tareas activadas se ejecutan a su hora: las tareas de límite de carga, Top Up y modo de energía cambian el ajuste de macOS. Pausar la carga, calibrar y descargar hasta un objetivo aún no se pueden ejecutar.";
+"Yeni çalışma %@ başladı; sonuç Görev geçmişinde güncellenir." = "La nueva ejecución %@ ha empezado; el resultado se actualizará en el historial de tareas.";
+"Yeni çalışma %@ tamamlanamadı: %@" = "La nueva ejecución %@ no se completó: %@";
+"Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "La nueva ejecución %@ terminó; el ajuste se verificó leyéndolo de nuevo.";
+"Yeni çalışma başlatılamadı: görev silinmiş ya da kayıt yazılamadı." = "No se pudo iniciar la nueva ejecución: la tarea se eliminó o no se pudo escribir el registro.";

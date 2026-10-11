@@ -655,8 +655,6 @@
 "Yeni görev" = "Yeni görev";
 "Yeni sürüm var: %@" = "Yeni sürüm var: %@";
 "Yeni sürüm var: %@ · Güncelle" = "Yeni sürüm var: %@ · Güncelle";
-"Yeni çalışma %@ kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi." = "Yeni çalışma %@ kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi.";
-"Yeni çalışma kaydedilemedi: %@" = "Yeni çalışma kaydedilemedi: %@";
 "Yeni çalışma olarak dene" = "Yeni çalışma olarak dene";
 "Yeniden başlatılıyor…" = "Yeniden başlatılıyor…";
 "Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur." = "Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur.";
@@ -684,7 +682,6 @@
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Yüzde 100'e şarj et ve önceki limiti geri yükle";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Yüzde 100’e şarj eder, sonra önceki limite döner.";
 "Yüzdeyi göster" = "Yüzdeyi göster";
-"Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez." = "Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez.";
 "aç" = "aç";
 "ağ bağlantıları" = "ağ bağlantıları";
 "bilinmiyor" = "bilinmiyor";
@@ -778,7 +775,6 @@
 "Öğeler arası boşluk: %lld pt" = "Öğeler arası boşluk: %lld pt";
 "Öğeleri sürükleyin; sıralama ve kaldırma seçenekleri için sağ tıklayın. Değişiklikler anında kaydedilir." = "Öğeleri sürükleyin; sıralama ve kaldırma seçenekleri için sağ tıklayın. Değişiklikler anında kaydedilir.";
 "İki haftada bir" = "İki haftada bir";
-"İki haftalık kalibrasyon" = "İki haftalık kalibrasyon";
 "İki uygulama aynı şarj sınırını yazarsa birbirini bozar; bu yüzden düğmeler kilitli." = "İki uygulama aynı şarj sınırını yazarsa birbirini bozar; bu yüzden düğmeler kilitli.";
 "İmza bu uygulamanın geliştiricisine ait değil." = "İmza bu uygulamanın geliştiricisine ait değil.";
 "İmza ve Apple onayı doğrulanıyor…" = "İmza ve Apple onayı doğrulanıyor…";
@@ -997,3 +993,8 @@
 "Şarj limiti %%100'e sıfırlanamadı: %@" = "Şarj limiti %%100'e sıfırlanamadı: %@";
 "Uygulama verileri silinemedi: %@" = "Uygulama verileri silinemedi: %@";
 "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:" = "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:";
+"Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz." = "Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz.";
+"Yeni çalışma %@ başladı; sonuç Görev geçmişinde güncellenir." = "Yeni çalışma %@ başladı; sonuç Görev geçmişinde güncellenir.";
+"Yeni çalışma %@ tamamlanamadı: %@" = "Yeni çalışma %@ tamamlanamadı: %@";
+"Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı.";
+"Yeni çalışma başlatılamadı: görev silinmiş ya da kayıt yazılamadı." = "Yeni çalışma başlatılamadı: görev silinmiş ya da kayıt yazılamadı.";

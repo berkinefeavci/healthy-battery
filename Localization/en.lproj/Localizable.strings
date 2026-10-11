@@ -655,8 +655,6 @@
 "Yeni görev" = "New task";
 "Yeni sürüm var: %@" = "New version available: %@";
 "Yeni sürüm var: %@ · Güncelle" = "New version available: %@ · Update";
-"Yeni çalışma %@ kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi." = "A new run was saved with ID %@. The system setting was not changed because there is no verified writer.";
-"Yeni çalışma kaydedilemedi: %@" = "The new run could not be saved: %@";
 "Yeni çalışma olarak dene" = "Try as a new run";
 "Yeniden başlatılıyor…" = "Restarting…";
 "Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur." = "Retrying does not change the old record; it creates a new run ID.";
@@ -684,7 +682,6 @@
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Charge to 100 percent and restore the previous limit";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Charges to 100 percent, then returns to the previous limit.";
 "Yüzdeyi göster" = "Show percentage";
-"Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez." = "The scheduler is ready; the task execution safety gate is closed. No task changes a macOS setting without a verified system writer.";
 "aç" = "open";
 "ağ bağlantıları" = "network connections";
 "bilinmiyor" = "unknown";
@@ -778,7 +775,6 @@
 "Öğeler arası boşluk: %lld pt" = "Spacing between items: %lld pt";
 "Öğeleri sürükleyin; sıralama ve kaldırma seçenekleri için sağ tıklayın. Değişiklikler anında kaydedilir." = "Drag items; right-click for reorder and remove options. Changes are saved immediately.";
 "İki haftada bir" = "Every two weeks";
-"İki haftalık kalibrasyon" = "Biweekly calibration";
 "İki uygulama aynı şarj sınırını yazarsa birbirini bozar; bu yüzden düğmeler kilitli." = "If two apps write the same charge limit they interfere with each other, so the buttons are locked.";
 "İmza bu uygulamanın geliştiricisine ait değil." = "The signature does not belong to this app’s developer.";
 "İmza ve Apple onayı doğrulanıyor…" = "Verifying signature and Apple notarization…";
@@ -997,3 +993,8 @@
 "Şarj limiti %%100'e sıfırlanamadı: %@" = "The charge limit could not be reset to 100%%: %@";
 "Uygulama verileri silinemedi: %@" = "The app data could not be deleted: %@";
 "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:" = "Helpers and services were removed, but some steps did not finish:";
+"Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz." = "Enabled tasks run when they are due: charge limit, Top Up and power mode tasks change the macOS setting. Pausing charging, calibration and discharging to a target cannot run yet.";
+"Yeni çalışma %@ başladı; sonuç Görev geçmişinde güncellenir." = "New run %@ has started; the result will be updated in the task history.";
+"Yeni çalışma %@ tamamlanamadı: %@" = "New run %@ did not complete: %@";
+"Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "New run %@ finished; the setting was verified by reading it back.";
+"Yeni çalışma başlatılamadı: görev silinmiş ya da kayıt yazılamadı." = "The new run could not be started: the task was deleted or the record could not be written.";

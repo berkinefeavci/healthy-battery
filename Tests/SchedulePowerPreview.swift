@@ -59,7 +59,7 @@ enum SchedulePowerPreview {
                    size: NSSize(width: 400, height: 700), path: CommandLine.arguments[1])
         try render(SettingsView(selection: .schedule, scheduleStorageDirectory: root).environmentObject(monitor).defaultAppStorage(defaults).preferredColorScheme(.dark),
                    size: NSSize(width: 1080, height: 740), path: CommandLine.arguments[2])
-        try render(ScheduleExecutionDetailView(record: history[1], taskName: task.name, onRetry: { _ in "Yeni çalışma güvenli biçimde kaydedildi." })
+        try render(ScheduleExecutionDetailView(record: history[1], taskName: task.name, retryAllowed: true, onRetry: { _ in "Yeni çalışma güvenli biçimde kaydedildi." })
                 .preferredColorScheme(.dark),
                    size: NSSize(width: 590, height: 430), path: CommandLine.arguments[3])
         print("Offscreen power/schedule previews written; windows were never shown.")

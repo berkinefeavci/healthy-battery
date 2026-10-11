@@ -137,6 +137,8 @@ struct ScheduleExecutionDetailView: View {
     @Environment(\.dismiss) private var dismiss
     let record: ScheduleExecutionRecord
     let taskName: String
+    /// False hides the retry button: the task is gone, the action cannot run on this Mac, or the run succeeded.
+    let retryAllowed: Bool
     let onRetry: (ScheduleExecutionRecord) -> String
     @State private var retryMessage: String?
 
@@ -173,9 +175,10 @@ struct ScheduleExecutionDetailView: View {
                 Text("Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur.")
                     .font(.caption).foregroundStyle(.secondary)
                 Spacer()
-                if canRetry {
+                if retryAllowed {
                     Button("Yeni çalışma olarak dene") { retryMessage = onRetry(record) }
                         .chargeMateButtonStyle()
+                        .disabled(retryMessage != nil)
                 }
             }
         }
@@ -185,9 +188,6 @@ struct ScheduleExecutionDetailView: View {
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
-    private var canRetry: Bool {
-        record.status.isTerminal && ![.configurationVerified, .completed].contains(record.status)
-    }
     private var actionText: String {
         record.requestedValue.map { "\(record.actionSnapshot.title) — %\($0)" } ?? record.actionSnapshot.title
     }
