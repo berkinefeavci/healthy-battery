@@ -113,11 +113,11 @@ final class MagSafeLEDHardwareService {
 
     private func resumeSavedPolicy() -> MagSafeLEDControlCoordinator.Outcome {
         let defaults = UserDefaults.standard
-        let saved = MagSafeLEDPolicy(rawValue: defaults.string(forKey: MagSafeLEDPreferences.policyKey) ?? "") ?? .system
+        let saved = MagSafeLEDPolicy(rawValue: defaults.string(forKey: MagSafeLEDPolicy.storageKey) ?? "") ?? .system
         let start = defaults.object(forKey: MagSafeLEDTimeWindow.startKey) as? Int ?? MagSafeLEDTimeWindow.defaultStart
         let end = defaults.object(forKey: MagSafeLEDTimeWindow.endKey) as? Int ?? MagSafeLEDTimeWindow.defaultEnd
         do {
-            try Self.configure(policy: saved == .status ? .system : saved, start: start, end: end)
+            try Self.configure(policy: saved, start: start, end: end)
             return .restored
         } catch {
             return .blocked(error.localizedDescription)
@@ -140,7 +140,6 @@ final class MagSafeLEDHardwareService {
         case .system: mode = 0
         case .alwaysOff: mode = 1
         case .scheduled: mode = 2
-        case .status: throw ServiceError.unsupportedValue
         }
         try request("P \(mode) \(start) \(end)")
         // An explicit policy selection transfers ownership from a manual test.
@@ -171,7 +170,7 @@ final class MagSafeLEDHardwareService {
 
     private static func writeLED(_ output: MagSafeLEDOutput) throws {
         guard installed() else { throw ServiceError.helperNotTrusted }
-        guard let value = MagSafeLEDRawCodec.encode(output) else { throw ServiceError.unsupportedValue }
+        let value = MagSafeLEDRawCodec.encode(output)
         // The helper only answers after eight settled 1 s samples (~8.5 s), though the light changes
         // at once. Send without waiting for that answer and confirm with our own read instead; a
         // press right after another waits for the helper to free up, hence the 12 s limit.

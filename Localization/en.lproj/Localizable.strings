@@ -149,7 +149,6 @@
 "Beş aşamalı tam şarj/deşarj döngüsünü otomatik yönetir." = "Automatically runs a five-stage full charge/discharge cycle.";
 "Bileşenler farklı anlarda ölçüldü; toplamla kısa süreli fark olabilir." = "Components were measured at different moments; they may briefly differ from the total.";
 "Bilinmeyen hata" = "Unknown error";
-"Bilinmeyen, çelişkili veya eski ölçümde Healthy Battery ışığı değiştirmez." = "Healthy Battery does not change the light on an unknown, conflicting or stale reading.";
 "Bir görev oluşturun veya güvenli bir şablonla başlayın." = "Create a task or start from a safe template.";
 "Bir işlem sürüyor" = "An operation is in progress";
 "Bir kez" = "Once";
@@ -162,8 +161,6 @@
 "Boyutu değiştir" = "Change size";
 "Bozuk LED oturum kaydı otomatik geri yüklenemez." = "A corrupt LED session record cannot be restored automatically.";
 "Boş menüde erişim için durum simgesi gösterilir." = "With an empty menu, a status icon is shown so the app stays reachable.";
-"Boşalırken turuncu yanıp sönsün" = "Blink orange while discharging";
-"Boşalıyor" = "Discharging";
 "Bu LED çıktısı backend tarafından desteklenmiyor." = "This LED output is not supported by the backend.";
 "Bu Mac %80–100 arasında beşer puan sunuyor." = "This Mac offers 80–100% in steps of five.";
 "Bu Mac Düşük Güç Modunu sunmuyor." = "This Mac does not offer Low Power Mode.";
@@ -245,8 +242,6 @@
 "Doğrulandı" = "Verified";
 "Durdur" = "Stop";
 "Durum" = "Status";
-"Duruma göre" = "By state";
-"Duruma göre renkler" = "Colors by state";
 "Döngü grafiği" = "Cycle chart";
 "Döngü sayısı" = "Cycle count";
 "Düzen kaydedilemedi: %@" = "The layout could not be saved: %@";
@@ -371,7 +366,6 @@
 "Hedefe kadar boşalt" = "Discharge to target";
 "Hedefe kadar otomatik uykuyu ertele" = "Delay automatic sleep until the target";
 "Hedefe ulaşıldı · %%%lld" = "Target reached · %lld%%";
-"Hedefe veya %100’e ulaşıldığı doğrulandığında." = "When reaching the target or 100% is verified.";
 "Hedefi yeniden uygula" = "Reapply target";
 "Henüz program yok" = "No schedules yet";
 "Henüz çalışma kaydı yok" = "No run records yet";
@@ -383,7 +377,6 @@
 "Her zaman kapalı" = "Always off";
 "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir." = "Always off and time range also work while the app is closed. Times use this Mac's local time.";
 "Hiçbir şey yapma" = "Do nothing";
-"Isı koruması bekletiyor" = "Held by heat protection";
 "Işık" = "Light";
 "Işık denetimi hazır" = "Light control ready";
 "Işık denetimini etkinleştir" = "Enable light control";
@@ -611,7 +604,6 @@
 "Toplam, işlemci ve ekran gerçek sensörlerden; Diğer GPU, bellek, depolama, fan ve ayrılamayan yüktür." = "Total, processor and display come from real sensors; Other is GPU, memory, storage, fans and load that cannot be separated.";
 "Turbo" = "High Power";
 "Turuncu" = "Orange";
-"Turuncu yanıp sönme" = "Blinking orange";
 "Tümü" = "All";
 "Tümünü temizle" = "Clear all";
 "USB cihazı" = "USB device";
@@ -641,7 +633,6 @@
 "Yalnız Healthy Battery arayüz ayarları sıfırlansın mı?" = "Reset only Healthy Battery's interface settings?";
 "Yalnız ek etkinlik ve Gösterge Tablosu örneklemesini etkiler; şarj denetimini açmaz veya durdurmaz." = "Only affects extra activity and Dashboard sampling; it does not turn charge control on or off.";
 "Yalnız çok yüksek" = "Very high only";
-"Yanıp sönme yalnız MagSafe 3 ve doğrulanmış bir backend destekliyorsa uygulanır; desteklenmeyen durumda sabit turuncuya sessizce çevrilmez." = "Blinking is only applied when MagSafe 3 and a verified backend support it; where unsupported it is not silently turned into steady orange.";
 "Yardımcı süreçler ve servisler kaldırıldı. Şimdi uygulamayı Çöp Sepeti'ne sürükleyin." = "Helper processes and services were removed. Now drag the app to the Trash.";
 "Yardımcı süreçleri ve arka plan servislerini kaldırır; uygulamayı Çöp Sepeti'ne taşımanız gerekir." = "Removes helper processes and background services; you still need to move the app to the Trash.";
 "Yardımcı yanıt vermedi." = "The helper did not respond.";
@@ -812,7 +803,6 @@
 "Şarj hedefi" = "Charge target";
 "Şarj hedefi düzenleyicisini kapat" = "Close the charge target editor";
 "Şarj hedefi eksik." = "Charge target is missing.";
-"Şarj hedefi tamamlandı" = "Charge target reached";
 "Şarj hedefi yüzde %lld; düzenleyiciyi %@" = "Charge target %lld percent; %@ the editor";
 "Şarj hedefi; bar üzerinde sürükleyip bırakınca uygulanır, yön tuşlarıyla taslak değişir" = "Charge target; applied when you drag and release on the bar, the arrow keys change the draft";
 "Şarj hedefini düzenle" = "Edit charge target";
@@ -827,7 +817,6 @@
 "Şarj politika kaydı doğrulanmalı." = "The charge policy record must be verified.";
 "Şarj politikası kaydedilemedi." = "The charge policy could not be saved.";
 "Şarj sınırı" = "Charge limit";
-"Şarj tamamlandığında" = "When charging completes";
 "Şarj ve boşalmayı hedef bandında dengeler." = "Balances charging and discharging within a target band.";
 "Şarj yönetimi için başka bir uygulama açık." = "Another app is open for charge management.";
 "Şarjı başlat / durdur — henüz kullanılamıyor" = "Start / stop charging — not available yet";

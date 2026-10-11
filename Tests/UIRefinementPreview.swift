@@ -25,7 +25,7 @@ enum UIRefinementPreview {
         defaults.set(true, forKey: "appReduceTransparency")
         defaults.set(true, forKey: "includeBackgroundEnergyProcesses")
         defaults.set(85.0, forKey: "chargeLimit")
-        defaults.set("status", forKey: MagSafeLEDPreferences.policyKey)
+        defaults.set("scheduled", forKey: MagSafeLEDPolicy.storageKey)
 
         var snapshot = BatterySnapshot()
         snapshot.sampledAt = Date()

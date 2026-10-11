@@ -2,12 +2,8 @@ import SwiftUI
 
 struct MagSafeLEDSettingsView: View {
     @EnvironmentObject private var battery: BatteryMonitor
-    @AppStorage(MagSafeLEDPreferences.policyKey) private var policyRaw = MagSafeLEDPolicy.system.rawValue
-    @AppStorage(MagSafeLEDPreferences.completionKey) private var completionRaw = MagSafeLEDCompletionBehavior.green.rawValue
-    @AppStorage(MagSafeLEDPreferences.blinkKey) private var blinkWhileDischarging = false
-    @State private var capability = MagSafeLEDCapability(
-        connection: .none, probeState: .checking, writerReady: false, supportedOutputs: []
-    )
+    @AppStorage(MagSafeLEDPolicy.storageKey) private var policyRaw = MagSafeLEDPolicy.system.rawValue
+    @State private var capability = MagSafeLEDCapability(probeState: .checking)
     @State private var helperInstalled = false
     @State private var isWorking = false
     @State private var testMessage = ""
@@ -23,16 +19,10 @@ struct MagSafeLEDSettingsView: View {
                 set: { policyRaw = $0.rawValue; policyMessage = "" })
     }
 
-    private var completion: Binding<MagSafeLEDCompletionBehavior> {
-        Binding(get: { MagSafeLEDCompletionBehavior(rawValue: completionRaw) ?? .green },
-                set: { completionRaw = $0.rawValue })
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             headerCard
             policyCard
-            if policy.wrappedValue == .status { mappingCard }
             diagnosticCard
         }
         .onAppear {
@@ -124,38 +114,6 @@ struct MagSafeLEDSettingsView: View {
             if isWorking { ProgressView(String(localized: "Ayar uygulanıyor…")) }
             if !policyMessage.isEmpty { Text(policyMessage).font(.caption).foregroundStyle(.secondary) }
 
-            if policy.wrappedValue == .status {
-                Divider()
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Şarj tamamlandığında").font(.system(size: 12, weight: .semibold))
-                        Text("Hedefe veya %100’e ulaşıldığı doğrulandığında.")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Picker("Şarj tamamlandığında", selection: completion) {
-                        ForEach(MagSafeLEDCompletionBehavior.allCases) { item in Text(item.title).tag(item) }
-                    }.labelsHidden().pickerStyle(.segmented).frame(width: 190)
-                }
-                Toggle("Boşalırken turuncu yanıp sönsün", isOn: $blinkWhileDischarging)
-                    .toggleStyle(.switch)
-                Text("Yanıp sönme yalnız MagSafe 3 ve doğrulanmış bir backend destekliyorsa uygulanır; desteklenmeyen durumda sabit turuncuya sessizce çevrilmez.")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-        }.chargeCard()
-    }
-
-    private var mappingCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Duruma göre renkler", systemImage: "circle.hexagongrid.fill").font(.headline)
-            mappingRow(String(localized: "Şarj oluyor"), color: .orange, result: String(localized: "Turuncu"))
-            mappingRow(String(localized: "Şarj hedefi tamamlandı"), color: completion.wrappedValue == .green ? .green : .secondary,
-                       result: completion.wrappedValue.title)
-            mappingRow(String(localized: "Isı koruması bekletiyor"), color: .orange, result: String(localized: "Turuncu"))
-            mappingRow(String(localized: "Boşalıyor"), color: .orange,
-                       result: blinkWhileDischarging ? String(localized: "Turuncu yanıp sönme") : String(localized: "Turuncu"))
-            Text("Bilinmeyen, çelişkili veya eski ölçümde Healthy Battery ışığı değiştirmez.")
-                .font(.caption).foregroundStyle(.secondary)
         }.chargeCard()
     }
 
@@ -190,15 +148,6 @@ struct MagSafeLEDSettingsView: View {
                     .textSelection(.enabled)
             }
         }.chargeCard()
-    }
-
-    private func mappingRow(_ title: String, color: Color, result: String) -> some View {
-        HStack(spacing: 10) {
-            Circle().fill(color).frame(width: 9, height: 9)
-            Text(title).font(.system(size: 12))
-            Spacer()
-            Text(result).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
-        }
     }
 
     private func testButton(_ title: String, icon: String, output: MagSafeLEDOutput, tint: Color? = nil) -> some View {

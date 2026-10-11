@@ -149,7 +149,6 @@
 "Beş aşamalı tam şarj/deşarj döngüsünü otomatik yönetir." = "Beş aşamalı tam şarj/deşarj döngüsünü otomatik yönetir.";
 "Bileşenler farklı anlarda ölçüldü; toplamla kısa süreli fark olabilir." = "Bileşenler farklı anlarda ölçüldü; toplamla kısa süreli fark olabilir.";
 "Bilinmeyen hata" = "Bilinmeyen hata";
-"Bilinmeyen, çelişkili veya eski ölçümde Healthy Battery ışığı değiştirmez." = "Bilinmeyen, çelişkili veya eski ölçümde Healthy Battery ışığı değiştirmez.";
 "Bir görev oluşturun veya güvenli bir şablonla başlayın." = "Bir görev oluşturun veya güvenli bir şablonla başlayın.";
 "Bir işlem sürüyor" = "Bir işlem sürüyor";
 "Bir kez" = "Bir kez";
@@ -162,8 +161,6 @@
 "Boyutu değiştir" = "Boyutu değiştir";
 "Bozuk LED oturum kaydı otomatik geri yüklenemez." = "Bozuk LED oturum kaydı otomatik geri yüklenemez.";
 "Boş menüde erişim için durum simgesi gösterilir." = "Boş menüde erişim için durum simgesi gösterilir.";
-"Boşalırken turuncu yanıp sönsün" = "Boşalırken turuncu yanıp sönsün";
-"Boşalıyor" = "Boşalıyor";
 "Bu LED çıktısı backend tarafından desteklenmiyor." = "Bu LED çıktısı backend tarafından desteklenmiyor.";
 "Bu Mac %80–100 arasında beşer puan sunuyor." = "Bu Mac %80–100 arasında beşer puan sunuyor.";
 "Bu Mac Düşük Güç Modunu sunmuyor." = "Bu Mac Düşük Güç Modunu sunmuyor.";
@@ -245,8 +242,6 @@
 "Doğrulandı" = "Doğrulandı";
 "Durdur" = "Durdur";
 "Durum" = "Durum";
-"Duruma göre" = "Duruma göre";
-"Duruma göre renkler" = "Duruma göre renkler";
 "Döngü grafiği" = "Döngü grafiği";
 "Döngü sayısı" = "Döngü sayısı";
 "Düzen kaydedilemedi: %@" = "Düzen kaydedilemedi: %@";
@@ -371,7 +366,6 @@
 "Hedefe kadar boşalt" = "Hedefe kadar boşalt";
 "Hedefe kadar otomatik uykuyu ertele" = "Hedefe kadar otomatik uykuyu ertele";
 "Hedefe ulaşıldı · %%%lld" = "Hedefe ulaşıldı · %%%lld";
-"Hedefe veya %100’e ulaşıldığı doğrulandığında." = "Hedefe veya %100’e ulaşıldığı doğrulandığında.";
 "Hedefi yeniden uygula" = "Hedefi yeniden uygula";
 "Henüz program yok" = "Henüz program yok";
 "Henüz çalışma kaydı yok" = "Henüz çalışma kaydı yok";
@@ -383,7 +377,6 @@
 "Her zaman kapalı" = "Her zaman kapalı";
 "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir." = "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir.";
 "Hiçbir şey yapma" = "Hiçbir şey yapma";
-"Isı koruması bekletiyor" = "Isı koruması bekletiyor";
 "Işık" = "Işık";
 "Işık denetimi hazır" = "Işık denetimi hazır";
 "Işık denetimini etkinleştir" = "Işık denetimini etkinleştir";
@@ -611,7 +604,6 @@
 "Toplam, işlemci ve ekran gerçek sensörlerden; Diğer GPU, bellek, depolama, fan ve ayrılamayan yüktür." = "Toplam, işlemci ve ekran gerçek sensörlerden; Diğer GPU, bellek, depolama, fan ve ayrılamayan yüktür.";
 "Turbo" = "Turbo";
 "Turuncu" = "Turuncu";
-"Turuncu yanıp sönme" = "Turuncu yanıp sönme";
 "Tümü" = "Tümü";
 "Tümünü temizle" = "Tümünü temizle";
 "USB cihazı" = "USB cihazı";
@@ -641,7 +633,6 @@
 "Yalnız Healthy Battery arayüz ayarları sıfırlansın mı?" = "Yalnız Healthy Battery arayüz ayarları sıfırlansın mı?";
 "Yalnız ek etkinlik ve Gösterge Tablosu örneklemesini etkiler; şarj denetimini açmaz veya durdurmaz." = "Yalnız ek etkinlik ve Gösterge Tablosu örneklemesini etkiler; şarj denetimini açmaz veya durdurmaz.";
 "Yalnız çok yüksek" = "Yalnız çok yüksek";
-"Yanıp sönme yalnız MagSafe 3 ve doğrulanmış bir backend destekliyorsa uygulanır; desteklenmeyen durumda sabit turuncuya sessizce çevrilmez." = "Yanıp sönme yalnız MagSafe 3 ve doğrulanmış bir backend destekliyorsa uygulanır; desteklenmeyen durumda sabit turuncuya sessizce çevrilmez.";
 "Yardımcı süreçler ve servisler kaldırıldı. Şimdi uygulamayı Çöp Sepeti'ne sürükleyin." = "Yardımcı süreçler ve servisler kaldırıldı. Şimdi uygulamayı Çöp Sepeti'ne sürükleyin.";
 "Yardımcı süreçleri ve arka plan servislerini kaldırır; uygulamayı Çöp Sepeti'ne taşımanız gerekir." = "Yardımcı süreçleri ve arka plan servislerini kaldırır; uygulamayı Çöp Sepeti'ne taşımanız gerekir.";
 "Yardımcı yanıt vermedi." = "Yardımcı yanıt vermedi.";
@@ -812,7 +803,6 @@
 "Şarj hedefi" = "Şarj hedefi";
 "Şarj hedefi düzenleyicisini kapat" = "Şarj hedefi düzenleyicisini kapat";
 "Şarj hedefi eksik." = "Şarj hedefi eksik.";
-"Şarj hedefi tamamlandı" = "Şarj hedefi tamamlandı";
 "Şarj hedefi yüzde %lld; düzenleyiciyi %@" = "Şarj hedefi yüzde %lld; düzenleyiciyi %@";
 "Şarj hedefi; bar üzerinde sürükleyip bırakınca uygulanır, yön tuşlarıyla taslak değişir" = "Şarj hedefi; bar üzerinde sürükleyip bırakınca uygulanır, yön tuşlarıyla taslak değişir";
 "Şarj hedefini düzenle" = "Şarj hedefini düzenle";
@@ -827,7 +817,6 @@
 "Şarj politika kaydı doğrulanmalı." = "Şarj politika kaydı doğrulanmalı.";
 "Şarj politikası kaydedilemedi." = "Şarj politikası kaydedilemedi.";
 "Şarj sınırı" = "Şarj sınırı";
-"Şarj tamamlandığında" = "Şarj tamamlandığında";
 "Şarj ve boşalmayı hedef bandında dengeler." = "Şarj ve boşalmayı hedef bandında dengeler.";
 "Şarj yönetimi için başka bir uygulama açık." = "Şarj yönetimi için başka bir uygulama açık.";
 "Şarjı başlat / durdur — henüz kullanılamıyor" = "Şarjı başlat / durdur — henüz kullanılamıyor";

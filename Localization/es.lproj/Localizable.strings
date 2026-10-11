@@ -149,7 +149,6 @@
 "Beş aşamalı tam şarj/deşarj döngüsünü otomatik yönetir." = "Ejecuta automáticamente un ciclo completo de carga y descarga en cinco fases.";
 "Bileşenler farklı anlarda ölçüldü; toplamla kısa süreli fark olabilir." = "Los componentes se midieron en momentos distintos; pueden diferir brevemente del total.";
 "Bilinmeyen hata" = "Error desconocido";
-"Bilinmeyen, çelişkili veya eski ölçümde Healthy Battery ışığı değiştirmez." = "Healthy Battery no cambia la luz ante una lectura desconocida, contradictoria u obsoleta.";
 "Bir görev oluşturun veya güvenli bir şablonla başlayın." = "Crea una tarea o empieza con una plantilla segura.";
 "Bir işlem sürüyor" = "Hay una operación en curso";
 "Bir kez" = "Una vez";
@@ -162,8 +161,6 @@
 "Boyutu değiştir" = "Cambiar tamaño";
 "Bozuk LED oturum kaydı otomatik geri yüklenemez." = "Un registro de sesión LED dañado no se puede restaurar automáticamente.";
 "Boş menüde erişim için durum simgesi gösterilir." = "Con el menú vacío se muestra un icono de estado para que la app siga accesible.";
-"Boşalırken turuncu yanıp sönsün" = "Parpadear en naranja al descargar";
-"Boşalıyor" = "Descargando";
 "Bu LED çıktısı backend tarafından desteklenmiyor." = "El backend no admite esta salida LED.";
 "Bu Mac %80–100 arasında beşer puan sunuyor." = "Este Mac ofrece 80–100 % en pasos de cinco.";
 "Bu Mac Düşük Güç Modunu sunmuyor." = "Este Mac no ofrece el modo de bajo consumo.";
@@ -245,8 +242,6 @@
 "Doğrulandı" = "Verificado";
 "Durdur" = "Detener";
 "Durum" = "Estado";
-"Duruma göre" = "Según el estado";
-"Duruma göre renkler" = "Colores según el estado";
 "Döngü grafiği" = "Gráfico de ciclos";
 "Döngü sayısı" = "Número de ciclos";
 "Düzen kaydedilemedi: %@" = "No se pudo guardar el diseño: %@";
@@ -371,7 +366,6 @@
 "Hedefe kadar boşalt" = "Descargar hasta el objetivo";
 "Hedefe kadar otomatik uykuyu ertele" = "Retrasar el reposo automático hasta el objetivo";
 "Hedefe ulaşıldı · %%%lld" = "Objetivo alcanzado · %lld %%";
-"Hedefe veya %100’e ulaşıldığı doğrulandığında." = "Cuando se verifica que se alcanzó el objetivo o el 100 %.";
 "Hedefi yeniden uygula" = "Volver a aplicar el objetivo";
 "Henüz program yok" = "Aún no hay programas";
 "Henüz çalışma kaydı yok" = "Aún no hay registros de ejecución";
@@ -383,7 +377,6 @@
 "Her zaman kapalı" = "Siempre apagada";
 "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir." = "«Siempre apagada» y el rango horario también funcionan con la app cerrada. Las horas usan la hora local de este Mac.";
 "Hiçbir şey yapma" = "No hacer nada";
-"Isı koruması bekletiyor" = "Detenido por la protección térmica";
 "Işık" = "Luz";
 "Işık denetimi hazır" = "Control de la luz listo";
 "Işık denetimini etkinleştir" = "Activar control de la luz";
@@ -611,7 +604,6 @@
 "Toplam, işlemci ve ekran gerçek sensörlerden; Diğer GPU, bellek, depolama, fan ve ayrılamayan yüktür." = "El total, el procesador y la pantalla provienen de sensores reales; Otros incluye GPU, memoria, almacenamiento, ventiladores y la carga que no se puede separar.";
 "Turbo" = "Alto rendimiento";
 "Turuncu" = "Naranja";
-"Turuncu yanıp sönme" = "Naranja parpadeante";
 "Tümü" = "Todo";
 "Tümünü temizle" = "Borrar todo";
 "USB cihazı" = "Dispositivo USB";
@@ -641,7 +633,6 @@
 "Yalnız Healthy Battery arayüz ayarları sıfırlansın mı?" = "¿Restablecer solo los ajustes de la interfaz de Healthy Battery?";
 "Yalnız ek etkinlik ve Gösterge Tablosu örneklemesini etkiler; şarj denetimini açmaz veya durdurmaz." = "Solo afecta a la actividad adicional y a las mediciones del panel de control; no activa ni desactiva el control de carga.";
 "Yalnız çok yüksek" = "Solo muy alto";
-"Yanıp sönme yalnız MagSafe 3 ve doğrulanmış bir backend destekliyorsa uygulanır; desteklenmeyen durumda sabit turuncuya sessizce çevrilmez." = "El parpadeo solo se aplica si MagSafe 3 y un backend verificado lo admiten; si no, no se cambia en silencio a naranja fijo.";
 "Yardımcı süreçler ve servisler kaldırıldı. Şimdi uygulamayı Çöp Sepeti'ne sürükleyin." = "Se eliminaron los procesos auxiliares y servicios. Ahora arrastra la app a la Papelera.";
 "Yardımcı süreçleri ve arka plan servislerini kaldırır; uygulamayı Çöp Sepeti'ne taşımanız gerekir." = "Elimina los procesos auxiliares y servicios en segundo plano; después tendrás que mover la app a la Papelera.";
 "Yardımcı yanıt vermedi." = "El auxiliar no respondió.";
@@ -812,7 +803,6 @@
 "Şarj hedefi" = "Objetivo de carga";
 "Şarj hedefi düzenleyicisini kapat" = "Cerrar el editor del objetivo de carga";
 "Şarj hedefi eksik." = "Falta el objetivo de carga.";
-"Şarj hedefi tamamlandı" = "Objetivo de carga alcanzado";
 "Şarj hedefi yüzde %lld; düzenleyiciyi %@" = "Objetivo de carga %lld %%; %@ el editor";
 "Şarj hedefi; bar üzerinde sürükleyip bırakınca uygulanır, yön tuşlarıyla taslak değişir" = "Objetivo de carga; se aplica al arrastrar y soltar en la barra, las flechas cambian el borrador";
 "Şarj hedefini düzenle" = "Editar objetivo de carga";
@@ -827,7 +817,6 @@
 "Şarj politika kaydı doğrulanmalı." = "Debe verificarse el registro de la regla de carga.";
 "Şarj politikası kaydedilemedi." = "No se pudo guardar la regla de carga.";
 "Şarj sınırı" = "Límite de carga";
-"Şarj tamamlandığında" = "Cuando termina la carga";
 "Şarj ve boşalmayı hedef bandında dengeler." = "Equilibra la carga y la descarga dentro de un rango objetivo.";
 "Şarj yönetimi için başka bir uygulama açık." = "Hay otra app de gestión de carga abierta.";
 "Şarjı başlat / durdur — henüz kullanılamıyor" = "Iniciar / detener la carga — aún no disponible";

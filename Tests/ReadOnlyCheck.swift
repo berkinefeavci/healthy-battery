@@ -230,8 +230,7 @@ struct ReadOnlyCheck {
         let reader = SMCReader.shared
         let ledSnapshot = BatteryMonitor.readBattery(useSMC: false)
         let led = MagSafeLEDCapability.liveProbe(externalConnected: ledSnapshot.externalConnected, reader: reader)
-        print("MagSafe LED read-only probe: \(led.probeState); writerReady=\(led.writerReady)")
-        precondition(!led.writerReady, "Read-only diagnostics must never enable the LED writer")
+        print("MagSafe LED read-only probe: \(led.probeState)")
         if let baseline = try? reader.read("ACLC") {
             print("ACLC read-only baseline: type=\(baseline.type) bytes=\(hex(baseline.bytes))")
         }

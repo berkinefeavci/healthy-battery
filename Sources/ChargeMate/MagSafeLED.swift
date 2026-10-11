@@ -2,27 +2,21 @@ import Foundation
 
 enum MagSafeLEDPolicy: String, CaseIterable, Codable, Identifiable {
     case system
-    case status
     case alwaysOff
     case scheduled
+
+    /// UserDefaults key of the selection made on the MagSafe page. An older build also stored "status"
+    /// ("by state", never reachable here); that and any unknown value read back as `.system`.
+    static let storageKey = "magSafeLEDPolicy"
 
     var id: String { rawValue }
     var title: String {
         switch self {
         case .system: return String(localized: "Sistem yönetsin")
-        case .status: return String(localized: "Duruma göre")
         case .alwaysOff: return String(localized: "Her zaman kapalı")
         case .scheduled: return String(localized: "Saat aralığında kapalı")
         }
     }
-}
-
-enum MagSafeLEDCompletionBehavior: String, CaseIterable, Codable, Identifiable {
-    case green
-    case off
-
-    var id: String { rawValue }
-    var title: String { self == .green ? String(localized: "Yeşil") : String(localized: "Kapalı") }
 }
 
 enum MagSafeLEDOutput: String, CaseIterable, Codable, Hashable {
@@ -30,25 +24,6 @@ enum MagSafeLEDOutput: String, CaseIterable, Codable, Hashable {
     case off
     case green
     case orange
-    case blinkingOrange
-}
-
-enum MagSafeConnectionKind: String, Codable {
-    case none
-    case magsafe2
-    case magsafe3
-    case usbC
-    case unknownAdapter
-}
-
-enum MagSafeLEDPhase: Equatable {
-    case charging
-    case confirmedTargetReached
-    case heatPaused
-    case topUpCharging
-    case calibrationComplete
-    case discharging
-    case unknown
 }
 
 /// What the root LED service is doing, parsed from its policy file ("mode start end").
@@ -83,32 +58,8 @@ enum MagSafeLEDTimeWindow {
     }
 }
 
-struct MagSafeLEDPreferences: Equatable {
-    static let policyKey = "magSafeLEDPolicy"
-    static let completionKey = "magSafeLEDCompletionBehavior"
-    static let blinkKey = "magSafeLEDBlinkWhileDischarging"
-
-    var policy: MagSafeLEDPolicy
-    var completionBehavior: MagSafeLEDCompletionBehavior
-    var blinkWhileDischarging: Bool
-
-    static let defaults = Self(policy: .system, completionBehavior: .green, blinkWhileDischarging: false)
-
-    static func load(from defaults: UserDefaults) -> Self {
-        Self(
-            policy: MagSafeLEDPolicy(rawValue: defaults.string(forKey: policyKey) ?? "") ?? .system,
-            completionBehavior: MagSafeLEDCompletionBehavior(rawValue: defaults.string(forKey: completionKey) ?? "") ?? .green,
-            blinkWhileDischarging: defaults.bool(forKey: blinkKey)
-        )
-    }
-
-    func save(to defaults: UserDefaults) {
-        defaults.set(policy.rawValue, forKey: Self.policyKey)
-        defaults.set(completionBehavior.rawValue, forKey: Self.completionKey)
-        defaults.set(blinkWhileDischarging, forKey: Self.blinkKey)
-    }
-}
-
+/// Read-only look at the MagSafe LED key. A readable key is evidence for the physical test, nothing more:
+/// this type never writes.
 struct MagSafeLEDCapability: Equatable {
     enum ProbeState: Equatable {
         case checking
@@ -118,82 +69,16 @@ struct MagSafeLEDCapability: Equatable {
         case malformedCandidate
     }
 
-    let connection: MagSafeConnectionKind
     let probeState: ProbeState
-    let writerReady: Bool
-    let supportedOutputs: Set<MagSafeLEDOutput>
 
-    /// This build deliberately has no SMC writer. A readable candidate key is evidence for
-    /// the next physical test, not permission to claim that LED control is available.
     static func liveProbe(externalConnected: Bool, reader: SMCReader = .shared) -> Self {
-        guard externalConnected else {
-            return Self(connection: .none, probeState: .noAdapter, writerReady: false, supportedOutputs: [])
-        }
+        guard externalConnected else { return Self(probeState: .noAdapter) }
         do {
             let value = try reader.read("ACLC")
-            guard value.bytes.count == 1 else {
-                return Self(connection: .unknownAdapter, probeState: .malformedCandidate,
-                            writerReady: false, supportedOutputs: [])
-            }
-            return Self(connection: .unknownAdapter,
-                        probeState: .candidateKeyFound(type: value.type, byteCount: value.bytes.count),
-                        writerReady: false, supportedOutputs: [])
+            guard value.bytes.count == 1 else { return Self(probeState: .malformedCandidate) }
+            return Self(probeState: .candidateKeyFound(type: value.type, byteCount: value.bytes.count))
         } catch {
-            return Self(connection: .unknownAdapter, probeState: .candidateKeyUnavailable,
-                        writerReady: false, supportedOutputs: [])
+            return Self(probeState: .candidateKeyUnavailable)
         }
-    }
-}
-
-enum MagSafeLEDBlockReason: Equatable {
-    case writerUnavailable
-    case noAdapter
-    case unsupportedConnection
-    case unknownConnection
-    case staleOrUnknownState
-    case unsupportedOutput(MagSafeLEDOutput)
-}
-
-enum MagSafeLEDDecision: Equatable {
-    case write(MagSafeLEDOutput)
-    case noWrite(MagSafeLEDBlockReason)
-}
-
-enum MagSafeLEDPolicyEngine {
-    static func decision(preferences: MagSafeLEDPreferences,
-                         connection: MagSafeConnectionKind,
-                         phase: MagSafeLEDPhase,
-                         telemetryFresh: Bool,
-                         writerReady: Bool,
-                         supportedOutputs: Set<MagSafeLEDOutput>) -> MagSafeLEDDecision {
-        guard writerReady else { return .noWrite(.writerUnavailable) }
-        guard connection != .none else { return .noWrite(.noAdapter) }
-        guard connection != .usbC else { return .noWrite(.unsupportedConnection) }
-        guard connection == .magsafe2 || connection == .magsafe3 else { return .noWrite(.unknownConnection) }
-
-        let output: MagSafeLEDOutput
-        switch preferences.policy {
-        case .system:
-            output = .system
-        case .alwaysOff:
-            output = .off
-        case .scheduled:
-            // The privileged time-window service evaluates local wall-clock time.
-            return .noWrite(.staleOrUnknownState)
-        case .status:
-            guard telemetryFresh else { return .noWrite(.staleOrUnknownState) }
-            switch phase {
-            case .charging, .heatPaused, .topUpCharging:
-                output = .orange
-            case .confirmedTargetReached, .calibrationComplete:
-                output = preferences.completionBehavior == .green ? .green : .off
-            case .discharging:
-                output = preferences.blinkWhileDischarging && connection == .magsafe3 ? .blinkingOrange : .orange
-            case .unknown:
-                return .noWrite(.staleOrUnknownState)
-            }
-        }
-        guard supportedOutputs.contains(output) else { return .noWrite(.unsupportedOutput(output)) }
-        return .write(output)
     }
 }
