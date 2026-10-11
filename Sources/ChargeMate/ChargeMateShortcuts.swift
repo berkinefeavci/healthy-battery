@@ -46,6 +46,19 @@ enum ChargeMateShortcutState: String, CaseIterable {
     }
 }
 
+/// How many of the eight Shortcuts actions can do their job on this Mac right now.
+enum ChargeMateShortcutReadiness {
+    static let readActions = 4     // battery %, charge limit, state, temperature: always answer
+    static let controlActions = 4  // set limit, Top Up, power mode, MagSafe light
+    static var total: Int { readActions + controlActions }
+
+    /// The reads always work. Limit and Top Up need the native limits macOS reports; power mode and the
+    /// MagSafe light each need their (already installed) helper.
+    static func ready(nativeLimitsAvailable: Bool, powerModeHelperInstalled: Bool, magSafeHelperInstalled: Bool) -> Int {
+        readActions + (nativeLimitsAvailable ? 2 : 0) + (powerModeHelperInstalled ? 1 : 0) + (magSafeHelperInstalled ? 1 : 0)
+    }
+}
+
 struct ChargeMateShortcutSnapshot {
     var sampledAt: Date
     var macOSPercentage: Int?

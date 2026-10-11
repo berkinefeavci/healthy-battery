@@ -50,7 +50,7 @@ struct DashboardView: View {
                 }.frame(maxWidth: .infinity)
                 VStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 11) {
-                        HStack { Text("Şarj durumu").font(.system(size: 12, weight: .semibold)); Spacer(); Circle().fill(.green).frame(width: 5, height: 5) }
+                        HStack { Text("Şarj durumu").font(.system(size: 12, weight: .semibold)); Spacer(); Circle().fill(statusColor).frame(width: 5, height: 5) }
                         Text(battery.statusSentence).font(.system(size: 11)).foregroundStyle(Color.primary.opacity(0.72)).fixedSize(horizontal: false, vertical: true)
                         Divider()
                         ReadOnlyBadge()
@@ -58,7 +58,7 @@ struct DashboardView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Label("Kayıtlı macOS limiti", systemImage: "battery.100percent").font(.system(size: 11)).foregroundStyle(Color.primary.opacity(0.72))
                         Text(battery.nativeLimit.map { "%\($0)" } ?? "—").font(.system(size: 27, weight: .light)).monospacedDigit()
-                        Text("Charge Control bölümünden düzenleyin.").font(.system(size: 10)).foregroundStyle(Color.primary.opacity(0.72))
+                        Text("Şarj Kontrolü bölümünden düzenleyin.").font(.system(size: 10)).foregroundStyle(Color.primary.opacity(0.72))
                     }.frame(maxWidth: .infinity, alignment: .leading).chargeCard()
                     VStack(alignment: .leading, spacing: 10) {
                         Label("Döngü sayısı", systemImage: "clock.arrow.circlepath").font(.system(size: 11)).foregroundStyle(Color.primary.opacity(0.72))
@@ -75,6 +75,13 @@ struct DashboardView: View {
             }.font(.system(size: 10)).foregroundStyle(Color.primary.opacity(0.5))
             LongTermHealthCard()
         }
+    }
+    /// The dot next to "Şarj durumu" follows the real state: grey without a fresh measurement, orange while
+    /// something needs attention (another charge app, an unverified operation, an outside change), green otherwise.
+    private var statusColor: Color {
+        if !s.available || s.powerFlow.mode == .unavailable { return .secondary }
+        if battery.otherControllerRunning || battery.controlRecoveryRequired || battery.policyConflict != nil { return .orange }
+        return .green
     }
     private func powerItem(_ icon: String, _ title: String, _ value: String, _ color: Color) -> some View {
         HStack(spacing: 6) { Image(systemName: icon).foregroundStyle(color); Text(title).foregroundStyle(Color.primary.opacity(0.72)); Text(value).fontWeight(.semibold).monospacedDigit() }

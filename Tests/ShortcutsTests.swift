@@ -104,6 +104,15 @@ import Foundation
                            .setPowerMode(.lowPower), .setMagSafe(.off)],
               "commands preserve typed values and order")
 
+        // The "actions ready" count follows what can really run: reads always, controls only with their prerequisite.
+        check(ChargeMateShortcutReadiness.total == 8, "eight shortcut actions in total")
+        check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: true, powerModeHelperInstalled: true,
+                                                magSafeHelperInstalled: true) == 8, "everything ready")
+        check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: false, powerModeHelperInstalled: false,
+                                                magSafeHelperInstalled: false) == 4, "only reads without prerequisites")
+        check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: true, powerModeHelperInstalled: false,
+                                                magSafeHelperInstalled: true) == 7, "missing power-mode helper costs one action")
+
         print("Shortcuts contract: \(assertions) assertions passed; writer fake only.")
     }
 }

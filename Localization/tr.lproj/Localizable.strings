@@ -52,7 +52,6 @@
 "%lld%%" = "%lld%%";
 "%lld. %@" = "%lld. %@";
 "(tümü)" = "(tümü)";
-"8 eylem hazır" = "8 eylem hazır";
 "8 saatlik güvenlik süresi doldu" = "8 saatlik güvenlik süresi doldu";
 ":" = ":";
 "Ad" = "Ad";
@@ -200,7 +199,6 @@
 "Healthy Battery menüsünü aç" = "Healthy Battery menüsünü aç";
 "Healthy Battery'i kaldır" = "Healthy Battery'i kaldır";
 "Healthy Battery’ten çık" = "Healthy Battery’ten çık";
-"Charge Control bölümünden düzenleyin." = "Charge Control bölümünden düzenleyin.";
 "Daha çok sonuç" = "Daha çok sonuç";
 "Denetle" = "Denetle";
 "Dengeli" = "Dengeli";
@@ -778,7 +776,6 @@
 "İstek iptal edildi; ayar değiştirilmedi." = "İstek iptal edildi; ayar değiştirilmedi.";
 "İstek kaydedildi; Sistem Ayarları’nda onay gerekiyor." = "İstek kaydedildi; Sistem Ayarları’nda onay gerekiyor.";
 "İsteği iptal et" = "İsteği iptal et";
-"İzleme etkin. Hiçbir şarj kontrolü açılmadı." = "İzleme etkin. Hiçbir şarj kontrolü açılmadı.";
 "İzleme modu" = "İzleme modu";
 "İzleme modu · başka şarj uygulaması açık" = "İzleme modu · başka şarj uygulaması açık";
 "İşlem durduruldu: %@" = "İşlem durduruldu: %@";
@@ -1005,3 +1002,6 @@
 "Kopyala" = "Kopyala";
 "Yapıştır" = "Yapıştır";
 "Tümünü Seç" = "Tümünü Seç";
+"%lld / %lld eylem hazır" = "%lld / %lld eylem hazır";
+"Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir." = "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir.";
+"Şarj Kontrolü bölümünden düzenleyin." = "Şarj Kontrolü bölümünden düzenleyin.";

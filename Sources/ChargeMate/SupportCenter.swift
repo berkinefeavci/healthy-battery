@@ -35,9 +35,10 @@ struct SupportCenterView: View {
                     .font(.caption).foregroundStyle(.secondary)
                 Spacer()
                 Button(onboardingCompleted ? String(localized: "Rehberi yeniden tamamla") : String(localized: "Başla")) {
-                    battery.start()
+                    // Monitoring already runs from launch; the button marks the guide done and opens the Dashboard,
+                    // where the live readings are.
                     onboardingCompleted = true
-                    message = String(localized: "İzleme etkin. Hiçbir şarj kontrolü açılmadı.")
+                    AppDelegate.shared?.showSettings(page: .dashboard)
                 }.chargeMateButtonStyle()
             }
         }.chargeCard()

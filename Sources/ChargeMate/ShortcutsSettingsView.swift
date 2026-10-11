@@ -2,6 +2,9 @@ import AppKit
 import SwiftUI
 
 struct ShortcutsSettingsView: View {
+    @EnvironmentObject private var battery: BatteryMonitor
+    @State private var readyActions: Int?
+
     private struct Action: Identifiable {
         let title: String
         let detail: String
@@ -47,8 +50,13 @@ struct ShortcutsSettingsView: View {
                 }
                 Spacer(minLength: 12)
                 VStack(alignment: .trailing, spacing: 9) {
-                    Label("8 eylem hazır", systemImage: "checkmark.seal.fill")
-                        .font(.caption.weight(.semibold)).foregroundStyle(.green)
+                    if let readyActions {
+                        let all = readyActions == ChargeMateShortcutReadiness.total
+                        Label("\(readyActions) / \(ChargeMateShortcutReadiness.total) eylem hazır",
+                              systemImage: all ? "checkmark.seal.fill" : "exclamationmark.circle.fill")
+                            .font(.caption.weight(.semibold)).foregroundStyle(all ? Color.green : Color.orange)
+                            .help(String(localized: "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir."))
+                    }
                     Button("Kestirmeler'i Aç") { openShortcuts() }
                         .chargeMateButtonStyle()
                 }
@@ -59,6 +67,15 @@ struct ShortcutsSettingsView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .chargeCard()
+        // Checking the helpers launches a process, so it runs off the main thread, never while rendering.
+        .task(id: battery.nativeLimits) {
+            let limits = !battery.nativeLimits.isEmpty
+            readyActions = await Task.detached(priority: .utility) {
+                ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: limits,
+                                                  powerModeHelperInstalled: SystemPowerModeService.installed(),
+                                                  magSafeHelperInstalled: MagSafeLEDHardwareService.installed())
+            }.value
+        }
 
         actionCard(title: String(localized: "Oku"), icon: "arrow.down.circle", actions: reads)
         actionCard(title: String(localized: "Denetle"), icon: "slider.horizontal.3", actions: controls)

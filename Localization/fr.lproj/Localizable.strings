@@ -52,7 +52,6 @@
 "%lld%%" = "%lld %%";
 "%lld. %@" = "%lld. %@";
 "(tümü)" = "(tout)";
-"8 eylem hazır" = "8 actions prêtes";
 "8 saatlik güvenlik süresi doldu" = "Limite de sécurité de 8 heures atteinte";
 ":" = " :";
 "Ad" = "Nom";
@@ -200,7 +199,6 @@
 "Healthy Battery menüsünü aç" = "Ouvrir le menu Healthy Battery";
 "Healthy Battery'i kaldır" = "Désinstaller Healthy Battery";
 "Healthy Battery’ten çık" = "Quitter Healthy Battery";
-"Charge Control bölümünden düzenleyin." = "Modifiez-la dans la section Contrôle de la charge.";
 "Daha çok sonuç" = "Plus de résultats";
 "Denetle" = "Contrôler";
 "Dengeli" = "Équilibré";
@@ -778,7 +776,6 @@
 "İstek iptal edildi; ayar değiştirilmedi." = "La demande a été annulée ; le réglage n’a pas été modifié.";
 "İstek kaydedildi; Sistem Ayarları’nda onay gerekiyor." = "La demande a été enregistrée ; une approbation est requise dans Réglages Système.";
 "İsteği iptal et" = "Annuler la demande";
-"İzleme etkin. Hiçbir şarj kontrolü açılmadı." = "La surveillance est active. Aucun contrôle de charge n’a été activé.";
 "İzleme modu" = "Mode surveillance";
 "İzleme modu · başka şarj uygulaması açık" = "Mode surveillance · une autre app de charge est ouverte";
 "İşlem durduruldu: %@" = "Opération arrêtée : %@";
@@ -1005,3 +1002,6 @@
 "Kopyala" = "Copier";
 "Yapıştır" = "Coller";
 "Tümünü Seç" = "Tout sélectionner";
+"%lld / %lld eylem hazır" = "%lld actions prêtes sur %lld";
+"Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir." = "Les lectures sont toujours prêtes. La limite et Top Up nécessitent les limites proposées par macOS ; le mode d’énergie et le voyant MagSafe nécessitent leur assistant installé.";
+"Şarj Kontrolü bölümünden düzenleyin." = "Modifiez-la dans la section Contrôle de la charge.";
