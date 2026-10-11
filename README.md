@@ -31,6 +31,7 @@
 
 - **Charge limit, 80–100%.** Healthy Battery drives macOS's own native charge-limit control (the same mechanism macOS itself uses) to hold your battery at a target between 80% and 100% in 5% steps. Applying a limit is a real read/write round trip with an independent read-back check — see [Limitations](#how-it-works-and-limitations) for what that does and does not prove.
 - **Top Up.** Temporarily charge to 100% for a trip, then Healthy Battery restores your usual limit afterward.
+- **Heat protection (off by default).** While the battery charges on the adapter above 35 °C, the charge limit drops to 80% and Turbo is turned off; below 32 °C, or when the adapter is unplugged, your usual limit and power mode come back. It cannot stop charging if the battery is already below 80%. Settings → Charge Control.
 - **Live power flow.** A diagram of adapter, battery, CPU, display, and "other" power, in watts. CPU and display watts are read from Apple's SMC sensors; the total system draw comes from the battery controller. Nothing here is estimated or invented — if a value can't be measured, it shows as "—" instead of a guess.
 - **Connected device power.** When exactly one USB device is drawing power on exactly one active port, Healthy Battery shows its wattage (read-only, from the battery controller's port telemetry). With more than one device or port, it shows "—" rather than a guess.
 - **History charts.** 1 hour / 6 hour / 24 hour views of charge level, power draw, and battery health. The recorded readings can be exported as CSV from Settings → About.
@@ -54,7 +55,6 @@ These are shown in the UI as locked and marked **"Yakında"** (Coming soon). The
 
 - **Discharge / auto-discharge** — no verified way to force the battery to discharge on this hardware.
 - **Sailing** (oscillate within a range) — needs a working pause/resume primitive that hasn't been found.
-- **Heat protection** — needs the same pause/resume primitive plus fresh temperature data.
 - **Calibration** — a long-running, restorable discharge/recharge cycle; not implemented.
 
 ## Requirements

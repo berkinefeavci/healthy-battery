@@ -31,6 +31,7 @@
 
 - **%80–100 şarj sınırı.** Healthy Battery, macOS'un kendi yerel şarj sınırı mekanizmasını (macOS Ayarlar'ın kullandığı aynı mekanizma) sürerek bataryayı %80 ile %100 arasında, %5'lik adımlarla bir hedefte tutar. Bir sınır uygulamak, bağımsız bir geri-okuma kontrolüyle doğrulanan gerçek bir okuma/yazma turudur — bunun ne kanıtlayıp ne kanıtlamadığı için [Sınırlamalar](#nasıl-çalışır-ve-sınırları) bölümüne bakın.
 - **Doldur (Top Up).** Bir seyahat için geçici olarak %100'e şarj eder; ardından Healthy Battery önceki sınırınızı geri yükler.
+- **Isı koruması (varsayılan olarak kapalı).** Batarya adaptörde şarj olurken 35 °C'yi geçerse şarj sınırı %80'e düşer ve Turbo kapanır; 32 °C'nin altına inince ya da adaptör çıkarılınca eski sınırınız ve güç modunuz geri gelir. Batarya zaten %80'in altındaysa şarjı durduramaz. Ayarlar → Şarj Kontrolü.
 - **Canlı güç akışı.** Adaptör, batarya, işlemci, ekran ve "diğer" gücün watt cinsinden diyagramı. İşlemci ve ekran watt değerleri Apple'ın SMC sensörlerinden, toplam sistem gücü ise batarya denetleyicisinden okunur. Hiçbir değer tahmin edilmez veya uydurulmaz; ölçülemiyorsa "—" gösterilir.
 - **Bağlı cihaz gücü.** Tam olarak tek bir USB cihazı tek bir aktif portta güç çekiyorsa, Healthy Battery o cihazın watt değerini gösterir (batarya denetleyicisinin port telemetrisinden, salt-okunur). Birden fazla cihaz veya port varsa tahmin yerine "—" gösterilir.
 - **Geçmiş grafikleri.** Şarj seviyesi, güç tüketimi ve batarya sağlığı için 1 saat / 6 saat / 24 saatlik görünümler. Kaydedilen ölçümler Ayarlar → Hakkında’dan CSV olarak dışa aktarılabilir.
@@ -54,7 +55,6 @@ Bunlar arayüzde kilitli olarak ve **"Yakında"** etiketiyle görünür. Bunlar 
 
 - **Deşarj / otomatik deşarj** — bu donanımda bataryayı zorla deşarj etmenin doğrulanmış bir yolu yok.
 - **Sailing** (bir aralıkta salınım) — bulunamayan çalışan bir duraklat/devam ettir (pause/resume) ilkeli gerektiriyor.
-- **Isı koruması** — aynı duraklat/devam ettir ilkeli artı taze sıcaklık verisi gerektiriyor.
 - **Kalibrasyon** — uzun süreli, geri alınabilir bir deşarj/şarj döngüsü; uygulanmadı.
 
 ## Gereksinimler

@@ -132,7 +132,10 @@ private final class FakeNative {
             until { deliveries > previous }
         }
         check(native.writeCount == 0, "startup migration plus 30 real refresh callbacks writer zero")
-        check(monitor.heatProtection && monitor.sailingEnabled && monitor.maxTemp == 42 && monitor.chargeLimit == 80,
+        // Old builds saved heat/sailing/max-temperature preferences that nothing reads any more; the monitor must
+        // neither fail on them nor wipe them.
+        check(defaults.bool(forKey: "heatProtection") && defaults.bool(forKey: "sailingEnabled")
+              && defaults.double(forKey: "maxTemp") == 42 && monitor.chargeLimit == 80,
               "legacy preference values preserved")
         check(!defaults.bool(forKey: "automaticControlEnabled") && defaults.integer(forKey: "preferencesSchemaVersion") == 2,
               "legacy preferences never authorize automatic control")
@@ -163,8 +166,8 @@ private final class FakeNative {
         let restart = makeMonitor()
         check(restart.chargeLimit == 95 && restart.committedLimit == 85 && native.writeCount == 2,
               "restart restores draft and confirmed separately, writer zero")
-        check(defaults.integer(forKey: "preferencesSchemaVersion") == 2 && restart.heatProtection && restart.maxTemp == 42,
-              "second startup preserves migration")
+        check(defaults.integer(forKey: "preferencesSchemaVersion") == 2 && defaults.bool(forKey: "heatProtection")
+              && defaults.double(forKey: "maxTemp") == 42, "second startup preserves migration")
         monitor.chargeLimit = .nan
         monitor.applyNativeLimit()
         check(!monitor.applyingLimit && native.writeCount == 2, "invalid direct input rejected without integer conversion trap")

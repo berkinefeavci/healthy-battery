@@ -50,8 +50,11 @@ struct AdvancedChargeSettingsView: View {
                             Text("Yelken aralığı: %\(runner.settings.sailingDelta) (şarj %\(runner.settings.targetLimit - runner.settings.sailingDelta) altında yeniden başlar)")
                         }
                     }
-                    Toggle("Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür", isOn: $runner.settings.heatProtectionEnabled)
-                    Toggle("Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur", isOn: $runner.settings.sleepBehaviorEnabled)
+                    // The engine has no heat action in adapter mode (the automatic protection above handles it), so
+                    // the toggle only appears where it can act.
+                    if !adapter.active {
+                        Toggle("Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür", isOn: $runner.settings.heatProtectionEnabled)
+                    }
                     Text("Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir.")
                         .font(.caption2).foregroundStyle(.secondary)
                     if runner.sleepMayOvershoot {
@@ -59,25 +62,32 @@ struct AdvancedChargeSettingsView: View {
                     }
                 }
                 .disabled(!supported)
-                Divider()
-                HStack {
-                    if runner.memory.discharge != nil {
-                        Button("Deşarjı iptal et") { runner.cancelDischarge() }
-                    } else {
-                        Button("Hedefe kadar deşarj et") { runner.requestDischarge() }.disabled(!canDischarge)
+                // Discharge and calibration need a verified charge-inhibit key: on a Mac without one (adapter mode
+                // included) they could never be enabled, so they are hidden, not greyed out. A request that is
+                // already running (restored from disk) can still be cancelled.
+                if canDischarge || runner.memory.discharge != nil || runner.memory.calibration != nil {
+                    Divider()
+                    HStack {
+                        if runner.memory.discharge != nil {
+                            Button("Deşarjı iptal et") { runner.cancelDischarge() }
+                        } else {
+                            Button("Hedefe kadar deşarj et") { runner.requestDischarge() }.disabled(!canDischarge)
+                        }
+                        if runner.memory.calibration != nil {
+                            Button("Kalibrasyonu iptal et") { runner.cancelCalibration() }
+                        } else {
+                            Button("Kalibrasyonu başlat") { runner.startCalibration() }.disabled(!canDischarge)
+                        }
+                        Spacer()
                     }
-                    if runner.memory.calibration != nil {
-                        Button("Kalibrasyonu iptal et") { runner.cancelCalibration() }
-                    } else {
-                        Button("Kalibrasyonu başlat") { runner.startCalibration() }.disabled(!canDischarge)
-                    }
-                    Spacer()
                 }
                 if let error = runner.lastError {
                     Text(error).font(.caption).foregroundStyle(.red)
                 }
-                Text("Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat).")
-                    .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                if canDischarge || runner.memory.calibration != nil {
+                    Text("Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat).")
+                        .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
             }
         }
         .chargeCard()

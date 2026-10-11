@@ -476,19 +476,6 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     }
     /// A Healthy Battery target is only committed after the explicit native Apply readback succeeds.
     @Published private(set) var committedLimit: Int?
-    @Published var sailingEnabled: Bool {
-        didSet { defaults.set(sailingEnabled, forKey: "sailingEnabled") }
-    }
-    @Published var sailingDelta: Double {
-        didSet { defaults.set(sailingDelta, forKey: "sailingDelta") }
-    }
-    @Published var heatProtection: Bool {
-        didSet { defaults.set(heatProtection, forKey: "heatProtection") }
-    }
-    @Published var maxTemp: Double {
-        didSet { defaults.set(maxTemp, forKey: "maxTemp") }
-    }
-    @Published private(set) var heatActive = false
     @Published private(set) var topUpActive = false
     @Published private(set) var topUpRestoreLimit: Int?
     @Published var externalChangeResponse: ExternalChangeResponse {
@@ -567,10 +554,6 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         externalChangeResponse = storedResponse
         policyController.externalChangeResponse = storedResponse
         committedLimit = policyController.policy?.desiredLimit
-        sailingEnabled = defaults.bool(forKey: "sailingEnabled")
-        sailingDelta = Self.saved(defaults, "sailingDelta", fallback: 5, range: 2...15)
-        heatProtection = defaults.object(forKey: "heatProtection") as? Bool ?? false
-        maxTemp = Self.saved(defaults, "maxTemp", fallback: 35, range: 25...45)
         controlRecoveryRequired = policyController.requiresRecovery
         topUpActive = policyController.topUpActive
         topUpRestoreLimit = policyController.topUpRestoreLimit
