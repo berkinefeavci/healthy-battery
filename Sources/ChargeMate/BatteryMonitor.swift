@@ -1333,7 +1333,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     self.selectedPowerMode = self.snapshot.externalConnected ? self.adapterPowerMode : self.batteryPowerMode
                     self.powerModeMessage = nil
                 case .failure(let error):
-                    self.powerModeMessage = error.localizedDescription
+                    // A dismissed administrator prompt is the user's own choice, not a failure to report.
+                    if case .cancelled = error { self.powerModeMessage = nil }
+                    else { self.powerModeMessage = error.localizedDescription }
                 }
                 self.applyingPowerMode = false
                 self.lastPowerModeRead = .distantPast

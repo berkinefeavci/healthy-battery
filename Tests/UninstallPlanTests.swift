@@ -54,6 +54,11 @@ import Foundation
         precondition(UninstallPlan.adminShellCommand(for: [.unregisterLoginItem]) == nil,
                      "no helper steps means no admin command is needed")
 
+        // Only a clean run is "completed"; a step that did not finish is reported, never swallowed.
+        precondition(UninstallOutcome.finish(problems: []) == .completed)
+        precondition(UninstallOutcome.finish(problems: ["limit"]) == .incomplete(["limit"]))
+        precondition(UninstallOutcome.completed != .cancelled && UninstallOutcome.cancelled != .failed("x"))
+
         print("Uninstall plan: default options, helper targets and admin command assertions passed; nothing executed.")
     }
 }

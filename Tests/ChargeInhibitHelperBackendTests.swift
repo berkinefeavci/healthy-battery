@@ -115,6 +115,8 @@ import Foundation
         precondition(command.contains("launchctl bootstrap system /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.chargeinhibit.plist"))
         precondition(command.contains("'/Apps/x y/Helper'"))
         precondition(command.range(of: "codesign --verify")!.lowerBound < command.range(of: "--authorize-uid")!.lowerBound)
+        precondition(!command.contains("\n"))
+        precondition(ChargeInhibitWire.Failure.cancelled != .installFailed && ChargeInhibitWire.Failure.cancelled.errorDescription != nil)
         precondition(ChargeInhibitHelperService.minimumHelperVersion == 2)
         precondition(ChargeInhibitSafety.watchdogTimeout == 60 && ChargeInhibitSafety.criticalPercent == 10)
         print("Charge inhibit backend: wire format, lock, capabilities, heartbeat owner and install command assertions passed; no helper contacted.")
