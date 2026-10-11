@@ -139,7 +139,7 @@ enum ChargePolicyEngine {
             return decision(.recoveryRequired(String(localized: "Top Up için adaptör bağlı olmalı.")), policy: input.policy)
         }
         guard native.availableLimits.contains(100) else {
-            return decision(.recoveryRequired("Bu Mac %100 yerel limitini desteklemiyor."), policy: input.policy)
+            return decision(.recoveryRequired(String(localized: "Bu Mac %100 yerel limitini desteklemiyor.")), policy: input.policy)
         }
         guard native.availableLimits.contains(native.manualLimit) else {
             return decision(.recoveryRequired(String(localized: "Mevcut %\(native.manualLimit) limiti Top Up sonrasında tam olarak geri yüklenemez.")),
@@ -243,7 +243,7 @@ enum ChargePolicyEngine {
         }
         if case .adoptNativeLimit = input.intent {
             guard native.availableLimits.contains(native.manualLimit) else {
-                return decision(.recoveryRequired("Okunan yerel limit desteklenmiyor."), policy: policy)
+                return decision(.recoveryRequired(String(localized: "Okunan yerel limit desteklenmiyor.")), policy: policy)
             }
             policy.desiredLimit = native.manualLimit
             return decision(.maintainingLimit(native.manualLimit), policy: policy)

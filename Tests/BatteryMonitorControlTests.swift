@@ -187,6 +187,7 @@ private final class FakeNative {
         until { !monitor.applyingLimit }
         check(monitor.topUpActive && native.limit == 100 && native.writeCount == 3,
               "Top Up is functional and persists verified 100")
+        check(monitor.actionMessage == nil && monitor.limitFailureMessage == nil, "a working Top Up shows no failure")
         providedSnapshot.externalConnected = false
         providedSnapshot.isCharging = false
         providedSnapshot.wattage = 0
@@ -200,6 +201,22 @@ private final class FakeNative {
         monitor.refresh()
         until { !monitor.topUpActive }
         check(native.writeCount == writesAfterRestore, "ordinary refresh does not duplicate restore")
+        // A refused Top Up start says why (it used to be overwritten by a generic "verified" line and never shown).
+        providedSnapshot.externalConnected = false
+        providedSnapshot.sampledAt = Date()
+        monitor.refresh()
+        until { !monitor.snapshot.externalConnected }
+        monitor.startTopUp()
+        until { !monitor.applyingLimit }
+        check(!monitor.topUpActive && native.writeCount == writesAfterRestore && monitor.actionMessage != nil
+              && monitor.actionMessage != String(localized: "Top Up durumu doğrulandı."),
+              "refused Top Up start keeps its real reason in actionMessage")
+        monitor.dismissFailureMessages()
+        check(monitor.actionMessage == nil, "closing the panel dismisses failure lines")
+        providedSnapshot.externalConnected = true
+        providedSnapshot.sampledAt = Date()
+        monitor.refresh()
+        until { monitor.snapshot.externalConnected }
         native.limit = 90
         providedSnapshot.externalConnected = true
         providedSnapshot.sampledAt = Date()
@@ -279,6 +296,69 @@ private final class FakeNative {
         until { !monitor.applyingLimit && native.limit == 80 }
         check(!monitor.adapterModeActive && monitor.chargeLimit == 80 && monitor.barLimits == [80, 85, 90, 95, 100],
               "leaving adapter mode restores the previous native limit")
+        // A limit write that macOS refuses is shown as a failure line (the popover has room for failures only);
+        // a verified write is not. Clean, separate environments: the one above ends in recovery scenarios.
+        func isolatedMonitor(_ name: String, fake: FakeNative) throws -> BatteryMonitor {
+            let isolatedRoot = root.appendingPathComponent(name)
+            try FileManager.default.createDirectory(at: isolatedRoot, withIntermediateDirectories: true)
+            let isolatedDefaults = UserDefaults(suiteName: suite + "." + name)!
+            isolatedDefaults.removePersistentDomain(forName: suite + "." + name)
+            let backend = fake.backend()
+            let coordinator = ChargeControlCoordinator(journal: isolatedRoot.appendingPathComponent("control-session.json"),
+                                                       backend: backend, rival: { false })
+            let controller = ChargePolicyController(
+                backend: backend, coordinator: coordinator,
+                policyStore: ChargePolicyStore(url: isolatedRoot.appendingPathComponent("charge-policy.json")),
+                sessionStore: TopUpSessionStore(url: isolatedRoot.appendingPathComponent("charge-session.json")),
+                rival: { false })
+            return BatteryMonitor(defaults: isolatedDefaults, policyController: controller,
+                historyURL: isolatedRoot.appendingPathComponent("history.json"),
+                batteryReader: { providedSnapshot }, nativeReader: { fake.read() },
+                controllerRunning: { false }, energyReader: { .success([]) })
+        }
+        do {
+            let fake = FakeNative()
+            let failing = try isolatedMonitor("failure-lines", fake: fake)
+            failing.start()
+            defer { failing.stop() }
+            until { failing.nativeLimit == 90 }
+            fake.reject = true
+            failing.chargeLimit = 95
+            failing.applyNativeLimit()
+            until { !failing.applyingLimit }
+            check(failing.limitFailureMessage != nil && failing.limitMessage == failing.limitFailureMessage,
+                  "a limit write macOS refuses is a failure line")
+            failing.dismissFailureMessages()
+            check(failing.limitFailureMessage == nil && failing.limitMessage == nil, "closing the panel dismisses the limit failure")
+        }
+        do {
+            let fake = FakeNative()
+            let working = try isolatedMonitor("success-lines", fake: fake)
+            working.start()
+            defer { working.stop() }
+            until { working.nativeLimit == 90 }
+            working.chargeLimit = 95
+            working.applyNativeLimit()
+            until { !working.applyingLimit && working.nativeLimit == 95 }
+            check(working.limitMessage != nil && working.limitFailureMessage == nil,
+                  "a verified limit write is a message, not a failure line")
+        }
+        // The long-term summary file failing to save is shown too (it used to be dropped with `try?`).
+        do {
+            let fake = FakeNative()
+            let stuck = try isolatedMonitor("summary-failure", fake: fake)
+            let blockedSummary = root.appendingPathComponent("summary-failure").appendingPathComponent("daily-summary.json")
+            try FileManager.default.createDirectory(at: blockedSummary, withIntermediateDirectories: true)
+            try Data("x".utf8).write(to: blockedSummary.appendingPathComponent("occupied"))
+            providedSnapshot.available = true
+            providedSnapshot.percentage = 70
+            providedSnapshot.sampledAt = Date()
+            stuck.start()
+            defer { stuck.stop() }
+            until { stuck.historyError != nil }
+            check(stuck.historyError?.hasPrefix(String(localized: "Geçmiş kaydedilemiyor: ").prefix(10)) == true,
+                  "a failing long-term summary write surfaces in the history message area")
+        }
         print("BatteryMonitor production integration: \(assertions) assertions passed; isolated defaults/history and fake hardware.")
     }
 }

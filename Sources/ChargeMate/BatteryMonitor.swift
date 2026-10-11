@@ -376,6 +376,10 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     @Published private(set) var otherControllerRunning = false
     @Published private(set) var applyingLimit = false
     @Published private(set) var limitMessage: String?
+    /// True while `limitMessage` explains a write that did not go through (set before the message itself).
+    private var limitMessageIsFailure = false
+    /// The reason the last limit write failed, for the popover (which only has room for failures).
+    var limitFailureMessage: String? { limitMessageIsFailure ? limitMessage : nil }
     @Published private(set) var controlRecoveryRequired = false
     /// Adapter mode (opt-in, set by the wiring controller): `chargeLimit` is the adapter target (20-100) and the
     /// native macOS limit is only a sleep ceiling derived from it.
@@ -488,6 +492,8 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     @Published private(set) var policyState: ChargePolicyState = .idle
     @Published private(set) var policyConflict: (expected: Int, observed: Int)?
     @Published private(set) var controlState: ControlState = .idle
+    /// Why the last Top Up (or the automatic Top Up step) did not go through; nil when it worked. Shown under
+    /// the charge bar in the panel and on the Top Up card in settings.
     @Published private(set) var actionMessage: String?
     enum ControlState: String { case idle, charging, pausedAtLimit, discharging, topUp, sailing, heatProtect }
     private var timer: Timer?
@@ -751,6 +757,37 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         nativeLimits = state.availableLimits
     }
 
+    /// Verified writes (and a reconciled readback) are not failures; a user's own cancel is not one either.
+    private static func isFailure(_ result: ChargeControlCoordinator.Result) -> Bool {
+        ![.configurationVerified, .reconciled, .cancelled].contains(result.status)
+    }
+
+    private func present(limit result: ChargeControlCoordinator.Result) {
+        limitMessageIsFailure = Self.isFailure(result)
+        limitMessage = result.message
+    }
+
+    /// After a Top Up start/cancel: an explicit failure result is shown; otherwise the reason the policy state
+    /// already put there stays (a refused start such as "adapter must be connected" comes back as a read-only
+    /// result, with the real reason in the policy state); a clean run clears the line.
+    private func presentTopUp(_ result: ChargeControlCoordinator.Result) {
+        if Self.isFailure(result) { actionMessage = result.message; return }
+        if case .recoveryRequired = policyState { return }
+        actionMessage = nil
+    }
+
+    private func clearLimitMessage() {
+        limitMessageIsFailure = false
+        limitMessage = nil
+    }
+
+    /// The panel was closed: failures it showed have been seen, so they do not greet the user hours later.
+    func dismissFailureMessages() {
+        precondition(Thread.isMainThread)
+        if actionMessage != nil { actionMessage = nil }
+        if limitMessageIsFailure { clearLimitMessage() }
+    }
+
     /// Only called by an explicit Apply action. Merely opening the app never writes.
     func applyNativeLimit() {
         precondition(Thread.isMainThread)
@@ -764,7 +801,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         cancellationRequested = false
         nativeObservationGeneration += 1
         applyingLimit = true
-        limitMessage = nil
+        clearLimitMessage()
         controlQueue.async {
             let result = self.policyController.applyManualLimit(requested, request: request)
             DispatchQueue.main.async {
@@ -781,7 +818,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     self.defaults.set(requested, forKey: "committedChargeLimit")
                 }
                 self.updatePolicyPresentation()
-                self.limitMessage = result.message
+                self.present(limit: result)
             }
         }
     }
@@ -814,7 +851,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 self.otherControllerRunning = self.controllerRunning()
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
-                self.limitMessage = result.message
+                self.present(limit: result)
             }
         }
     }
@@ -852,7 +889,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 self.lastNativeRead = .distantPast
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
-                self.actionMessage = result.message
+                self.presentTopUp(result)
             }
         }
     }
@@ -870,7 +907,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 self.lastNativeRead = .distantPast
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
-                self.actionMessage = result.message
+                self.presentTopUp(result)
             }
         }
     }
@@ -920,7 +957,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     func applyShortcutLimit(_ limit: Int) async -> ChargeControlCoordinator.Result {
         guard !applyingLimit else { return busyShortcutResult() }
         applyingLimit = true
-        limitMessage = nil
+        clearLimitMessage()
         return await withCheckedContinuation { continuation in
             controlQueue.async { [weak self] in
                 guard let self else {
@@ -936,7 +973,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     if let state = result.state { self.receiveNativeState(state) }
                     if result.status == .configurationVerified { self.chargeLimit = Double(limit) }
                     self.updatePolicyPresentation()
-                    self.limitMessage = result.message
+                    self.present(limit: result)
                     continuation.resume(returning: result)
                 }
             }
@@ -980,7 +1017,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     self.lastNativeRead = .distantPast
                     if let state = result.state { self.receiveNativeState(state) }
                     self.updatePolicyPresentation()
-                    self.actionMessage = result.message
+                    self.presentTopUp(result)
                     continuation.resume(returning: result)
                 }
             }
@@ -1008,7 +1045,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 self.applyingLimit = false
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
-                self.limitMessage = result.message
+                self.present(limit: result)
             }
         }
     }
@@ -1020,11 +1057,13 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         controlQueue.async { [weak self] in
             guard let self else { return }
             let message: String
+            var failed = false
             do { try self.policyController.adoptObservedLimit(); message = String(localized: "macOS limiti Healthy Battery hedefi olarak benimsendi.") }
-            catch { message = String(localized: "macOS limiti benimsenemedi: \(error.localizedDescription)") }
+            catch { failed = true; message = String(localized: "macOS limiti benimsenemedi: \(error.localizedDescription)") }
             DispatchQueue.main.async {
                 self.applyingLimit = false
                 self.updatePolicyPresentation()
+                self.limitMessageIsFailure = failed
                 self.limitMessage = message
             }
         }
@@ -1243,13 +1282,12 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     self.updateDailySummaries(now: now)
                     let summaries = self.dailySummaries
                     if self.historyWritable { self.readerQueue.async {
-                        try? LongTermHistory.write(summaries, to: self.dailySummaryURL)
-                        do {
-                            try archive.write(self.historyURL)
-                            DispatchQueue.main.async { self.historyError = nil }
-                        } catch {
-                            DispatchQueue.main.async { self.historyError = String(localized: "Geçmiş kaydedilemiyor: \(error.localizedDescription)") }
-                        }
+                        // The 24-hour archive and the long-term summary are separate files: either one failing is shown.
+                        var failure: Error?
+                        do { try LongTermHistory.write(summaries, to: self.dailySummaryURL) } catch { failure = error }
+                        do { try archive.write(self.historyURL) } catch { failure = failure ?? error }
+                        let message = failure.map { String(localized: "Geçmiş kaydedilemiyor: \($0.localizedDescription)") }
+                        DispatchQueue.main.async { if self.historyError != message { self.historyError = message } }
                     } }
                 }
             }
@@ -1281,13 +1319,12 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         case .topUpStarting, .topUpCharging: controlState = .topUp
         case .topUpRestoring: controlState = .topUp
         case .recoveryRequired(let message): actionMessage = message
-        case .pausedByConflict(let expected, let observed):
-            actionMessage = String(localized: "Healthy Battery hedefi %\(expected), macOS ayarı %\(observed). Seçiminizi yapın.")
+        case .pausedByConflict: break // The conflict banner already says what differs and offers the choices.
         case .maintainingLimit: if !topUpActive { actionMessage = nil }
-        case .idle: break
+        case .idle: actionMessage = nil
         }
         guard let event else { return }
-        actionMessage = event.message
+        actionMessage = event.kind == .topUpFailed ? event.message : nil
         NotificationCenter.default.post(name: .chargeMatePolicyEvent, object: event)
     }
 

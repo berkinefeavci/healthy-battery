@@ -194,7 +194,6 @@
 "Healthy Battery durumu" = "Statut de Healthy Battery";
 "Healthy Battery hedef doluluğa kadar şarjı izliyor" = "Healthy Battery surveille la charge jusqu’au niveau cible";
 "Healthy Battery hedefi" = "Cible Healthy Battery";
-"Healthy Battery hedefi %%%lld, macOS ayarı %%%lld. Seçiminizi yapın." = "La cible Healthy Battery est de %lld %%, le réglage macOS de %lld %%. Faites votre choix.";
 "Healthy Battery hedefi, native manuel veya geçerli limit" = "Cible Healthy Battery, limite manuelle native ou limite actuelle";
 "Healthy Battery hedefini veya macOS native limitini döndürür." = "Renvoie la cible Healthy Battery ou la limite native de macOS.";
 "Healthy Battery hedefini yeniden uygula" = "Réappliquer la cible Healthy Battery";
@@ -384,7 +383,6 @@
 "Her zaman kapalı" = "Toujours éteint";
 "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir." = "« Toujours éteint » et la plage horaire fonctionnent aussi quand l’app est fermée. Les heures suivent l’heure locale de ce Mac.";
 "Hiçbir şey yapma" = "Ne rien faire";
-"Isı koruması" = "Protection thermique";
 "Isı koruması bekletiyor" = "Retenu par la protection thermique";
 "Işık" = "Voyant";
 "Işık denetimi hazır" = "Contrôle du voyant prêt";
@@ -678,7 +676,6 @@
 "Yüksek Enerji Kullanımı:" = "Forte consommation d’énergie :";
 "Yüksek Güç Modunu aç" = "Activer le mode Haute puissance";
 "Yüksek etki" = "Impact élevé";
-"Yüksek sıcaklıkta şarjı geçici olarak durdurur." = "Met temporairement la charge en pause en cas de température élevée.";
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Charger à 100 % puis rétablir la limite précédente";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Charge à 100 %, puis revient à la limite précédente.";
 "Yüzdeyi göster" = "Afficher le pourcentage";
@@ -882,7 +879,6 @@
 "Kritik seviye" = "Niveau critique";
 "Pilden çalışıyor" = "Sur batterie";
 "Sınırda tutuluyor" = "Maintenu à la limite";
-"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Mise en veille : arrêter la charge au-dessus de la cible avant de dormir";
 "Uyku sırasında hedefin üstüne çıkabilir." = "Peut dépasser la cible pendant la veille.";
 "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Pendant la veille, l'assistant libère tout par sécurité ; la batterie peut dépasser la cible pendant que le Mac dort.";
 "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Plage de navigation : %lld %% (la charge reprend sous %lld %%)";
@@ -998,3 +994,19 @@
 "Yeni çalışma %@ tamamlanamadı: %@" = "La nouvelle exécution %@ ne s’est pas terminée : %@";
 "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "La nouvelle exécution %@ est terminée ; le réglage a été vérifié par relecture.";
 "Yeni çalışma başlatılamadı: görev silinmiş ya da kayıt yazılamadı." = "La nouvelle exécution n’a pas pu démarrer : la tâche a été supprimée ou l’enregistrement n’a pas pu être écrit.";
+"Bu macOS sürümünde yerel limit arayüzü kullanılamıyor." = "L’interface de limite native n’est pas disponible sur cette version de macOS.";
+"Kayıtlı macOS limiti okunamadı." = "La limite macOS enregistrée n’a pas pu être lue.";
+"Desteklenen limitler okunamadı." = "Les limites prises en charge n’ont pas pu être lues.";
+"Beklenmeyen macOS limit listesi." = "macOS a renvoyé une liste de limites inattendue.";
+"macOS şarj durumu okunamadı." = "L’état de charge de macOS n’a pas pu être lu.";
+"Geçerli sistem limiti okunamadı." = "La limite système actuelle n’a pas pu être lue.";
+"Bu şarj limiti desteklenmiyor; değişiklik yapılmadı." = "Cette limite de charge n’est pas prise en charge ; rien n’a été modifié.";
+"macOS limit değişikliğini kabul etmedi." = "macOS n’a pas accepté le changement de limite.";
+"Limit değişikliği okuma ile doğrulanamadı." = "Le changement de limite n’a pas pu être vérifié par relecture.";
+"Geçersiz yardımcı komutu." = "Commande d’assistant non valide.";
+"Yanıt kodlanamadı." = "La réponse n’a pas pu être encodée.";
+"Bu Mac %100 yerel limitini desteklemiyor." = "Ce Mac ne prend pas en charge la limite native de 100 %.";
+"Okunan yerel limit desteklenmiyor." = "La limite lue n’est pas prise en charge.";
+"Etkin bir Healthy Battery hedefi yok." = "Il n’y a aucune cible Healthy Battery active.";
+"Top Up oturumu kaydedilemedi." = "La session Top Up n’a pas pu être enregistrée.";
+"Tamamlanan Top Up oturumu temizlenemedi." = "La session Top Up terminée n’a pas pu être effacée.";

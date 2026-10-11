@@ -92,7 +92,8 @@ struct NativeChargeBackend {
         catch { throw NativeChargeBackendError.malformedResponse }
         guard envelope.schemaVersion == 1 else { throw NativeChargeBackendError.malformedResponse }
         guard result.status == 0, envelope.ok, let raw = envelope.state else {
-            throw NativeChargeBackendError.rejected(envelope.error ?? String(localized: "Yerel şarj işlemi reddedildi."))
+            throw NativeChargeBackendError.rejected(envelope.error.map(Self.localized(helperMessage:))
+                                                    ?? String(localized: "Yerel şarj işlemi reddedildi."))
         }
         let limits = raw.availableLimits.sorted()
         guard Set(limits).count == limits.count,
@@ -103,6 +104,32 @@ struct NativeChargeBackend {
         }
         return NativeChargeState(manualLimit: raw.manualLimit, availableLimits: limits,
                                  enabledRaw: raw.enabledRaw, currentLimit: raw.currentLimit)
+    }
+
+    /// The helper and its PowerUI bridge write their errors in Turkish (the source language). Each known message
+    /// is looked up here so it shows in the app's language; text from macOS itself passes through unchanged.
+    static func localized(helperMessage message: String) -> String { translation(ofHelperMessage: message) ?? message }
+
+    /// True when `message` has a translation entry (checked against the bridge's sources in the tests).
+    static func isTranslated(helperMessage message: String) -> Bool { translation(ofHelperMessage: message) != nil }
+
+    private static func translation(ofHelperMessage message: String) -> String? {
+        switch message {
+        case "Bu macOS sürümünde yerel limit arayüzü kullanılamıyor.":
+            return String(localized: "Bu macOS sürümünde yerel limit arayüzü kullanılamıyor.")
+        case "Kayıtlı macOS limiti okunamadı.": return String(localized: "Kayıtlı macOS limiti okunamadı.")
+        case "Desteklenen limitler okunamadı.": return String(localized: "Desteklenen limitler okunamadı.")
+        case "Beklenmeyen macOS limit listesi.": return String(localized: "Beklenmeyen macOS limit listesi.")
+        case "macOS şarj durumu okunamadı.": return String(localized: "macOS şarj durumu okunamadı.")
+        case "Geçerli sistem limiti okunamadı.": return String(localized: "Geçerli sistem limiti okunamadı.")
+        case "Bu şarj limiti desteklenmiyor; değişiklik yapılmadı.":
+            return String(localized: "Bu şarj limiti desteklenmiyor; değişiklik yapılmadı.")
+        case "macOS limit değişikliğini kabul etmedi.": return String(localized: "macOS limit değişikliğini kabul etmedi.")
+        case "Limit değişikliği okuma ile doğrulanamadı.": return String(localized: "Limit değişikliği okuma ile doğrulanamadı.")
+        case "Geçersiz yardımcı komutu.": return String(localized: "Geçersiz yardımcı komutu.")
+        case "Yanıt kodlanamadı.": return String(localized: "Yanıt kodlanamadı.")
+        default: return nil
+        }
     }
 
     private struct Envelope: Decodable {

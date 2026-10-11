@@ -194,7 +194,6 @@
 "Healthy Battery durumu" = "Healthy Battery durumu";
 "Healthy Battery hedef doluluğa kadar şarjı izliyor" = "Healthy Battery hedef doluluğa kadar şarjı izliyor";
 "Healthy Battery hedefi" = "Healthy Battery hedefi";
-"Healthy Battery hedefi %%%lld, macOS ayarı %%%lld. Seçiminizi yapın." = "Healthy Battery hedefi %%%lld, macOS ayarı %%%lld. Seçiminizi yapın.";
 "Healthy Battery hedefi, native manuel veya geçerli limit" = "Healthy Battery hedefi, native manuel veya geçerli limit";
 "Healthy Battery hedefini veya macOS native limitini döndürür." = "Healthy Battery hedefini veya macOS native limitini döndürür.";
 "Healthy Battery hedefini yeniden uygula" = "Healthy Battery hedefini yeniden uygula";
@@ -384,7 +383,6 @@
 "Her zaman kapalı" = "Her zaman kapalı";
 "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir." = "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir.";
 "Hiçbir şey yapma" = "Hiçbir şey yapma";
-"Isı koruması" = "Isı koruması";
 "Isı koruması bekletiyor" = "Isı koruması bekletiyor";
 "Işık" = "Işık";
 "Işık denetimi hazır" = "Işık denetimi hazır";
@@ -678,7 +676,6 @@
 "Yüksek Enerji Kullanımı:" = "Yüksek Enerji Kullanımı:";
 "Yüksek Güç Modunu aç" = "Yüksek Güç Modunu aç";
 "Yüksek etki" = "Yüksek etki";
-"Yüksek sıcaklıkta şarjı geçici olarak durdurur." = "Yüksek sıcaklıkta şarjı geçici olarak durdurur.";
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Yüzde 100'e şarj et ve önceki limiti geri yükle";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Yüzde 100’e şarj eder, sonra önceki limite döner.";
 "Yüzdeyi göster" = "Yüzdeyi göster";
@@ -882,7 +879,6 @@
 "Kritik seviye" = "Kritik seviye";
 "Pilden çalışıyor" = "Pilden çalışıyor";
 "Sınırda tutuluyor" = "Sınırda tutuluyor";
-"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur";
 "Uyku sırasında hedefin üstüne çıkabilir." = "Uyku sırasında hedefin üstüne çıkabilir.";
 "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir.";
 "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)";
@@ -998,3 +994,19 @@
 "Yeni çalışma %@ tamamlanamadı: %@" = "Yeni çalışma %@ tamamlanamadı: %@";
 "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı.";
 "Yeni çalışma başlatılamadı: görev silinmiş ya da kayıt yazılamadı." = "Yeni çalışma başlatılamadı: görev silinmiş ya da kayıt yazılamadı.";
+"Bu macOS sürümünde yerel limit arayüzü kullanılamıyor." = "Bu macOS sürümünde yerel limit arayüzü kullanılamıyor.";
+"Kayıtlı macOS limiti okunamadı." = "Kayıtlı macOS limiti okunamadı.";
+"Desteklenen limitler okunamadı." = "Desteklenen limitler okunamadı.";
+"Beklenmeyen macOS limit listesi." = "Beklenmeyen macOS limit listesi.";
+"macOS şarj durumu okunamadı." = "macOS şarj durumu okunamadı.";
+"Geçerli sistem limiti okunamadı." = "Geçerli sistem limiti okunamadı.";
+"Bu şarj limiti desteklenmiyor; değişiklik yapılmadı." = "Bu şarj limiti desteklenmiyor; değişiklik yapılmadı.";
+"macOS limit değişikliğini kabul etmedi." = "macOS limit değişikliğini kabul etmedi.";
+"Limit değişikliği okuma ile doğrulanamadı." = "Limit değişikliği okuma ile doğrulanamadı.";
+"Geçersiz yardımcı komutu." = "Geçersiz yardımcı komutu.";
+"Yanıt kodlanamadı." = "Yanıt kodlanamadı.";
+"Bu Mac %100 yerel limitini desteklemiyor." = "Bu Mac %100 yerel limitini desteklemiyor.";
+"Okunan yerel limit desteklenmiyor." = "Okunan yerel limit desteklenmiyor.";
+"Etkin bir Healthy Battery hedefi yok." = "Etkin bir Healthy Battery hedefi yok.";
+"Top Up oturumu kaydedilemedi." = "Top Up oturumu kaydedilemedi.";
+"Tamamlanan Top Up oturumu temizlenemedi." = "Tamamlanan Top Up oturumu temizlenemedi.";

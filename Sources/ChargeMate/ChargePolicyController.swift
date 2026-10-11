@@ -111,7 +111,7 @@ final class ChargePolicyController {
     }
 
     func reapplyPolicy() -> ChargeControlCoordinator.Result {
-        guard let policy, policy.enabled else { return blockedResult("Etkin bir Healthy Battery hedefi yok.", recovery: false) }
+        guard let policy, policy.enabled else { return blockedResult(String(localized: "Etkin bir Healthy Battery hedefi yok."), recovery: false) }
         return applyManualLimit(policy.desiredLimit)
     }
 
@@ -173,11 +173,11 @@ final class ChargePolicyController {
         }
         if let updated = evaluated.session {
             do { try sessionStore.save(updated); session = updated }
-            catch { return persistenceFailure("Top Up oturumu kaydedilemedi.", session: updated) }
+            catch { return persistenceFailure(String(localized: "Top Up oturumu kaydedilemedi."), session: updated) }
         }
         if evaluated.clearSession {
             do { try sessionStore.clear(); session = nil }
-            catch { return persistenceFailure("Tamamlanan Top Up oturumu temizlenemedi.", session: evaluated.session) }
+            catch { return persistenceFailure(String(localized: "Tamamlanan Top Up oturumu temizlenemedi."), session: evaluated.session) }
             return (nil, .init(kind: .topUpFinished,
                                originExecutionID: evaluated.session?.originExecutionID,
                                message: String(localized: "Top Up tamamlandı; önceki limit geri yüklendi.")))

@@ -194,7 +194,6 @@
 "Healthy Battery durumu" = "Healthy Battery status";
 "Healthy Battery hedef doluluğa kadar şarjı izliyor" = "Healthy Battery is monitoring charging up to the target level";
 "Healthy Battery hedefi" = "Healthy Battery target";
-"Healthy Battery hedefi %%%lld, macOS ayarı %%%lld. Seçiminizi yapın." = "The Healthy Battery target is %lld%%, the macOS setting is %lld%%. Make your choice.";
 "Healthy Battery hedefi, native manuel veya geçerli limit" = "Healthy Battery target, native manual or current limit";
 "Healthy Battery hedefini veya macOS native limitini döndürür." = "Returns the Healthy Battery target or the native macOS limit.";
 "Healthy Battery hedefini yeniden uygula" = "Reapply Healthy Battery target";
@@ -384,7 +383,6 @@
 "Her zaman kapalı" = "Always off";
 "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir." = "Always off and time range also work while the app is closed. Times use this Mac's local time.";
 "Hiçbir şey yapma" = "Do nothing";
-"Isı koruması" = "Heat protection";
 "Isı koruması bekletiyor" = "Held by heat protection";
 "Işık" = "Light";
 "Işık denetimi hazır" = "Light control ready";
@@ -678,7 +676,6 @@
 "Yüksek Enerji Kullanımı:" = "High Energy Usage:";
 "Yüksek Güç Modunu aç" = "Turn on High Power Mode";
 "Yüksek etki" = "High impact";
-"Yüksek sıcaklıkta şarjı geçici olarak durdurur." = "Temporarily pauses charging at high temperature.";
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Charge to 100 percent and restore the previous limit";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Charges to 100 percent, then returns to the previous limit.";
 "Yüzdeyi göster" = "Show percentage";
@@ -882,7 +879,6 @@
 "Kritik seviye" = "Critical level";
 "Pilden çalışıyor" = "Running on battery";
 "Sınırda tutuluyor" = "Holding at limit";
-"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Sleep behavior: stop charging above the target before sleeping";
 "Uyku sırasında hedefin üstüne çıkabilir." = "May exceed the target while asleep.";
 "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "During sleep the helper releases everything for safety; the battery may rise above the target while the Mac sleeps.";
 "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Sailing range: %lld%% (charging restarts below %lld%%)";
@@ -998,3 +994,19 @@
 "Yeni çalışma %@ tamamlanamadı: %@" = "New run %@ did not complete: %@";
 "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "New run %@ finished; the setting was verified by reading it back.";
 "Yeni çalışma başlatılamadı: görev silinmiş ya da kayıt yazılamadı." = "The new run could not be started: the task was deleted or the record could not be written.";
+"Bu macOS sürümünde yerel limit arayüzü kullanılamıyor." = "The native limit interface is not available on this macOS version.";
+"Kayıtlı macOS limiti okunamadı." = "The saved macOS limit could not be read.";
+"Desteklenen limitler okunamadı." = "The supported limits could not be read.";
+"Beklenmeyen macOS limit listesi." = "macOS returned an unexpected list of limits.";
+"macOS şarj durumu okunamadı." = "The macOS charging state could not be read.";
+"Geçerli sistem limiti okunamadı." = "The current system limit could not be read.";
+"Bu şarj limiti desteklenmiyor; değişiklik yapılmadı." = "This charge limit is not supported; nothing was changed.";
+"macOS limit değişikliğini kabul etmedi." = "macOS did not accept the limit change.";
+"Limit değişikliği okuma ile doğrulanamadı." = "The limit change could not be verified by reading it back.";
+"Geçersiz yardımcı komutu." = "Invalid helper command.";
+"Yanıt kodlanamadı." = "The reply could not be encoded.";
+"Bu Mac %100 yerel limitini desteklemiyor." = "This Mac does not support the native 100% limit.";
+"Okunan yerel limit desteklenmiyor." = "The limit that was read is not supported.";
+"Etkin bir Healthy Battery hedefi yok." = "There is no active Healthy Battery target.";
+"Top Up oturumu kaydedilemedi." = "The Top Up session could not be saved.";
+"Tamamlanan Top Up oturumu temizlenemedi." = "The finished Top Up session could not be cleared.";

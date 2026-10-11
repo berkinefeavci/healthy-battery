@@ -98,6 +98,14 @@ struct PopoverView: View {
                             .font(.system(size: 10)).foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    // Failures of the last Top Up or limit write. The limit editor shows its own message, so a limit
+                    // failure is listed here only while the editor is closed.
+                    if let failure = battery.actionMessage ?? (limitEditor ? nil : battery.limitFailureMessage) {
+                        Text(failure)
+                            .font(.system(size: 10)).foregroundStyle(.orange)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                     if limitEditor {
                         NativeLimitControls().chargeCard()
                             .transition(.opacity.combined(with: .move(edge: .top)))
@@ -151,6 +159,7 @@ struct PopoverView: View {
         .modifier(WindowSurface())
         .onReceive(NotificationCenter.default.publisher(for: .chargeMatePanelClosed)) { _ in
             editing = false; draft = []; dragging = nil; limitEditor = false; galleryOpen = false
+            battery.dismissFailureMessages()
         }
         .onReceive(NotificationCenter.default.publisher(for: .chargeMatePanelLongPress)) { _ in startEditing() }
         .onExitCommand { AppDelegate.shared?.closePanel() }
@@ -965,6 +974,9 @@ struct SettingsView: View {
                 .disabled(!battery.topUpControlAvailable)
                 .accessibilityLabel(battery.topUpActive ? String(localized: "Doldurmayı iptal et") : String(localized: "Doldurmayı başlat"))
                 .help(battery.topUpActive ? String(localized: "Önceki limite dön") : String(localized: "Yüzde 100'e şarj et ve önceki limiti geri yükle"))
+            }
+            if let failure = battery.actionMessage {
+                Text(failure).font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
             }
         }.chargeCard()
     }
