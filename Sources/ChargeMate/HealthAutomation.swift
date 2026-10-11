@@ -174,7 +174,7 @@ final class HealthAutomation: ObservableObject {
                     }
                     self.heatOverride = record
                     self.heatOverrideActive = true
-                    if modeFrom != nil { battery.applyPowerMode(.automatic, source: .adapter) }
+                    if modeFrom != nil { battery.applyPowerMode(.automatic, source: .adapter, interactive: false) }
                     HealthNotifications.shared.post(
                         identifier: HealthNotifications.heatIdentifier,
                         title: String(localized: "Pil sıcak: şarj sınırı %80'e çekildi"),
@@ -202,7 +202,7 @@ final class HealthAutomation: ObservableObject {
                     try? self.overrideStore.clear()
                     self.heatOverride = nil
                     self.heatOverrideActive = false
-                    if let mode { battery.applyPowerMode(mode, source: .adapter) }
+                    if let mode { battery.applyPowerMode(mode, source: .adapter, interactive: false) }
                 }
             }
         }

@@ -343,6 +343,32 @@ private final class FakeNative {
             check(working.limitMessage != nil && working.limitFailureMessage == nil,
                   "a verified limit write is a message, not a failure line")
         }
+        // Automations (heat protection) write the power mode through an already installed helper only: they never
+        // reach the interactive writer, which would raise an administrator prompt out of the blue.
+        do {
+            var interactiveWrites = 0, automationWrites = 0
+            let fake = FakeNative()
+            let isolatedRoot = root.appendingPathComponent("automation-power")
+            try FileManager.default.createDirectory(at: isolatedRoot, withIntermediateDirectories: true)
+            let backend = fake.backend()
+            let coordinator = ChargeControlCoordinator(journal: isolatedRoot.appendingPathComponent("control-session.json"), backend: backend, rival: { false })
+            let controller = ChargePolicyController(backend: backend, coordinator: coordinator,
+                policyStore: ChargePolicyStore(url: isolatedRoot.appendingPathComponent("charge-policy.json")),
+                sessionStore: TopUpSessionStore(url: isolatedRoot.appendingPathComponent("charge-session.json")), rival: { false })
+            let counting = BatteryMonitor(defaults: UserDefaults(suiteName: suite + ".automation")!, policyController: controller,
+                historyURL: isolatedRoot.appendingPathComponent("history.json"),
+                batteryReader: { BatterySnapshot() }, nativeReader: { fake.read() }, controllerRunning: { false },
+                energyReader: { .success([]) },
+                powerModeWriter: { mode, _ in interactiveWrites += 1; return .success(mode) },
+                automationPowerModeWriter: { _, _ in automationWrites += 1; return .failure(.helperMissing) })
+            counting.applyPowerMode(.automatic, source: .adapter, interactive: false)
+            until { !counting.applyingPowerMode }
+            check(automationWrites == 1 && interactiveWrites == 0, "an automation never uses the prompting writer")
+            check(counting.powerModeMessage == nil, "a missing helper stays quiet for an automation")
+            counting.applyPowerMode(.lowPower, source: .adapter)
+            until { !counting.applyingPowerMode }
+            check(interactiveWrites == 1 && automationWrites == 1, "a user's choice still goes through the interactive writer")
+        }
         // Publish only on change: with unchanged hardware, a refresh wakes SwiftUI once (the snapshot carries a
         // fresh timestamp and must be published), not once per property it re-assigned.
         do {

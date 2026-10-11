@@ -486,6 +486,8 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     private let connectedDeviceReader: () -> [ConnectedDevice]
     private let powerModeReader: () -> SystemPowerModeProfiles?
     private let powerModeWriter: (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError>
+    /// Used by automations (heat protection): only an already installed helper, never an installer prompt.
+    private let automationPowerModeWriter: (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError>
     private let historyURL: URL
     private var pendingRequest: ChargeControlCoordinator.Request?
     @Published private(set) var cancellationRequested = false
@@ -589,6 +591,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
          },
          powerModeWriter: @escaping (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError> = {
              SystemPowerModeService.apply($0, source: $1)
+         },
+         automationPowerModeWriter: @escaping (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError> = {
+             SystemPowerModeService.applyInstalled($0, source: $1)
          }) {
         self.defaults = defaults; self.policyController = policyController; self.historyURL = historyURL
         self.batteryReader = batteryReader; self.nativeReader = nativeReader
@@ -596,6 +601,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         self.connectedDeviceReader = connectedDeviceReader
         self.powerModeReader = powerModeReader
         self.powerModeWriter = powerModeWriter
+        self.automationPowerModeWriter = automationPowerModeWriter
         chargeLimit = Self.saved(defaults, "chargeLimit", fallback: 80, range: 20...100)
         let storedResponse = ExternalChangeResponse(stored: defaults.string(forKey: ExternalChangeResponse.storageKey))
         externalChangeResponse = storedResponse
@@ -625,6 +631,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                      },
                      powerModeWriter: @escaping (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError> = {
                          SystemPowerModeService.apply($0, source: $1)
+                     },
+                     automationPowerModeWriter: @escaping (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError> = {
+                         SystemPowerModeService.applyInstalled($0, source: $1)
                      }) {
         let directory = historyURL.deletingLastPathComponent()
         let controller = ChargePolicyController(
@@ -636,7 +645,8 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                   batteryReader: batteryReader, nativeReader: nativeReader,
                   controllerRunning: controllerRunning, energyReader: energyReader,
                   connectedDeviceReader: connectedDeviceReader,
-                  powerModeReader: powerModeReader, powerModeWriter: powerModeWriter)
+                  powerModeReader: powerModeReader, powerModeWriter: powerModeWriter,
+                  automationPowerModeWriter: automationPowerModeWriter)
     }
 
     static func loadHistory(from url: URL, now: Date = Date()) -> [BatteryHistoryPoint] {
@@ -1406,14 +1416,17 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         applyPowerMode(mode, source: .all)
     }
 
-    func applyPowerMode(_ mode: SystemPowerMode, source: SystemPowerSource) {
+    /// `interactive: false` is for automations: they only use a helper that is already installed and never raise
+    /// an administrator prompt at a moment the user did not choose (and stay quiet when it is missing).
+    func applyPowerMode(_ mode: SystemPowerMode, source: SystemPowerSource, interactive: Bool = true) {
         precondition(Thread.isMainThread)
         guard !applyingPowerMode else { return }
         applyingPowerMode = true
         powerModeMessage = nil
+        let writer = interactive ? powerModeWriter : automationPowerModeWriter
         controlQueue.async { [weak self] in
             guard let self else { return }
-            let result = self.powerModeWriter(mode, source)
+            let result = writer(mode, source)
             DispatchQueue.main.async {
                 switch result {
                 case .success(let confirmed):
@@ -1429,7 +1442,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 case .failure(let error):
                     // A dismissed administrator prompt is the user's own choice, not a failure to report.
                     if case .cancelled = error { self.powerModeMessage = nil }
-                    else { self.powerModeMessage = error.localizedDescription }
+                    else if interactive { self.powerModeMessage = error.localizedDescription }
                 }
                 self.applyingPowerMode = false
                 self.lastPowerModeRead = .distantPast
