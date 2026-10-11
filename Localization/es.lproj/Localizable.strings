@@ -999,3 +999,9 @@
 "Etkin bir Healthy Battery hedefi yok." = "No hay ningún objetivo activo de Healthy Battery.";
 "Top Up oturumu kaydedilemedi." = "No se pudo guardar la sesión de Top Up.";
 "Tamamlanan Top Up oturumu temizlenemedi." = "No se pudo borrar la sesión de Top Up terminada.";
+"Geri Al" = "Deshacer";
+"Yinele" = "Rehacer";
+"Kes" = "Cortar";
+"Kopyala" = "Copiar";
+"Yapıştır" = "Pegar";
+"Tümünü Seç" = "Seleccionar todo";

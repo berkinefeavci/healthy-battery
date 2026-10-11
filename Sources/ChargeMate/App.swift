@@ -233,7 +233,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         appMenu.addItem(withTitle: String(localized: "Healthy Battery’ten çık"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         item.submenu = appMenu
         menu.addItem(item)
+        menu.addItem(editMenuItem())
         NSApp.mainMenu = menu
+    }
+
+    /// The standard Edit menu. Without it ⌘Z/⌘X/⌘C/⌘V/⌘A have nothing to dispatch to, so text fields (schedule
+    /// name, time zone) could not copy or paste; the actions travel the responder chain to the focused field.
+    private func editMenuItem() -> NSMenuItem {
+        let item = NSMenuItem()
+        let menu = NSMenu(title: String(localized: "Düzenle"))
+        menu.addItem(withTitle: String(localized: "Geri Al"), action: Selector(("undo:")), keyEquivalent: "z")
+        let redo = menu.addItem(withTitle: String(localized: "Yinele"), action: Selector(("redo:")), keyEquivalent: "z")
+        redo.keyEquivalentModifierMask = [.command, .shift]
+        menu.addItem(.separator())
+        menu.addItem(withTitle: String(localized: "Kes"), action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+        menu.addItem(withTitle: String(localized: "Kopyala"), action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        menu.addItem(withTitle: String(localized: "Yapıştır"), action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        menu.addItem(withTitle: String(localized: "Tümünü Seç"), action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        item.submenu = menu
+        return item
     }
 
     @objc private func openDashboard() { showSettings(page: .dashboard) }
