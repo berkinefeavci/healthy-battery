@@ -1,6 +1,6 @@
 cask "cellkeep" do
-  version "1.4.1"
-  sha256 "a5adeb88a54655d0d48c1635b6951d26daac41b3b0f43899bd71e79ec3857da6"
+  version "1.4.2"
+  sha256 "65bec5d2105d5823bf24d5a0ab77780799c73f0bf40bf5eaabe8d9d09d5c1691"
 
   url "https://github.com/berkinefeavci/healthy-battery/releases/download/v#{version}/Cellkeep-#{version}.dmg"
   name "Healthy Battery"
@@ -42,9 +42,9 @@ cask "cellkeep" do
       ]
 
   caveats <<~EOS
-    Upgrades keep Cellkeep's helpers. To remove them, use Settings → General → Uninstall
-    Cellkeep first, or `brew uninstall --zap --cask cellkeep`.
-    Cellkeep's charge limit uses macOS's own charge-limit setting, which stays as it was
+    Upgrades keep Healthy Battery's helpers. To remove them, use Settings → General → Uninstall
+    Healthy Battery first, or `brew uninstall --zap --cask cellkeep`.
+    Healthy Battery's charge limit uses macOS's own charge-limit setting, which stays as it was
     after uninstalling. Reset it in System Settings → Battery if you want to.
   EOS
 end
