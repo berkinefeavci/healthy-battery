@@ -290,22 +290,33 @@ private enum ChargeMateShortcutService {
         return try withinDeadline { try NativeChargeBackend.production(helperURL: helper).readState() }
     }
 
+    /// Shortcuts are a Pro feature; the free app keeps its own buttons.
+    private static func requirePro() throws {
+        guard ProAccess.isPro else {
+            throw ChargeMateShortcutError.commandFailed(String(localized: "Kısayollar Healthy Battery Pro ile çalışır."))
+        }
+    }
+
     static func batteryPercentage(_ source: ChargeMateShortcutBatterySource) async throws -> Int {
+        try requirePro()
         let snapshot = try batterySnapshot()
         return try ChargeMateShortcutReader(snapshot: snapshot, now: Date()).percentage(source)
     }
 
     static func temperatureCelsius() async throws -> Double {
+        try requirePro()
         let snapshot = try batterySnapshot()
         return try ChargeMateShortcutReader(snapshot: snapshot, now: Date()).temperatureCelsius()
     }
 
     static func state() async throws -> ChargeMateShortcutState {
+        try requirePro()
         let snapshot = try batterySnapshot()
         return try ChargeMateShortcutReader(snapshot: snapshot, now: Date()).state()
     }
 
     static func chargeLimit(_ source: ChargeMateShortcutLimitSource) async throws -> Int {
+        try requirePro()
         let snapshot: ChargeMateShortcutSnapshot
         if source == .committed {
             let committed = await MainActor.run { BatteryMonitor.shared.committedLimit }
@@ -323,6 +334,7 @@ private enum ChargeMateShortcutService {
     }
 
     static func setChargeLimit(_ limit: Int) async throws -> String {
+        try requirePro()
         guard try nativeState().availableLimits.contains(limit) else {
             throw ChargeMateShortcutError.unsupportedChargeLimit(limit)
         }
@@ -330,6 +342,7 @@ private enum ChargeMateShortcutService {
     }
 
     static func controlTopUp(start: Bool) async throws -> String {
+        try requirePro()
         let snapshot = try withinDeadline { BatteryMonitor.readBattery() }
         let result = start
             ? await BatteryMonitor.shared.startShortcutTopUp(snapshot: snapshot)
@@ -338,6 +351,7 @@ private enum ChargeMateShortcutService {
     }
 
     static func setPowerMode(_ mode: SystemPowerMode) async throws -> String {
+        try requirePro()
         guard SystemPowerModeService.availableModes().contains(mode) else {
             throw ChargeMateShortcutError.commandFailed("\(mode.title) bu Mac'te desteklenmiyor.")
         }
@@ -348,6 +362,7 @@ private enum ChargeMateShortcutService {
     }
 
     static func setMagSafe(_ output: MagSafeLEDOutput) async throws -> String {
+        try requirePro()
         switch MagSafeLEDHardwareService.shared.apply(output) {
         case .applied: return String(localized: "MagSafe ışığı: \(output.rawValue).")
         case .unchanged: return String(localized: "MagSafe ışığı zaten seçilen durumda.")

@@ -52,6 +52,13 @@ final class AdapterModeController: ObservableObject {
         battery.$snapshot.map(\.externalConnected).removeDuplicates().sink { [weak self] plugged in
             if plugged { DispatchQueue.main.async { self?.runPendingSelfTest() } }
         }.store(in: &cancellables)
+        // Adapter mode is Pro: re-check when a license changes and when a trial may have ended.
+        NotificationCenter.default.publisher(for: ProAccess.didChange).sink { [weak self] _ in
+            DispatchQueue.main.async { self?.reconcile() }
+        }.store(in: &cancellables)
+        Timer.publish(every: 900, on: .main, in: .common).autoconnect().sink { [weak self] _ in
+            if self?.enabled == true { self?.reconcile() }
+        }.store(in: &cancellables)
         reconcile()
         runPendingSelfTest()
     }
@@ -62,6 +69,10 @@ final class AdapterModeController: ObservableObject {
     func setEnabled(_ on: Bool) {
         message = nil
         refreshHelperState()
+        if on, !ProAccess.isPro {
+            message = String(localized: "Adaptör modu Healthy Battery Pro ile açılır.")
+            return
+        }
         if on {
             let rivals = ChargeControllerDetector.current()
             if !rivals.isEmpty {
@@ -155,7 +166,7 @@ final class AdapterModeController: ObservableObject {
         refreshHelperState()
         let rival = battery.otherControllerRunning
         var wanted = Kind.none
-        if enabled, helperInstalled, !rival { wanted = .adapter }
+        if enabled, helperInstalled, !rival, ProAccess.isPro { wanted = .adapter }
         else if ChargeInhibitUnlock.isUnlocked() { wanted = .debug }
         if enabled, rival, message == nil {
             message = String(localized: "Başka bir şarj uygulaması açık; adaptör modu bekletiliyor.")

@@ -982,3 +982,36 @@
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır.";
+
+/* Pro and license */
+"Healthy Battery Pro ile açılır." = "Healthy Battery Pro ile açılır.";
+"Pro'ya bak" = "Pro'ya bak";
+"Canlı güç akışı" = "Canlı güç akışı";
+"7 ve 30 günlük geçmiş, uzun süreli sağlık" = "7 ve 30 günlük geçmiş, uzun süreli sağlık";
+"Takvim ve “Şu saatte hazır”" = "Takvim ve “Şu saatte hazır”";
+"Kısayollar ve otomasyon eylemleri" = "Kısayollar ve otomasyon eylemleri";
+"Pro'da neler var" = "Pro'da neler var";
+"Şarj sınırı, Doldur, pil sağlığı ve menü paneli her zaman ücretsiz." = "Şarj sınırı, Doldur, pil sağlığı ve menü paneli her zaman ücretsiz.";
+"Pro açık: erken kullanıcı hediyesi" = "Pro açık: erken kullanıcı hediyesi";
+"Healthy Battery'yi Pro çıkmadan önce kullandığınız için bütün Pro özellikleri bu Mac'te ücretsiz ve kalıcı. Teşekkürler!" = "Healthy Battery'yi Pro çıkmadan önce kullandığınız için bütün Pro özellikleri bu Mac'te ücretsiz ve kalıcı. Teşekkürler!";
+"Pro açık" = "Pro açık";
+"Lisans bu Mac'te kayıtlı. Mac'inizi değiştirirseniz aynı anahtarı yeni Mac'e girin." = "Lisans bu Mac'te kayıtlı. Mac'inizi değiştirirseniz aynı anahtarı yeni Mac'e girin.";
+"Bu Mac'ten lisansı kaldır" = "Bu Mac'ten lisansı kaldır";
+"Pro denemesi: %lld gün kaldı" = "Pro denemesi: %lld gün kaldı";
+"Deneme bitince ücretsiz sürüm devam eder; ayarlarınız ve geçmişiniz silinmez." = "Deneme bitince ücretsiz sürüm devam eder; ayarlarınız ve geçmişiniz silinmez.";
+"Ücretsiz sürüm" = "Ücretsiz sürüm";
+"Pro tek seferlik bir satın alma: abonelik yok, güncellemeler dahil." = "Pro tek seferlik bir satın alma: abonelik yok, güncellemeler dahil.";
+"Pro'yu satın al" = "Pro'yu satın al";
+"Lisans anahtarı" = "Lisans anahtarı";
+"BEA1-…" = "BEA1-…";
+"Etkinleştir" = "Etkinleştir";
+"Bu anahtar geçerli değil ya da Healthy Battery için değil." = "Bu anahtar geçerli değil ya da Healthy Battery için değil.";
+"Satın aldıktan sonra açılan sayfadaki “Uygulamada etkinleştir” düğmesi anahtarı kendiliğinden girer." = "Satın aldıktan sonra açılan sayfadaki “Uygulamada etkinleştir” düğmesi anahtarı kendiliğinden girer.";
+"Adaptör modu Healthy Battery Pro ile açılır." = "Adaptör modu Healthy Battery Pro ile açılır.";
+"7 ve 30 günlük enerji geçmişi" = "7 ve 30 günlük enerji geçmişi";
+"Uzun süreli sağlık geçmişi" = "Uzun süreli sağlık geçmişi";
+"Pro" = "Pro";
+"Kısayollar Healthy Battery Pro ile çalışır." = "Kısayollar Healthy Battery Pro ile çalışır.";
+"Healthy Battery Pro açıldı" = "Healthy Battery Pro açıldı";
+"Lisans etkinleştirilemedi" = "Lisans etkinleştirilemedi";
+"Teşekkürler! Bütün Pro özellikleri bu Mac'te açık." = "Teşekkürler! Bütün Pro özellikleri bu Mac'te açık.";

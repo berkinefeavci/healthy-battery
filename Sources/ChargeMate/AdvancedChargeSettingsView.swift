@@ -16,7 +16,7 @@ struct AdvancedChargeSettingsView: View {
                 Spacer()
                 StatusBadge(text: statusText, color: (supported || adapter.active) ? .green : .secondary, icon: (supported || adapter.active) ? "checkmark.circle" : "lock.fill")
             }
-            adapterModeSection
+            ProGate(feature: String(localized: "Adaptör modu")) { adapterModeSection }
             Divider()
             if adapter.active {
                 // Adapter mode status replaces the generic "locked" text.

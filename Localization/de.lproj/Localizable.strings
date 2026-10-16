@@ -982,3 +982,36 @@
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Anteil an der letzten Messung. Hilfsprozesse einer App werden in einer Zeile zusammengefasst.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Anteil an der gesamten Energiewirkung des Zeitraums (macOS-Messung × Zeit; keine Watt). Daten aus %lld Tagen.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Dieser Mac erlaubt kein Pausieren des Ladens bei angeschlossenem Netzteil; Segeln, Hitzepause, Ruhezustand, Entladen und Kalibrierung werden daher hier nicht angezeigt. Mit eingeschaltetem Netzteilmodus wird das Ziel darüber umgesetzt.";
+
+/* Pro and license */
+"Healthy Battery Pro ile açılır." = "Mit Healthy Battery Pro verfügbar.";
+"Pro'ya bak" = "Pro ansehen";
+"Canlı güç akışı" = "Live-Energiefluss";
+"7 ve 30 günlük geçmiş, uzun süreli sağlık" = "7- und 30-Tage-Verlauf, langfristiger Zustand";
+"Takvim ve “Şu saatte hazır”" = "Zeitplan und „Bereit um“";
+"Kısayollar ve otomasyon eylemleri" = "Kurzbefehle und Automationsaktionen";
+"Pro'da neler var" = "Das bietet Pro";
+"Şarj sınırı, Doldur, pil sağlığı ve menü paneli her zaman ücretsiz." = "Ladelimit, Auffüllen, Batteriezustand und das Menüleistenfenster bleiben immer kostenlos.";
+"Pro açık: erken kullanıcı hediyesi" = "Pro ist aktiv: ein Geschenk für frühe Nutzer";
+"Healthy Battery'yi Pro çıkmadan önce kullandığınız için bütün Pro özellikleri bu Mac'te ücretsiz ve kalıcı. Teşekkürler!" = "Sie haben Healthy Battery schon vor Pro genutzt, deshalb sind alle Pro-Funktionen auf diesem Mac dauerhaft kostenlos. Danke!";
+"Pro açık" = "Pro ist aktiv";
+"Lisans bu Mac'te kayıtlı. Mac'inizi değiştirirseniz aynı anahtarı yeni Mac'e girin." = "Die Lizenz ist auf diesem Mac gespeichert. Geben Sie auf einem neuen Mac denselben Schlüssel ein.";
+"Bu Mac'ten lisansı kaldır" = "Lizenz von diesem Mac entfernen";
+"Pro denemesi: %lld gün kaldı" = "Pro-Test: noch %lld Tage";
+"Deneme bitince ücretsiz sürüm devam eder; ayarlarınız ve geçmişiniz silinmez." = "Nach dem Test läuft die kostenlose Version weiter; Einstellungen und Verlauf bleiben erhalten.";
+"Ücretsiz sürüm" = "Kostenlose Version";
+"Pro tek seferlik bir satın alma: abonelik yok, güncellemeler dahil." = "Pro ist ein einmaliger Kauf: kein Abo, Updates inklusive.";
+"Pro'yu satın al" = "Pro kaufen";
+"Lisans anahtarı" = "Lizenzschlüssel";
+"BEA1-…" = "BEA1-…";
+"Etkinleştir" = "Aktivieren";
+"Bu anahtar geçerli değil ya da Healthy Battery için değil." = "Dieser Schlüssel ist ungültig oder nicht für Healthy Battery.";
+"Satın aldıktan sonra açılan sayfadaki “Uygulamada etkinleştir” düğmesi anahtarı kendiliğinden girer." = "Nach dem Kauf trägt die Taste „In der App aktivieren“ auf der geöffneten Seite den Schlüssel automatisch ein.";
+"Adaptör modu Healthy Battery Pro ile açılır." = "Der Netzteilmodus ist mit Healthy Battery Pro verfügbar.";
+"7 ve 30 günlük enerji geçmişi" = "7- und 30-Tage-Energieverlauf";
+"Uzun süreli sağlık geçmişi" = "Langfristiger Zustandsverlauf";
+"Pro" = "Pro";
+"Kısayollar Healthy Battery Pro ile çalışır." = "Kurzbefehle funktionieren mit Healthy Battery Pro.";
+"Healthy Battery Pro açıldı" = "Healthy Battery Pro ist aktiv";
+"Lisans etkinleştirilemedi" = "Die Lizenz konnte nicht aktiviert werden";
+"Teşekkürler! Bütün Pro özellikleri bu Mac'te açık." = "Danke! Alle Pro-Funktionen sind auf diesem Mac aktiv.";

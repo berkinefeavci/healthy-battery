@@ -1159,7 +1159,7 @@ struct EnergyUsageView: View {
 struct EnergyLeadersCard: View {
     @EnvironmentObject var battery: BatteryMonitor
     @ObservedObject private var store = EnergyLedgerStore.shared
-    @State private var period = EnergyLedger.Period.week
+    @State private var period = ProAccess.isPro ? EnergyLedger.Period.week : .now
 
     private var rows: [EnergyLedger.Row] {
         store.ledger.rows(for: period, current: battery.energyApps, now: Date())
@@ -1178,7 +1178,9 @@ struct EnergyLeadersCard: View {
                 }
                 .pickerStyle(.segmented).labelsHidden().frame(width: 210)
             }
-            if rows.isEmpty {
+            if period != .now && !ProAccess.isPro {
+                ProLockedCard(feature: String(localized: "7 ve 30 günlük enerji geçmişi"))
+            } else if rows.isEmpty {
                 Text(period == .now ? "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir."
                      : "Geçmiş birikiyor; Healthy Battery açık kaldıkça bu grafik dolar.")
                     .font(.system(size: 12)).foregroundStyle(.secondary).frame(height: 26, alignment: .leading)

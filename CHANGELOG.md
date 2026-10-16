@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased (1.5.0)
+
+- Healthy Battery Pro. The charge limit, Top Up, battery health and the menu panel stay free. Live power flow, 7- and 30-day history and long-term health, the schedule and "Ready by", Shortcuts, heat protection and adapter mode are Pro.
+- Everyone who used Healthy Battery before this version keeps every Pro feature for free, for good. New installs get a 7-day Pro trial; afterwards the free version carries on and nothing is deleted.
+- Settings → Pro shows your status, takes a license key and opens the purchase page. Pro is a one-time purchase. The key is checked offline; `healthybattery://activate?key=…` links from the purchase page enter it for you.
+- Without Pro, scheduled tasks are recorded as unsupported instead of run, heat protection gives the previous limit back, and adapter mode stays off.
+
 ## 1.4.2
 
 - Adapter mode tests itself. Right after the charge helper is installed (or the next time the adapter is plugged in), Healthy Battery cuts the adapter, waits for the battery gauge to report that the battery really powers the Mac (it reports only about once a minute), brings the adapter back, then cuts it once more without heartbeats and checks that the helper's 60-second safety timer restores it. It takes a few minutes and always ends with the adapter on. Adapter mode can be turned on only after this test passes; the result is shown in Settings → Charge Control.
