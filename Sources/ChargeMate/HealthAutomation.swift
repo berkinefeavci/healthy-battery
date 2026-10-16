@@ -56,7 +56,8 @@ final class HealthAutomation: ObservableObject {
         }
     }
 
-    private var heatEnabled: Bool { defaults.bool(forKey: Keys.heatProtectionV1) }
+    // Pro feature. Losing Pro turns it off, and the restore path below gives the old limit back.
+    private var heatEnabled: Bool { defaults.bool(forKey: Keys.heatProtectionV1) && ProAccess.isPro }
     private var dwellEnabled: Bool { defaults.object(forKey: Keys.fullChargeDwell) as? Bool ?? true }
 
     private func observe(_ snapshot: BatterySnapshot) {

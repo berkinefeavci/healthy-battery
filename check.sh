@@ -219,6 +219,15 @@ xcrun swiftc Sources/ChargeMate/SettingsPage.swift Tests/SettingsPageTests.swift
   -o .build/checks/settings-page-tests
 .build/checks/settings-page-tests
 
+# Pro license keys are verified offline; the vector is shared with lisans-sunucusu/test/vector.json.
+xcrun swiftc Sources/ChargeMate/License.swift Tests/LicenseTests.swift -o .build/checks/license-tests
+.build/checks/license-tests
+# Pro gates: logic that runs without UI must check ProAccess too, not only the views.
+grep -Fq 'ProAccess.isPro ? battery?.scheduleCapabilities' Sources/ChargeMate/App.swift
+grep -Fq '&& ProAccess.isPro }' Sources/ChargeMate/HealthAutomation.swift
+grep -Fq '!rival, ProAccess.isPro { wanted = .adapter }' Sources/ChargeMate/AdapterModeController.swift
+test "$(grep -c 'try requirePro()' Sources/ChargeMate/ChargeMateIntents.swift)" = "8"
+
 xcrun swiftc Sources/ChargeMate/SettingsLayout.swift Tests/SettingsLayoutTests.swift \
   -o .build/checks/settings-layout-tests
 .build/checks/settings-layout-tests

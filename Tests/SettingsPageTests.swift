@@ -20,6 +20,7 @@ import Foundation
             .shortcuts: "Kısayollar",
             .popover: "Açılır Panel",
             .menubar: "Menü Çubuğu",
+            .pro: "Pro",
             .general: "Genel",
             .magsafeLED: "MagSafe Işığı",
             .about: "Hakkında"

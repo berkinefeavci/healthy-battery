@@ -23,6 +23,9 @@ enum ChargeMateApp {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         IdentityMigration.runIfNeeded(oldSupportDirectory: support.appendingPathComponent("ChargeMate"),
                                        newSupportDirectory: support.appendingPathComponent("Cellkeep"))
+        // Same timing rule: decide "existing user (Pro kept free)" vs "new install (7-day trial)"
+        // before BatteryMonitor creates anything that would make every Mac look like an existing user.
+        ProAccess.bootstrapIfNeeded(supportDirectory: support.appendingPathComponent("Cellkeep"))
         let app = NSApplication.shared
         let delegate = AppDelegate()
         app.delegate = delegate
@@ -90,7 +93,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         scheduleRuntime = ScheduleRuntime(
             directory: supportDirectory,
             manualOperationActive: { [weak battery] in battery?.scheduleOperationActive ?? true },
-            capabilities: { [weak battery] in battery?.scheduleCapabilities ?? .unavailable },
+            // The schedule is Pro: without it every task is recorded as unsupported instead of run.
+            capabilities: { [weak battery] in ProAccess.isPro ? battery?.scheduleCapabilities ?? .unavailable : .unavailable },
             chargeLimit: { [weak battery] limit in
                 battery?.applyScheduledLimit(limit)
                     ?? .init(operationID: UUID(), status: .rejected, state: nil, message: String(localized: "Healthy Battery kullanılamıyor."))
@@ -399,6 +403,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         if notification.object as? NSWindow === settingsWindow { battery.settingsVisible = false }
+    }
+
+    /// healthybattery://activate?key=… from the page shown after buying.
+    func application(_ application: NSApplication, open urls: [URL]) {
+        guard let key = urls.lazy.compactMap(ProAccess.key(fromActivationURL:)).first else { return }
+        let ok = ProAccess.activate(key)
+        showSettings(page: .pro)
+        let alert = NSAlert()
+        alert.messageText = ok ? String(localized: "Healthy Battery Pro açıldı") : String(localized: "Lisans etkinleştirilemedi")
+        alert.informativeText = ok ? String(localized: "Teşekkürler! Bütün Pro özellikleri bu Mac'te açık.")
+            : String(localized: "Bu anahtar geçerli değil ya da Healthy Battery için değil.")
+        alert.runModal()
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

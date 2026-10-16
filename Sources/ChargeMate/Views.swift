@@ -366,7 +366,10 @@ struct PopoverView: View {
                 Divider()
                 PowerModeQuickControl(compact: true)
             }.frame(maxWidth: .infinity, alignment: .leading).chargeCard()
-        case .powerFlow: PowerFlowView(snapshot: battery.snapshot, connectedDevices: battery.connectedDevices)
+        case .powerFlow:
+            ProGate(feature: String(localized: "Canlı güç akışı")) {
+                PowerFlowView(snapshot: battery.snapshot, connectedDevices: battery.connectedDevices)
+            }
         case .significantEnergy: EnergyUsageView(compact: true, maximumApps: 2, square: square)
         case .powerMode:
             PowerModeQuickControl().chargeCard()
@@ -729,7 +732,7 @@ struct SettingsView: View {
                 sidebarGroup(String(localized: "PİL BAKIMI"), pages: [.charge, .sleep, .energy])
                 sidebarGroup(String(localized: "OTOMASYONLAR"), pages: [.schedule, .shortcuts])
                 sidebarGroup(String(localized: "GÖRÜNÜM"), pages: [.popover, .menubar])
-                sidebarGroup(String(localized: "DİĞER"), pages: [.general, .magsafeLED, .about])
+                sidebarGroup(String(localized: "DİĞER"), pages: [.pro, .general, .magsafeLED, .about])
                 Spacer()
                 Divider().padding(.horizontal, 10)
                 HStack {
@@ -813,7 +816,9 @@ struct SettingsView: View {
             AdvancedChargeSettingsView(runner: AdvancedChargeRunner.shared)
         case .energy:
             EnergyUsageView()
-            PowerFlowView(snapshot: battery.snapshot, connectedDevices: battery.connectedDevices).chargeCard()
+            ProGate(feature: String(localized: "Canlı güç akışı")) {
+                PowerFlowView(snapshot: battery.snapshot, connectedDevices: battery.connectedDevices).chargeCard()
+            }
             QuickStatsView().chargeCard()
             VStack(spacing: 12) {
                 energyDetailRow(String(localized: "Gerilim"), value: battery.snapshot.reading(.voltage).text(digits: 2))
@@ -827,9 +832,13 @@ struct SettingsView: View {
         case .sleep:
             SleepBehaviorView()
         case .schedule:
-            ScheduleView(storageDirectory: scheduleStorageDirectory)
+            ProGate(feature: String(localized: "Takvim ve “Şu saatte hazır”")) {
+                ScheduleView(storageDirectory: scheduleStorageDirectory)
+            }
         case .shortcuts:
-            ShortcutsSettingsView()
+            ProGate(feature: String(localized: "Kısayollar ve otomasyon eylemleri")) { ShortcutsSettingsView() }
+        case .pro:
+            ProSettingsView()
         case .popover: AppearanceView()
         case .menubar: MenubarSettingsView()
         case .general: GeneralSettingsView()

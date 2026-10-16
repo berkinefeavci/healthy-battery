@@ -39,7 +39,11 @@ struct HealthSettingsCards: View {
     var automationCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Otomatik koruma", systemImage: "thermometer.snowflake").font(.headline)
-            TrailingToggle(title: String(localized: "Sıcaklık koruması (sınırı %80'e çeker)"), isOn: $heatProtection)
+            if ProAccess.isPro {
+                TrailingToggle(title: String(localized: "Sıcaklık koruması (sınırı %80'e çeker)"), isOn: $heatProtection)
+            } else {
+                ProLockedCard(feature: String(localized: "Sıcaklık koruması"))
+            }
             Text("Pil adaptörde şarj olurken 35 °C'yi geçerse sınır geçici olarak %80 olur, Turbo kapanır ve bildirim gelir. 32 °C'ye inince ya da adaptör çıkınca eski ayar döner. Pil zaten %80'in altındaysa şarjı durduramaz.")
                 .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             if automation.heatOverrideActive {

@@ -24,6 +24,17 @@
 	</array>
 	<key>CFBundleName</key>
 	<string>Healthy Battery</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>io.github.berkinefeavci.cellkeep.activate</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>healthybattery</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

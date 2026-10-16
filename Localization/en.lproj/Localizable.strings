@@ -982,3 +982,36 @@
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Share of the latest reading. Helper processes of an app are combined into one row.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Share of the period's total energy impact (macOS reading × time; not watts). %lld days of data.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "This Mac does not let apps pause charging while plugged in, so sailing, heat pause, sleep behavior, discharge and calibration are not shown here. With adapter mode on, the target limit is applied through it.";
+
+/* Pro and license */
+"Healthy Battery Pro ile açılır." = "Unlocks with Healthy Battery Pro.";
+"Pro'ya bak" = "See Pro";
+"Canlı güç akışı" = "Live power flow";
+"7 ve 30 günlük geçmiş, uzun süreli sağlık" = "7- and 30-day history, long-term health";
+"Takvim ve “Şu saatte hazır”" = "Schedule and “Ready by”";
+"Kısayollar ve otomasyon eylemleri" = "Shortcuts and automation actions";
+"Pro'da neler var" = "What Pro includes";
+"Şarj sınırı, Doldur, pil sağlığı ve menü paneli her zaman ücretsiz." = "The charge limit, Top Up, battery health and the menu panel are always free.";
+"Pro açık: erken kullanıcı hediyesi" = "Pro is on: an early-user gift";
+"Healthy Battery'yi Pro çıkmadan önce kullandığınız için bütün Pro özellikleri bu Mac'te ücretsiz ve kalıcı. Teşekkürler!" = "You used Healthy Battery before Pro existed, so every Pro feature is free on this Mac, for good. Thank you!";
+"Pro açık" = "Pro is on";
+"Lisans bu Mac'te kayıtlı. Mac'inizi değiştirirseniz aynı anahtarı yeni Mac'e girin." = "The license is saved on this Mac. If you change Macs, enter the same key on the new one.";
+"Bu Mac'ten lisansı kaldır" = "Remove the license from this Mac";
+"Pro denemesi: %lld gün kaldı" = "Pro trial: %lld days left";
+"Deneme bitince ücretsiz sürüm devam eder; ayarlarınız ve geçmişiniz silinmez." = "When the trial ends, the free version carries on; your settings and history stay.";
+"Ücretsiz sürüm" = "Free version";
+"Pro tek seferlik bir satın alma: abonelik yok, güncellemeler dahil." = "Pro is a one-time purchase: no subscription, updates included.";
+"Pro'yu satın al" = "Buy Pro";
+"Lisans anahtarı" = "License key";
+"BEA1-…" = "BEA1-…";
+"Etkinleştir" = "Activate";
+"Bu anahtar geçerli değil ya da Healthy Battery için değil." = "This key isn’t valid, or it isn’t for Healthy Battery.";
+"Satın aldıktan sonra açılan sayfadaki “Uygulamada etkinleştir” düğmesi anahtarı kendiliğinden girer." = "After buying, the “Activate in the app” button on the page that opens enters the key for you.";
+"Adaptör modu Healthy Battery Pro ile açılır." = "Adapter mode unlocks with Healthy Battery Pro.";
+"7 ve 30 günlük enerji geçmişi" = "7- and 30-day energy history";
+"Uzun süreli sağlık geçmişi" = "Long-term health history";
+"Pro" = "Pro";
+"Kısayollar Healthy Battery Pro ile çalışır." = "Shortcuts work with Healthy Battery Pro.";
+"Healthy Battery Pro açıldı" = "Healthy Battery Pro is on";
+"Lisans etkinleştirilemedi" = "The license couldn’t be activated";
+"Teşekkürler! Bütün Pro özellikleri bu Mac'te açık." = "Thank you! Every Pro feature is on for this Mac.";
