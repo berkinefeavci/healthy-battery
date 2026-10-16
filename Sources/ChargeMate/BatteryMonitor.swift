@@ -376,10 +376,50 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     @Published private(set) var applyingLimit = false
     @Published private(set) var limitMessage: String?
     @Published private(set) var controlRecoveryRequired = false
+    /// Adapter mode (opt-in, set by the wiring controller): `chargeLimit` is the adapter target (20-100) and the
+    /// native macOS limit is only a sleep ceiling derived from it.
+    @Published private(set) var adapterModeActive = false
+    /// The user's native limit choice from before adapter mode, restored when it ends.
+    private var limitBeforeAdapterMode: Double? {
+        get { defaults.object(forKey: "limitBeforeAdapterMode") as? Double }
+        set { if let newValue { defaults.set(newValue, forKey: "limitBeforeAdapterMode") } else { defaults.removeObject(forKey: "limitBeforeAdapterMode") } }
+    }
+    /// Native sleep ceiling for an adapter target: max(80, target rounded up to 5), at most 100.
+    static func adapterCeiling(forTarget target: Int) -> Int { min(100, max(80, (target + 4) / 5 * 5)) }
+    /// Limits the main bar may select: 20-100 in steps of 5 in adapter mode, the native limits otherwise.
+    var barLimits: [Int] { adapterModeActive ? Array(stride(from: 20, through: 100, by: 5)) : nativeLimits }
+    /// The limit the native layer should hold for the current draft.
+    private var requestedNativeLimit: Int {
+        adapterModeActive ? Self.adapterCeiling(forTarget: Int(chargeLimit)) : Int(chargeLimit)
+    }
+    /// The target shown on the bar and in the toolbar.
+    var shownTarget: Int {
+        adapterModeActive ? Int(chargeLimit) : ChargeLimitDisplay.shown(native: nativeLimit, preference: chargeLimit)
+    }
     var hardwareControlAvailable: Bool {
         chargeLimit.isFinite && (0...100).contains(chargeLimit)
             && !controlRecoveryRequired && !otherControllerRunning && !applyingLimit
-            && nativeLimits.contains(Int(chargeLimit))
+            && nativeLimits.contains(requestedNativeLimit)
+    }
+
+    /// Switches adapter mode on/off. Turning it on keeps the macOS limit as a sleep ceiling; turning it off
+    /// restores the user's earlier limit (at least 80) and applies it.
+    func setAdapterMode(active: Bool) {
+        precondition(Thread.isMainThread)
+        guard active != adapterModeActive else { return }
+        if active {
+            if limitBeforeAdapterMode == nil {
+                limitBeforeAdapterMode = Double(max(80, nativeLimit ?? Int(chargeLimit)))
+            }
+            adapterModeActive = true
+        } else {
+            adapterModeActive = false
+            let saved = max(80, Int(limitBeforeAdapterMode ?? 80))
+            limitBeforeAdapterMode = nil
+            let options = nativeLimits.filter { $0 >= 80 }
+            chargeLimit = Double(options.min(by: { abs($0 - saved) < abs($1 - saved) }) ?? saved)
+        }
+        applyNativeLimit()
     }
     var topUpControlAvailable: Bool {
         if topUpActive { return !applyingLimit && !controlRecoveryRequired }
@@ -447,6 +487,14 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     }
     @Published private(set) var heatActive = false
     @Published private(set) var topUpActive = false
+    @Published private(set) var topUpRestoreLimit: Int?
+    @Published var externalChangeResponse: ExternalChangeResponse {
+        didSet {
+            defaults.set(externalChangeResponse.rawValue, forKey: ExternalChangeResponse.storageKey)
+            let response = externalChangeResponse
+            controlQueue.async { [policyController] in policyController.externalChangeResponse = response }
+        }
+    }
     @Published private(set) var policyState: ChargePolicyState = .idle
     @Published private(set) var policyConflict: (expected: Int, observed: Int)?
     @Published private(set) var controlState: ControlState = .idle
@@ -465,6 +513,8 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     private var lastPowerModeRead = Date.distantPast
     private var lastPolicyEvaluation = Date.distantPast
     private var lastExternalConnected: Bool?
+    /// Main-thread hook for every fresh snapshot (advanced charge engine); nil keeps behaviour unchanged.
+    var snapshotObserver: ((BatterySnapshot) -> Void)?
     private var pendingPolicyTrigger: ChargePolicyTrigger = .startup
     var panelVisible = false
     var settingsVisible = false
@@ -510,6 +560,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         self.powerModeReader = powerModeReader
         self.powerModeWriter = powerModeWriter
         chargeLimit = Self.saved(defaults, "chargeLimit", fallback: 80, range: 20...100)
+        let storedResponse = ExternalChangeResponse(stored: defaults.string(forKey: ExternalChangeResponse.storageKey))
+        externalChangeResponse = storedResponse
+        policyController.externalChangeResponse = storedResponse
         committedLimit = policyController.policy?.desiredLimit
         sailingEnabled = defaults.bool(forKey: "sailingEnabled")
         sailingDelta = Self.saved(defaults, "sailingDelta", fallback: 5, range: 2...15)
@@ -517,6 +570,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         maxTemp = Self.saved(defaults, "maxTemp", fallback: 35, range: 25...45)
         controlRecoveryRequired = policyController.requiresRecovery
         topUpActive = policyController.topUpActive
+        topUpRestoreLimit = policyController.topUpRestoreLimit
         policyState = policyController.state
         if controlRecoveryRequired { limitMessage = String(localized: "Önceki şarj işlemi doğrulama bekliyor; macOS Batarya ayarını kontrol edin.") }
         // v0.3 stored a single target and enabled Heat by default. Keep the user's
@@ -716,7 +770,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         precondition(Thread.isMainThread)
         otherControllerRunning = controllerRunning()
         guard hardwareControlAvailable else { return }
-        let requested = Int(chargeLimit)
+        let requested = requestedNativeLimit
+        // Adapter mode re-applies on every target change; skip when the ceiling already holds.
+        if adapterModeActive, committedLimit == requested, nativeLimit == requested { return }
         let request = ChargeControlCoordinator.Request(requested)
         pendingRequest = request
         cancellationRequested = false
@@ -754,7 +810,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
 
     func cancelDraftLimit() {
         precondition(Thread.isMainThread)
-        guard !applyingLimit, let saved = nativeLimit ?? committedLimit else { return }
+        guard !applyingLimit, !adapterModeActive, let saved = nativeLimit ?? committedLimit else { return }
         chargeLimit = Double(saved)
     }
 
@@ -851,6 +907,19 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
 
     func applyScheduledLimit(_ limit: Int) -> ChargeControlCoordinator.Result {
         controlQueue.sync { policyController.applyManualLimit(limit, source: .schedule) }
+    }
+
+    /// Isı koruması gibi otomasyonlar için eşzamanlı yazma; ana iş parçacığı dışından çağrılmalı.
+    /// Sonuç okunan yerel durum ana kuyrukta yayınlanır, böylece sonraki karar eski değeri görmez.
+    func applyAutomationLimit(_ limit: Int, source: ChargeControlCoordinator.Source) -> ChargeControlCoordinator.Result {
+        let result = controlQueue.sync { policyController.applyManualLimit(limit, source: source) }
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.lastNativeRead = .distantPast
+            if let state = result.state { self.receiveNativeState(state) }
+            self.updatePolicyPresentation()
+        }
+        return result
     }
 
     func startScheduledTopUp(executionID: UUID) -> ChargeControlCoordinator.Result {
@@ -1132,6 +1201,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 guard let self else { return }
                 self.reading = false
                 self.snapshot = value
+                self.snapshotObserver?(value)
                 if let devices { self.connectedDevices = devices }
                 self.lowPowerModeEnabled = ProcessInfo.processInfo.isLowPowerModeEnabled
                 if let powerModes {
@@ -1212,6 +1282,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         policyState = policyController.state
         policyConflict = policyController.conflict
         topUpActive = policyController.topUpActive
+        topUpRestoreLimit = policyController.topUpRestoreLimit
         controlRecoveryRequired = policyController.requiresRecovery
         if let desired = policyController.policy?.desiredLimit {
             committedLimit = desired

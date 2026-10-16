@@ -74,6 +74,8 @@ struct GeneralSettingsView: View {
             }
             .chargeCard()
 
+            ReminderSettingsCard()
+
             VStack(alignment: .leading, spacing: 14) {
                 Label("Dil", systemImage: "globe").font(.headline)
                 HStack {

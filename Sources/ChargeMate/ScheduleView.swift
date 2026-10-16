@@ -3,8 +3,10 @@ import SwiftUI
 private enum ScheduleSheet: Identifiable {
     case editor(ScheduleTask)
     case execution(ScheduleExecutionRecord)
+    case readyBy
     var id: String {
         switch self {
+        case .readyBy: return "ready-by"
         case .editor(let task): return "editor-\(task.id.uuidString)"
         case .execution(let record): return "execution-\(record.executionID.uuidString)"
         }
@@ -46,6 +48,8 @@ struct ScheduleView: View {
                     ForEach(ScheduleTemplate.allCases) { template in
                         Button(template.title) { presentedSheet = .editor(template.task(now: Date())) }
                     }
+                    Divider()
+                    Button(String(localized: "Şu saatte %100 hazır olsun…")) { presentedSheet = .readyBy }
                 } label: { Label("Şablon", systemImage: "wand.and.stars") }
                 Button { presentedSheet = .editor(.new(now: Date())) } label: { Label("Görev ekle", systemImage: "plus") }
                     .chargeMateButtonStyle()
@@ -83,6 +87,11 @@ struct ScheduleView: View {
                     else { tasks.append(saved) }
                     presentedSheet = nil; persist()
                 } onCancel: { presentedSheet = nil }
+            case .readyBy:
+                ReadyBySheet(rateSamples: battery.history.map {
+                    ChargeRateSample(date: $0.date, percentage: $0.percentage ?? 0,
+                                     isCharging: ($0.percentage != nil) && ($0.wattage ?? 0) > 0)
+                }, onCreate: { presentedSheet = .editor($0) }, onCancel: { presentedSheet = nil })
             case .execution(let record):
                 ScheduleExecutionDetailView(record: record,
                     taskName: tasks.first(where: { $0.id == record.taskID })?.name ?? String(localized: "Silinmiş görev"),

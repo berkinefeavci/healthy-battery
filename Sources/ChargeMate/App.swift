@@ -102,6 +102,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         scheduleRuntime?.start()
         // A no-op when the user turned the daily release check off.
         UpdateNotifications.shared.start()
+        HealthAutomation.shared.start()
+        ReminderCenter.shared.presenter.anchor = { [weak self] in self?.statusButtonFrame }
+        ReminderCenter.shared.presenter.appPanelOpen = { [weak self] in self?.panel?.isVisible ?? false }
+        ReminderCenter.shared.start()
+        DispatchQueue.global(qos: .utility).async { SystemPowerModeService.warmUpCapabilities() }
         GlobalHotKey.shared.action = { [weak self] in self?.togglePanel(nil) }
         GlobalHotKey.shared.apply(.current)
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -183,11 +188,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(refreshMenuAppearance), name: NSColor.systemColorsDidChangeNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(workspaceDidWake),
                                                           name: NSWorkspace.didWakeNotification, object: nil)
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(workspaceWillSleep),
+                                                          name: NSWorkspace.willSleepNotification, object: nil)
+        // Inert until a supported ChargeInhibitBackend is injected into AdvancedChargeRunner.shared.
+        AdvancedChargeRunner.shared.start()
+        AdapterModeController.shared.start()
+        battery.snapshotObserver = { [weak battery] snapshot in
+            guard let percentage = snapshot.percentage ?? snapshot.hardwarePercentage else { return }
+            AdvancedChargeRunner.shared.update(percentage: percentage, temperatureC: snapshot.temperatureC,
+                                               externalConnected: snapshot.externalConnected, isCharging: snapshot.isCharging,
+                                               topUpActive: battery?.topUpActive ?? false)
+        }
         installApplicationMenu()
         ChartTrackingView.isPanelWindow = { $0 is MenuPanel }
         if UserDefaults.standard.bool(forKey: "showPanelAtLaunch") {
-            DispatchQueue.main.async { [weak self] in self?.togglePanel(nil) }
+            DispatchQueue.main.async { [weak self] in self?.showPanelAtLaunch() }
         }
+    }
+
+    /// Açılışta durum öğesi menü çubuğuna yerleşene kadar bekler (en çok ~3 sn); yoksa
+    /// panel öğenin geçici çerçevesine göre ekranın sol altında açılıyordu.
+    private func showPanelAtLaunch(attempt: Int = 0) {
+        guard !panel.isVisible else { return }
+        if statusButtonFrame == nil && attempt < 30 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.showPanelAtLaunch(attempt: attempt + 1)
+            }
+            return
+        }
+        togglePanel(nil)
     }
 
     private func installApplicationMenu() {
@@ -218,7 +247,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     @objc private func refreshMenuAppearance() { updateMenuBar() }
-    @objc private func workspaceDidWake() { battery.handleWake() }
+    @objc private func workspaceDidWake() {
+        AdvancedChargeRunner.shared.setSleepState(.awake)
+        MainActor.assumeIsolated { ReminderCenter.shared.systemDidWake() }
+        battery.handleWake()
+    }
+    @objc private func workspaceWillSleep() {
+        AdvancedChargeRunner.shared.setSleepState(.asleep)
+        MainActor.assumeIsolated { ReminderCenter.shared.systemWillSleep() }
+    }
 
     private func updateMenuBar() {
         guard let button = statusItem?.button else { return }
@@ -274,9 +311,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     @objc func togglePanel(_ sender: Any?) {
         if panel.isVisible { closePanel(); return }
-        guard let button = statusItem?.button, let window = button.window else { return }
-        let anchor = window.convertToScreen(button.convert(button.bounds, to: nil))
-        let screen = (window.screen ?? NSScreen.main)?.visibleFrame ?? anchor
+        let screen = (statusItem?.button?.window?.screen ?? NSScreen.main)?.visibleFrame
+            ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+        // Öğe henüz yerleşmemişse sağ üst köşeye, menü çubuğunun hemen altına açılır.
+        let anchor = statusButtonFrame
+            ?? NSRect(x: screen.maxX - PanelSizeMode.current.width / 2 - PanelSizing.horizontalMargin,
+                      y: screen.maxY + PanelSizing.anchorGap, width: 0, height: 0)
         let mode = PanelSizeMode.current
         let content = panelContentSize(for: mode)
         let frame = PanelSizing.panelFrame(anchor: anchor, mode: mode, content: content, screen: screen)
@@ -297,9 +337,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NotificationCenter.default.post(name: .chargeMatePanelClosed, object: nil)
     }
 
+    /// Durum öğesinin ekran çerçevesi. Açılışın ilk anlarında öğe penceresi henüz menü
+    /// çubuğunda değildir (sol altta durur); o zaman nil döner, panel ve hatırlatma
+    /// baloncuğu yanlış köşeye çapalanmaz.
     private var statusButtonFrame: NSRect? {
         guard let button = statusItem?.button, let window = button.window else { return nil }
-        return window.convertToScreen(button.convert(button.bounds, to: nil))
+        let frame = window.convertToScreen(button.convert(button.bounds, to: nil))
+        guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(frame) }),
+              frame.midY > screen.frame.midY else { return nil }
+        return frame
     }
 
     private func closePanelIfOutside(at point: NSPoint) {
@@ -364,6 +410,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         menuTimer?.invalidate()
         sleepObservation?.cancel()
         SleepInhibitionController.shared.stop()
+        AdvancedChargeRunner.shared.stop()
         scheduleRuntime?.stop()
         battery.stop()
         NSWorkspace.shared.notificationCenter.removeObserver(self)

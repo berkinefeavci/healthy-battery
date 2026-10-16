@@ -1,6 +1,6 @@
 cask "cellkeep" do
-  version "1.2.2"
-  sha256 "bb1f0b8fb48e991a065758d8d4553824b95436e069c58d2c37e4e3f114cf73bb"
+  version "1.4.1"
+  sha256 "a5adeb88a54655d0d48c1635b6951d26daac41b3b0f43899bd71e79ec3857da6"
 
   url "https://github.com/berkinefeavci/healthy-battery/releases/download/v#{version}/Cellkeep-#{version}.dmg"
   name "Healthy Battery"
@@ -22,14 +22,17 @@ cask "cellkeep" do
   uninstall quit: "io.github.berkinefeavci.cellkeep"
 
   zap launchctl: [
+        "io.github.berkinefeavci.cellkeep.chargeinhibit",
         "io.github.berkinefeavci.cellkeep.led",
         "io.github.berkinefeavci.cellkeep.powermode",
       ],
       delete:    [
         "/Library/Application Support/CellkeepLED",
         "/Library/Application Support/CellkeepPowerMode",
+        "/Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.chargeinhibit.plist",
         "/Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.led.plist",
         "/Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.powermode.plist",
+        "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.chargeinhibit",
         "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.led",
         "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.powermode",
       ],

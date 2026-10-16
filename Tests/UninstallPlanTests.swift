@@ -17,9 +17,10 @@ import Foundation
             guard case .bootOutAndRemoveHelper(let target) = step else { return nil }
             return target
         }
-        precondition(helperSteps.count == 4, "2 current + 2 legacy helper targets")
+        precondition(helperSteps.count == 5, "3 current + 2 legacy helper targets")
         precondition(helperSteps.contains { $0.daemonLabel == "io.github.berkinefeavci.cellkeep.led" })
         precondition(helperSteps.contains { $0.daemonLabel == "io.github.berkinefeavci.cellkeep.powermode" })
+        precondition(helperSteps.contains { $0.daemonLabel == "io.github.berkinefeavci.cellkeep.chargeinhibit" })
         precondition(helperSteps.contains { $0.daemonLabel == "local.chargemate.led" })
         precondition(helperSteps.contains { $0.daemonLabel == "local.chargemate.powermode" })
         precondition(helperSteps.contains { $0.binaryPath == "/Library/PrivilegedHelperTools/com.chargemate.ledctl" })
@@ -45,6 +46,7 @@ import Foundation
         precondition(command != nil)
         precondition(command!.contains("launchctl bootout system/io.github.berkinefeavci.cellkeep.led"))
         precondition(command!.contains("launchctl bootout system/io.github.berkinefeavci.cellkeep.powermode"))
+        precondition(command!.contains("launchctl bootout system/io.github.berkinefeavci.cellkeep.chargeinhibit"))
         precondition(command!.contains("launchctl bootout system/local.chargemate.led"))
         precondition(command!.contains("launchctl bootout system/local.chargemate.powermode"))
         precondition(command!.contains("rm -f '/Library/PrivilegedHelperTools/com.chargemate.ledctl'"))

@@ -93,6 +93,8 @@ struct ChargePolicyEvaluationInput {
     let coordinatorRecovery: Bool
     let now: Date
     let trigger: ChargePolicyTrigger
+    var externalChangeResponse: ExternalChangeResponse = .ask
+    var autoReapplyAllowed: Bool = true
 }
 
 struct ChargePolicyDecision {
@@ -252,6 +254,17 @@ enum ChargePolicyEngine {
         if case .reapplyPolicy = input.intent {
             return decision(.pausedByConflict(expected: policy.desiredLimit, observed: native.manualLimit),
                             command: .write(limit: policy.desiredLimit, source: .manual), policy: policy)
+        }
+        if case .none = input.intent {
+            switch input.externalChangeResponse {
+            case .adopt where native.availableLimits.contains(native.manualLimit):
+                policy.desiredLimit = native.manualLimit
+                return decision(.maintainingLimit(native.manualLimit), policy: policy)
+            case .reapply where input.autoReapplyAllowed:
+                return decision(.pausedByConflict(expected: policy.desiredLimit, observed: native.manualLimit),
+                                command: .write(limit: policy.desiredLimit, source: .manual), policy: policy)
+            default: break
+            }
         }
         return decision(.pausedByConflict(expected: policy.desiredLimit, observed: native.manualLimit),
                         policy: policy)
