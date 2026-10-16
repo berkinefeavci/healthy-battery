@@ -1,5 +1,8 @@
 # Faz 3 fiziksel test protokolü (şarj durdurma helper'ı)
 
+> **2026-10-10 · Claude · 1.4.2 güncellemesi:** A, C ve D bölümlerini artık uygulama kendisi yapıyor (`Sources/ChargeMate/AdapterSelfTest.swift`). Yardımcı kurulunca ya da adaptör takılınca test kendiliğinden başlar (~2 dk): adaptörü keser, pilin boşaldığını ölçer, geri açar, sonra heartbeat göndermeden bekçinin 60 sn'de geri açtığını doğrular. Sonuç `~/Library/Application Support/Cellkeep/adapter-self-test.json` dosyasına yazılır ve Ayarlar → Şarj Kontrolü'nde görünür; adaptör modu ancak test geçince açılır.
+> Yardımcı sürüm 2'den itibaren Developer ID imzalıyken yalnız aynı ekibin imzaladığı `io.github.berkinefeavci.cellkeep` uygulamasından komut kabul eder; aşağıdaki `nc -U` komutları yalnız `./build.sh` ile yapılmış ad-hoc yardımcıda çalışır. Elle test yalnız C2, E (kablo çıkar/tak) ve F (uyku) için gerekir.
+
 Bu testi insan çalıştırır. Kod yazan ajan hiçbir SMC yazması, kurulum ya da `sudo` yapmadı. Özellik arayüzde kilitli ("deneysel, fiziksel test bekliyor"); aşağıdaki test el ile kurulum ve gizli bir bayrakla yapılır.
 
 Güvenlik ağı: helper her başlangıçta ve her çıkışta her şeyi serbest bırakır. Test boyunca elinizin altında şarj aleti ve ikinci bir terminal bulundurun. Acil çıkış (her zaman): `sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.chargeinhibit` (SIGTERM gönderir, helper serbest bırakır).

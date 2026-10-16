@@ -34,7 +34,7 @@ if [[ "${1:-}" == "--local-preview-sdk" ]]; then
   xcrun clang -isysroot "$sdk_path" -mmacosx-version-min=13.0 -O2 \
     Tools/PowerModeHelper.c -o .build/local-preview/ChargeMatePowerModeHelper
   xcrun clang -isysroot "$sdk_path" -mmacosx-version-min=13.0 -O2 \
-    Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation \
+    Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation -framework Security \
     -o .build/local-preview/ChargeMateChargeInhibitHelper
   charge_inhibit_helper=.build/local-preview/ChargeMateChargeInhibitHelper
   helper_binary=.build/local-preview/ChargeMateLEDHelper
@@ -59,7 +59,7 @@ else
   xcrun clang -O2 Tools/MagSafeLEDProbe.c -framework IOKit -framework CoreFoundation \
     -o .build/release/CellkeepLEDHelper
   xcrun clang -O2 Tools/PowerModeHelper.c -o .build/release/CellkeepPowerModeHelper
-  xcrun clang -O2 Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation \
+  xcrun clang -O2 Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation -framework Security \
     -o .build/release/CellkeepChargeInhibitHelper
   charge_inhibit_helper=.build/release/CellkeepChargeInhibitHelper
   helper_binary=.build/release/CellkeepLEDHelper
@@ -75,6 +75,9 @@ fi
 # builds (Xcode 27, local) keep these steps mandatory, CI only proves compile + tests.
 ci_optional() { if [ -n "${CI:-}" ]; then echo "UYARI (CI): $1 bulunamadı, atlanıyor" >&2; return 0; fi; return 1; }
 if [ ! -f "$asset_catalog" ]; then ci_optional "Assets.car" || { test -f "$asset_catalog"; }; asset_catalog=""; fi
+# Start from an empty bundle: a file left by a build of another branch (say, a helper that
+# release.sh does not sign there) would otherwise ship and fail notarization.
+rm -rf "$app_path"
 mkdir -p "$app_path/Contents/MacOS" "$app_path/Contents/Resources"
 cp "$executable" "$app_path/Contents/MacOS/Cellkeep"
 # App icon: Packaging/AppIcon.icon (Icon Composer). actool compiles it together with the asset

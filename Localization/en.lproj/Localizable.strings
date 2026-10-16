@@ -440,7 +440,6 @@
 "Kontrol durumu yeniden okunamadı; ayar değiştirilmedi." = "The control state could not be read again; the setting was not changed.";
 "Kontrol gerekli" = "Check needed";
 "Kontrol gerekli; yeni işlem durduruldu" = "Check needed; new operations are stopped";
-"Kontrol göstergeleri ve macOS pil durumu, doğrulanmış kaynakları hazır olduğunda kullanılabilir olacak." = "Control indicators and macOS battery condition will become available once their verified sources are ready.";
 "Kontrol yetenekleri" = "Control capabilities";
 "Koyu" = "Dark";
 "Kullanılabilir kapasite" = "Usable capacity";
@@ -894,7 +893,7 @@
 "Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz." = "The charge-stopping helper is not installed or not verified. These settings have no effect for now and write nothing to the hardware.";
 
 /* Faz 2: sağlık otomasyonları */
-"%%100 hazır: %@" = "%%100 ready: %@";
+"%%100 hazır: %@" = "100%% ready: %@";
 "%95 üstünde, takılıyken" = "Above 95%, plugged in";
 "35 °C üstünde şarj" = "Charging above 35 °C";
 "Adaptör takılıyken pil 3 saatten uzun süre %95 üstünde kalırsa bildirim gelir." = "If the battery stays above 95% for more than 3 hours while plugged in, you get a notification.";
@@ -904,9 +903,9 @@
 "Henüz yeterli veri yok; Healthy Battery açık kaldıkça burada öneri görünür." = "Not enough data yet; advice appears here as Healthy Battery stays running.";
 "Ortalama boşalma derinliği" = "Average discharge depth";
 "Otomatik koruma" = "Automatic protection";
-"Pil %%%lld seviyesinde bekliyor, sınır %%%lld. macOS'un Optimize Şarj özelliği şarjı tutuyor olabilir (Sistem Ayarları › Pil › Pil Sağlığı). İki mekanizma birlikte çalışınca pil beklediğinizden geç dolar; ayarı buradan okuyamıyoruz, bu yalnızca gözleme dayalı bir ipucudur." = "Battery is waiting at %%%lld, limit %%%lld. macOS Optimized Battery Charging may be holding the charge (System Settings › Battery › Battery Health). When both mechanisms work together the battery fills later than expected; this setting cannot be read here, so this is only a hint based on observed behavior.";
-"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi ve Turbo kapatıldı." = "Battery %@ °C. Charge limit temporarily lowered to %%80 and Turbo turned off.";
-"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi." = "Battery %@ °C. Charge limit temporarily lowered to %%80.";
+"Pil %%%lld seviyesinde bekliyor, sınır %%%lld. macOS'un Optimize Şarj özelliği şarjı tutuyor olabilir (Sistem Ayarları › Pil › Pil Sağlığı). İki mekanizma birlikte çalışınca pil beklediğinizden geç dolar; ayarı buradan okuyamıyoruz, bu yalnızca gözleme dayalı bir ipucudur." = "Battery is waiting at %lld%%, limit %lld%%. macOS Optimized Battery Charging may be holding the charge (System Settings › Battery › Battery Health). When both mechanisms work together the battery fills later than expected; this setting cannot be read here, so this is only a hint based on observed behavior.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi ve Turbo kapatıldı." = "Battery %@ °C. Charge limit temporarily lowered to 80%% and Turbo turned off.";
+"Pil %@ °C. Şarj sınırı geçici olarak %%80'e çekildi." = "Battery %@ °C. Charge limit temporarily lowered to 80%%.";
 "Pil 3 saattir %95 üstünde" = "Battery above 95% for 3 hours";
 "Pil adaptörde şarj olurken 35 °C'yi geçerse sınır geçici olarak %80 olur, Turbo kapanır ve bildirim gelir. 32 °C'ye inince ya da adaptör çıkınca eski ayar döner. Pil zaten %80'in altındaysa şarjı durduramaz." = "While charging on the adapter, if the battery exceeds 35 °C the limit temporarily becomes 80%, Turbo turns off and you get a notification. When it drops to 32 °C or the adapter is unplugged, the previous setting returns. If the battery is already below 80% it cannot stop charging.";
 "Pil sıcak: şarj sınırı %80'e çekildi" = "Battery is hot: charge limit lowered to 80%";
@@ -931,7 +930,7 @@
 "Başka bir şarj uygulaması açık (%@). Adaptör modu için önce onu kapatın." = "Another charging app is running (%@). Quit it first to use adapter mode.";
 "Başka bir şarj uygulaması açık; adaptör modu bekletiliyor." = "Another charging app is running; adapter mode is on hold.";
 "Bu Mac adaptör kesmeyi doğrulamadı." = "This Mac did not verify adapter cut-off.";
-"Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Fiziksel test bekliyor." = "macOS does not allow stopping charging on this Mac. Adapter mode cuts the adapter in software when the battery reaches the target (the Mac runs from the battery) and restores it a few points lower. It only works while the Mac is awake; the adapter is restored before sleep, so during sleep the battery may rise above the target up to the macOS ceiling. The battery uses about 1 shallow cycle per day. Physical testing is pending.";
+"Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Yardımcı kurulunca adaptör kesme bu Mac'te otomatik olarak test edilir." = "macOS does not allow stopping charging on this Mac. Adapter mode cuts the adapter in software when the battery reaches the target (the Mac runs from the battery) and restores it a few points lower. It only works while the Mac is awake; the adapter is restored before sleep, so during sleep the battery may rise above the target up to the macOS ceiling. The battery uses about 1 shallow cycle per day. Once the helper is installed, cutting the adapter is tested automatically on this Mac.";
 "Hedef sınır ana sınır çubuğundan ayarlanır (%%%lld)." = "The target is set on the main limit bar (%lld%%).";
 "Kuruluyor…" = "Installing…";
 "Tek seferlik yönetici onayı ister." = "Asks for administrator approval once.";
@@ -953,3 +952,33 @@
 "Örnek göster" = "Show sample";
 "Örnek hatırlatma — bu ipucu 5 saniye sonra kaybolur." = "Sample reminder — this hint disappears after 5 seconds.";
 "Şarjda ısınırsa" = "If it heats up while charging";
+"Adaptör testi sürüyor (birkaç dakika). Mac bu sırada birkaç kez kısa süre pilden çalışır." = "Adapter test running (a few minutes). The Mac runs from the battery a few times in between.";
+"Adaptör testi henüz yapılmadı." = "The adapter test has not run yet.";
+"Testi çalıştır" = "Run test";
+"Testi yeniden çalıştır" = "Run test again";
+"Test için önce adaptör modunu kapatın." = "Turn adapter mode off before running the test.";
+"Adaptör testi sürüyor; bitince açabilirsiniz." = "The adapter test is running; you can turn this on when it finishes.";
+"Adaptör modu, otomatik adaptör testi geçince açılabilir." = "Adapter mode can be turned on once the automatic adapter test passes.";
+"Pil okunamadı; test yapılmadı." = "The battery could not be read; the test did not run.";
+"Adaptör takılı değil; test adaptör takılınca kendiliğinden yapılır." = "The adapter is not connected; the test runs on its own once it is plugged in.";
+"Pil %20'nin altında; test yapılmadı." = "Battery below 20%; the test did not run.";
+"Mac adaptördeyken de pilden besleniyor (yük yüksek); test sonra yapılır." = "The Mac is drawing on the battery even on power (heavy load); the test will run later.";
+"macOS bu Mac'te adaptörü kesmeye izin vermiyor; adaptör modu kullanılamaz." = "macOS does not allow cutting the adapter on this Mac; adapter mode is not available.";
+"Bu Mac'te adaptörü kesen anahtar yok; adaptör modu kullanılamaz." = "This Mac has no key to cut the adapter; adapter mode is not available.";
+"Yardımcı adaptörü kesmedi." = "The helper did not cut the adapter.";
+"Adaptör kesildi göründü ama pil boşalmadı; bu Mac'te adaptör modu çalışmıyor." = "The adapter looked cut but the battery did not discharge; adapter mode does not work on this Mac.";
+"Adaptör geri açılmadı; kabloyu çıkarıp takın." = "The adapter did not come back; unplug the cable and plug it in again.";
+"Uygulama sustuğunda yardımcı adaptörü kendiliğinden geri açmadı." = "When the app went quiet, the helper did not bring the adapter back on its own.";
+"Şarj yardımcısıyla konuşulamadı: %@" = "Could not talk to the charge helper: %@";
+"Adaptör testi geçti: kesme, geri açma ve güvenlik zamanlayıcısı çalışıyor." = "Adapter test passed: cutting, restoring and the safety timer all work.";
+"Pil ölçümü test süresince yenilenmedi; test daha sonra yeniden denenebilir." = "The battery reading did not refresh during the test; it can be run again later.";
+"30 gün" = "30 days";
+"7 gün" = "7 days";
+"Şimdi" = "Now";
+"Dönem" = "Period";
+"En çok enerji kullananlar" = "Top energy users";
+"Geçmiş birikiyor; Healthy Battery açık kaldıkça bu grafik dolar." = "History is building up; this chart fills in while Healthy Battery runs.";
+"Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "No reading yet; the first one arrives within a minute.";
+"Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Share of the latest reading. Helper processes of an app are combined into one row.";
+"Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Share of the period's total energy impact (macOS reading × time; not watts). %lld days of data.";
+"Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "This Mac does not let apps pause charging while plugged in, so sailing, heat pause, sleep behavior, discharge and calibration are not shown here. With adapter mode on, the target limit is applied through it.";
