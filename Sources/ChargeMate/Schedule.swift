@@ -4,6 +4,8 @@ struct ScheduleCapabilities: Equatable {
     let chargeLimits: [Int]
     let topUpAvailable: Bool
     let powerModes: Set<SystemPowerMode>
+    /// The verified adapter cut (charge helper + passed adapter test): discharge and calibration can run.
+    var adapterCut = false
 
     static let unavailable = Self(chargeLimits: [], topUpAvailable: false, powerModes: [])
 }
@@ -25,8 +27,9 @@ enum ScheduleAction: String, Codable, CaseIterable, Identifiable {
         }
     }
     var needsTarget: Bool { self == .setChargeLimit || self == .dischargeTo }
-    /// False for actions whose hardware effect was never verified: the runtime records them as unsupported.
-    var isImplemented: Bool { ![.pauseCharging, .startCalibration, .dischargeTo].contains(self) }
+    /// False for actions no Mac can run: pausing charging needs a charge-stop key that macOS 27 locks.
+    /// Discharge and calibration run through the adapter cut where it is verified (`availability`).
+    var isImplemented: Bool { self != .pauseCharging }
     /// What the editor's picker offers: actions that can run, plus the one an existing task already has.
     static func offered(keeping current: ScheduleAction) -> [ScheduleAction] {
         allCases.filter { $0.isImplemented || $0 == current }
@@ -44,7 +47,10 @@ enum ScheduleAction: String, Codable, CaseIterable, Identifiable {
             return capabilities.powerModes.contains(.automatic) ? nil : String(localized: "Otomatik güç modu kullanılamıyor.")
         case .enableHighPower:
             return capabilities.powerModes.contains(.turbo) ? nil : String(localized: "Bu Mac Yüksek Güç Modunu sunmuyor.")
-        case .pauseCharging, .startCalibration, .dischargeTo:
+        case .startCalibration, .dischargeTo:
+            return capabilities.adapterCut ? nil
+                : String(localized: "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü).")
+        case .pauseCharging:
             return String(localized: "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı.")
         }
     }

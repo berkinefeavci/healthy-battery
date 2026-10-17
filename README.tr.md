@@ -41,7 +41,7 @@
 - **Isı koruması.** İsteğe bağlı, varsayılan olarak kapalı. Adaptörde şarj olurken 35 °C'yi geçerse sınır %80'e iner ve Turbo kapanır; 32 °C'nin altına inince (ya da adaptör çıkınca) her şey eski hâline döner. Pil zaten %80'in altındaysa şarjı durduramaz.
 - **MagSafe LED denetimi.** İmzalı, dar kapsamlı ve yalnızca bilinen tek bir SMC anahtarına yazan bir ayrıcalıklı yardımcı üzerinden manuel Sistem / Yeşil / Turuncu / Kapalı denetimi, artı her zaman kapalı veya saatli bir politika.
 - **Zamanlamalar (Schedules).** Bir sınır uygulama, güç modu değiştirme ve benzeri için tekrarlı veya tek seferlik eylemler; filtrelenebilir çalıştırma geçmişiyle.
-- **Apple Kısayolları (Shortcuts) eylemleri.** Pil yüzdesi, sıcaklık ve durum okuma; sınır uygulama, Doldur başlatma/iptal etme, güç modu değiştirme veya MagSafe LED ayarlama için sekiz App Intent.
+- **Apple Kısayolları (Shortcuts) eylemleri.** Pil yüzdesi, sıcaklık ve durum okuma; sınır uygulama, Doldur başlatma/iptal etme, deşarj ya da kalibrasyon başlatma/iptal etme, güç modu değiştirme veya MagSafe LED ayarlama için on App Intent.
 - **Çıkış ile yüksek enerjili uygulamalar.** Enerji listesi yardımcı süreçleri sahibi uygulama altında toplar, gerçek ikonu gösterir ve listeden doğrudan bir uygulamayı kapatmanıza izin verir.
 - **Uygulama içinden güncelleme.** Healthy Battery günde en fazla bir kez GitHub'dan son sürüm numarasını sorar ve yeni sürüm çıkınca bir bildirim gösterir; ikisi de Ayarlar → Hakkında'dan kapatılabilir. **Güncelle**'ye basınca o sürümü indirir; sağlama değerini, Developer ID imzasını ve Apple onayını doğruladıktan sonra kendini değiştirip yeniden açılır. Hiçbir veri gönderilmez; bkz. [PRIVACY.md](PRIVACY.md).
 - **Çakışma koruması.** Başka bir şarj limiti aracı çalışıyor ya da kuruluysa (AlDente, Battery Toolkit, BatFi, batt, battery, bclm) Healthy Battery izlemeye devam eder ama kendi limit yazmalarını kilitler; iki uygulama aynı ayar için çekişmez.
@@ -49,13 +49,17 @@
 - **Diller.** İngilizce, Türkçe, Almanca, Fransızca ve İspanyolca; Healthy Battery macOS dilinizi izler, desteklenmeyen dillerde İngilizceye döner.
 - **Özelleştirilebilir panel.** Bir karta uzun basın (veya sağ tık → Kartları düzenle): sürükleyerek sıralama, kart ekleme/çıkarma, kare/geniş seçimi ve batarya bilgileri kartında hangi satırların görüneceği.
 
-### Planlanan; donanımda doğrulama gerekiyor
+### Adaptörü keserek (deneysel)
 
-Bunlar arayüzde kilitli olarak ve **"Yakında"** etiketiyle görünür. Bunlar **çalışan özellikler değildir** — henüz bir şey yapmalarını beklemeyin:
+macOS 27 hiçbir uygulamanın kablo takılıyken şarjı duraklatmasına izin vermiyor. Çalışan yol adaptörü yazılımla kesmek: Mac kablo takılıyken pilden çalışır. Aşağıdakiler bunu ayrı bir şarj yardımcısıyla (tek yönetici onayı) yapar; yardımcı yalnız Healthy Battery'yi dinler ve kablo çıkınca, uykuda, uygulama kapanınca ya da haber alamayınca adaptörü geri açar. Mac'inizde otomatik adaptör testi geçince açılırlar:
 
-- **Deşarj / otomatik deşarj** — bu donanımda bataryayı zorla deşarj etmenin doğrulanmış bir yolu yok.
-- **Sailing** (bir aralıkta salınım) — bulunamayan çalışan bir duraklat/devam ettir (pause/resume) ilkeli gerektiriyor.
-- **Kalibrasyon** — uzun süreli, geri alınabilir bir deşarj/şarj döngüsü; uygulanmadı.
+- **Deşarj.** Paneldeki eksi düğmesi (ya da zamanlama / Kısayol) Mac'i pilden çalıştırıp sınıra ya da seçtiğiniz seviyeye indirir, sonra adaptörü geri açar.
+- **Kalibrasyon.** %100'e şarj (macOS sınırı Doldur ile kaldırılır), 1 saat bekleme, %15'e deşarj, yeniden %100, sonra sınır geri gelir; en fazla 24 saat.
+- **Adaptör modu.** %20–100 arasında bir hedef tutar: adaptör hedefte kesilir, 5 puan aşağıda açılır.
+- **Yelken.** Adaptör modunda bu bandı 5–15 puana genişletir; pil daha seyrek şarj olur.
+- **Adaptör modunda ısı koruması.** Şarj sırasında 35 °C üstünde adaptör kesilir, pil 32 °C'nin altına inince şarj sürer (%30 ve altında asla).
+
+Hepsi yalnız Mac uyanıkken çalışır: uykudan önce adaptör geri açılır; Deşarj ve Kalibrasyon sürerken Mac boşta uyumaz.
 
 ## Gereksinimler
 

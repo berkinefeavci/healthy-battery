@@ -915,8 +915,11 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         .init(chargeLimits: nativeLimits,
               topUpAvailable: nativeLimits.contains(100) && nativeLimit.map(nativeLimits.contains) == true
                   && !controlRecoveryRequired && !otherControllerRunning,
-              powerModes: SystemPowerModeService.availableModes())
+              powerModes: SystemPowerModeService.availableModes(),
+              adapterCut: scheduleAdapterCut())
     }
+    /// Set by the adapter wiring (the monitor must not reference the helper itself).
+    var scheduleAdapterCut: () -> Bool = { false }
 
     func applyScheduledLimit(_ limit: Int) -> ChargeControlCoordinator.Result {
         controlQueue.sync { policyController.applyManualLimit(limit, source: .schedule) }

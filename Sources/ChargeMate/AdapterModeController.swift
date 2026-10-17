@@ -30,8 +30,11 @@ final class AdapterModeController: ObservableObject {
     private let battery: BatteryMonitor
     private var kind = Kind.none
     private var cancellables = Set<AnyCancellable>()
-    /// Top Up started by calibration (so cancelling calibration also ends it).
-    private var calibrationTopUp = false
+    /// Top Up started by calibration, so cancelling calibration also ends it, even after a restart.
+    private var calibrationTopUp: Bool {
+        get { defaults.bool(forKey: "calibrationStartedTopUp") }
+        set { defaults.set(newValue, forKey: "calibrationStartedTopUp") }
+    }
     private var lastCalibrationTopUpStart = Date.distantPast
     private var awakeAssertion: UInt32?
 
@@ -44,6 +47,7 @@ final class AdapterModeController: ObservableObject {
 
     func start() {
         guard cancellables.isEmpty else { return }
+        battery.scheduleAdapterCut = { [weak self] in self?.adapterCutAvailable ?? false }
         refreshHelperState()
         runner.$capabilities.removeDuplicates().sink { [weak self] _ in
             DispatchQueue.main.async { self?.reconcile() }
@@ -89,26 +93,54 @@ final class AdapterModeController: ObservableObject {
     var calibrationRunning: Bool { runner.memory.calibration != nil }
 
     /// Why Discharge cannot start now; nil when it can.
-    var dischargeBlockReason: String? {
+    var dischargeBlockReason: String? { dischargeBlockReason(to: dischargeLimit) }
+
+    func dischargeBlockReason(to level: Int) -> String? {
+        if let reason = adapterCutBlockReason { return reason }
+        guard let percent = battery.snapshot.percentage, Int(percent) > level else {
+            return String(localized: "Pil zaten %\(level) ya da altında")
+        }
+        return nil
+    }
+
+    /// Why the adapter cut cannot be used right now (helper, test, rival app, cable); nil when it can.
+    private var adapterCutBlockReason: String? {
         if !helperInstalled { return String(localized: "Deşarj için Ayarlar → Şarj Kontrolü'nden şarj yardımcısını kurun") }
         if !selfTestPassed { return String(localized: "Deşarj, adaptör testi geçince kullanılabilir") }
         if !adapterCutAvailable { return String(localized: "Başka bir şarj uygulaması açık ya da adaptör testi sürüyor") }
         if !battery.snapshot.externalConnected && !battery.adapterCutByApp { return String(localized: "Adaptör bağlı değil") }
-        guard let percent = battery.snapshot.percentage, Int(percent) > dischargeLimit else {
-            return String(localized: "Pil zaten %\(dischargeLimit) ya da altında")
-        }
         return nil
     }
 
     func toggleDischarge() {
         if dischargeRunning { runner.cancelDischarge(); return }
-        guard dischargeBlockReason == nil else { return }
-        runner.requestDischarge(to: dischargeLimit)
+        _ = startDischarge()
     }
 
-    func startCalibration() {
-        guard adapterCutAvailable, !calibrationRunning else { return }
+    func startCalibration() { _ = beginCalibration() }
+
+    /// Panel button, schedule and Shortcuts entry point. `level` nil = the current limit.
+    @discardableResult
+    func startDischarge(to level: Int? = nil) -> Result<String, ScheduleAdapterRefusal> {
+        if dischargeRunning { return .failure(.init(message: String(localized: "Bir deşarj zaten sürüyor."))) }
+        if calibrationRunning { return .failure(.init(message: String(localized: "Kalibrasyon sürüyor; deşarj başlatılmadı."))) }
+        let target = AdvancedChargeLimits.normalizedTarget(level ?? dischargeLimit)
+        if let reason = dischargeBlockReason(to: target) {
+            return .failure(.init(message: reason, conflict: helperInstalled && selfTestPassed))
+        }
+        runner.requestDischarge(to: target)
+        return .success(String(localized: "Deşarj başladı: pil %\(target) seviyesine iniyor"))
+    }
+
+    @discardableResult
+    func beginCalibration() -> Result<String, ScheduleAdapterRefusal> {
+        if calibrationRunning { return .failure(.init(message: String(localized: "Kalibrasyon zaten sürüyor."))) }
+        if let reason = adapterCutBlockReason {
+            return .failure(.init(message: reason, conflict: helperInstalled && selfTestPassed))
+        }
+        if dischargeRunning { runner.cancelDischarge() } // calibration includes its own discharge
         runner.startCalibration()
+        return .success(String(localized: "Kalibrasyon başladı (en fazla 24 saat)."))
     }
 
     func cancelCalibration() { runner.cancelCalibration() }

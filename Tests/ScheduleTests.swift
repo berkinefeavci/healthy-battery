@@ -49,7 +49,7 @@ enum ScheduleTests {
         }
         var target = fresh; target.action = .setChargeLimit; target.target = 85
         let capabilities = ScheduleCapabilities(chargeLimits: [80, 85, 90, 95, 100], topUpAvailable: true,
-                                                powerModes: [.automatic, .lowPower, .turbo])
+                                                powerModes: [.automatic, .lowPower, .turbo], adapterCut: true)
         check(target.validationError(capabilities: capabilities) == nil, "supported target validates")
         target.target = 83
         check(target.validationError(capabilities: capabilities) != nil, "unsupported target rejected")
@@ -63,9 +63,15 @@ enum ScheduleTests {
         check(ScheduleAction.topUp.availability(in: limited) != nil, "Top Up needs 100 capability")
         check(ScheduleAction.enableLowPower.availability(in: limited) != nil, "low power needs capability")
         check(ScheduleAction.enableHighPower.availability(in: limited) != nil, "high power needs capability")
-        for action in [ScheduleAction.pauseCharging, .startCalibration, .dischargeTo] {
-            check(action.availability(in: capabilities) != nil, "unverified action remains unavailable")
+        check(ScheduleAction.pauseCharging.availability(in: capabilities) != nil, "pause charging stays unavailable")
+        for action in [ScheduleAction.startCalibration, .dischargeTo] {
+            check(action.availability(in: capabilities) == nil, "adapter cut enables \(action.rawValue)")
+            check(action.availability(in: limited) != nil, "\(action.rawValue) needs the verified adapter cut")
         }
+        var discharge = fresh; discharge.action = .dischargeTo; discharge.target = 50
+        check(discharge.validationError(capabilities: capabilities) == nil, "discharge target 50 validates")
+        discharge.target = nil
+        check(discharge.validationError(capabilities: capabilities) != nil, "discharge needs a target")
         for action in ScheduleAction.allCases {
             check(action.isImplemented == (action.availability(in: capabilities) == nil), "isImplemented matches availability with full capabilities")
         }

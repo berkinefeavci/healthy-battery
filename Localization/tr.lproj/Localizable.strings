@@ -1023,3 +1023,32 @@
 "Yelken açık: adaptör hedefte kesilir, pil yelken aralığı kadar inince geri açılır. Pil daha seyrek şarj olur." = "Yelken açık: adaptör hedefte kesilir, pil yelken aralığı kadar inince geri açılır. Pil daha seyrek şarj olur.";
 "Yelken kapalı: adaptör hedefte kesilir, pil 5 puan inince geri açılır." = "Yelken kapalı: adaptör hedefte kesilir, pil 5 puan inince geri açılır.";
 "Yüzde %lld seviyesine deşarj et" = "Yüzde %lld seviyesine deşarj et";
+
+/* Schedule, Shortcuts and menu bar states for discharge, calibration, sailing and heat */
+"%100 → 1 saat → %15 → %100; başlat veya iptal et" = "%100 → 1 saat → %15 → %100; başlat veya iptal et";
+"10 eylem hazır" = "10 eylem hazır";
+"Bir deşarj zaten sürüyor." = "Bir deşarj zaten sürüyor.";
+"Deşarj başladı: pil %%%lld seviyesine iniyor" = "Deşarj başladı: pil %%%lld seviyesine iniyor";
+"Deşarj hedefi eksik." = "Deşarj hedefi eksik.";
+"Deşarj iptal edildi; adaptör geri açıldı." = "Deşarj iptal edildi; adaptör geri açıldı.";
+"Deşarj kullanılamıyor." = "Deşarj kullanılamıyor.";
+"Deşarj ve Kalibrasyon adaptörü keserek çalışır; şarj yardımcısı kurulu ve adaptör testi geçmiş olmalı. Değilse eylem nedenini söyleyerek durur." = "Deşarj ve Kalibrasyon adaptörü keserek çalışır; şarj yardımcısı kurulu ve adaptör testi geçmiş olmalı. Değilse eylem nedenini söyleyerek durur.";
+"Deşarjı Denetle" = "Deşarjı Denetle";
+"Hedef yüzde" = "Hedef yüzde";
+"Isı koruması" = "Isı koruması";
+"Kablo takılıyken adaptörü keserek pili şarj sınırına (ya da verilen seviyeye) indirir veya süren deşarjı iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir." = "Kablo takılıyken adaptörü keserek pili şarj sınırına (ya da verilen seviyeye) indirir veya süren deşarjı iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir.";
+"Kablo takılıyken sınıra ya da verilen yüzdeye in; iptal et" = "Kablo takılıyken sınıra ya da verilen yüzdeye in; iptal et";
+"Kal. %lld/4" = "Kal. %lld/4";
+"Kalibrasyon başladı (en fazla 24 saat)." = "Kalibrasyon başladı (en fazla 24 saat).";
+"Kalibrasyon iptal edildi; sınır geri yükleniyor." = "Kalibrasyon iptal edildi; sınır geri yükleniyor.";
+"Kalibrasyon kullanılamıyor." = "Kalibrasyon kullanılamıyor.";
+"Kalibrasyon sürüyor; deşarj başlatılmadı." = "Kalibrasyon sürüyor; deşarj başlatılmadı.";
+"Kalibrasyon zaten sürüyor." = "Kalibrasyon zaten sürüyor.";
+"Kalibrasyonu Denetle" = "Kalibrasyonu Denetle";
+"Kalibrasyonu başlatır (%100, 1 saat bekleme, %15, yeniden %100) veya iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir." = "Kalibrasyonu başlatır (%100, 1 saat bekleme, %15, yeniden %100) veya iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir.";
+"On yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır." = "On yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır.";
+"Süren bir deşarj yok." = "Süren bir deşarj yok.";
+"Süren bir kalibrasyon yok." = "Süren bir kalibrasyon yok.";
+"Yelken %%%lld–%%%lld" = "Yelken %%%lld–%%%lld";
+"Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü)." = "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü).";
+"Şarj yardımcısı ve geçen adaptör testi gerekir" = "Şarj yardımcısı ve geçen adaptör testi gerekir";

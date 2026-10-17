@@ -64,6 +64,16 @@ extension AdvancedChargeSettings {
 
 enum CalibrationPhase: String, Codable, Equatable {
     case chargeToFull, hold, dischargeToLow, rechargeToFull
+
+    /// 1-based step out of four, for status texts.
+    var step: Int {
+        switch self {
+        case .chargeToFull: return 1
+        case .hold: return 2
+        case .dischargeToLow: return 3
+        case .rechargeToFull: return 4
+        }
+    }
 }
 
 struct CalibrationSession: Codable, Equatable {

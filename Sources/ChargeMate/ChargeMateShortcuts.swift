@@ -28,10 +28,19 @@ enum ChargeMateShortcutState: String, CaseIterable {
     case monitoring, charging, paused, sailing, discharging, topUp
     case heatProtect, calibration, unavailable, error
 
-    static func resolve(available: Bool, controlState: String, policyState: String,
+    /// `advancedState`: what the adapter-cut engine is doing ("calibrating", "discharging", "heatPaused",
+    /// "sailing", "adapterCut"); it wins over the native control state, which cannot see the cut.
+    static func resolve(available: Bool, controlState: String, advancedState: String? = nil, policyState: String,
                         isCharging: Bool, externalConnected: Bool) -> Self {
         guard available else { return .unavailable }
         if policyState.hasPrefix("recoveryRequired") || policyState.hasPrefix("pausedByConflict") { return .error }
+        switch advancedState {
+        case "calibrating": return .calibration
+        case "discharging", "adapterCut": return .discharging
+        case "heatPaused": return .heatProtect
+        case "sailing": return .sailing
+        default: break
+        }
         switch controlState {
         case "topUp": return .topUp
         case "heatProtect": return .heatProtect

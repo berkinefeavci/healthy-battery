@@ -55,9 +55,7 @@ enum MenubarMetric: String, Codable, CaseIterable, Identifiable {
     var unavailableReason: String? {
         switch self {
         case .macOSCondition: return String(localized: "macOS pil durumu için doğrulanmış veri kaynağı bulunmuyor.")
-        case .calibration, .heatProtection, .sailing:
-            return String(localized: "Bu kontrol henüz etkin değil; doğrulanmış işlem durumu bekleniyor.")
-        case .topUp: return nil
+        case .calibration, .heatProtection, .sailing, .topUp: return nil
         default: return nil
         }
     }

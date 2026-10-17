@@ -48,7 +48,7 @@ enum MenubarTests {
         p.metrics = []; p.save(to: defaults)
         expect(MenubarPreferences.load(from: defaults).metrics.isEmpty, "explicit clear persists")
         expect(p.accessFallback && p.effectiveStyle == .chargeStatus, "hidden empty stays accessible")
-        p.metrics = [.sailing]
+        p.metrics = [.macOSCondition]
         expect(p.accessFallback, "unsupported-only list stays accessible")
         p.toggle(.topUp)
         expect(p.metrics.contains(.topUp), "verified Top Up status can be added")
@@ -65,13 +65,17 @@ enum MenubarTests {
         var sample = snapshot(.charging, at: now)
         p = MenubarPreferences(); p.metrics = [.percentage, .hardwarePercentage, .adapterWatts, .sailing]
         let model = MenubarPresentation(preferences: p, snapshot: sample, lowPower: false, now: now)
-        expect(model.values.count == 3, "unconfirmed controls omitted")
+        expect(model.values.count == 4 && model.values[3].text == "—", "idle control shows a dash")
         expect(model.values[0].text == "%73" && model.values[1].text == "%70", "display and hardware percentage distinct")
         expect(model.values[2].text == "—", "missing adapter is not zero")
         p.metrics = [.topUp]
         let topUpModel = MenubarPresentation(preferences: p, snapshot: sample, lowPower: false,
                                              policyState: .topUpCharging(73), now: now)
         expect(topUpModel.values.first?.text == "Top Up %73", "menu Top Up status is real controller state")
+        p.metrics = [.calibration, .sailing, .heatProtection]
+        let controlModel = MenubarPresentation(preferences: p, snapshot: sample, lowPower: false,
+                                               controlStates: [.calibration: "Kal. 3/4", .sailing: "Yelken %70–%80"], now: now)
+        expect(controlModel.values.map(\.text) == ["Kal. 3/4", "Yelken %70–%80", "—"], "control metrics show live states")
         p.metrics = [.percentage, .hardwarePercentage, .adapterWatts, .sailing]
         let stale = MenubarPresentation(preferences: p, snapshot: sample, lowPower: false, now: now.addingTimeInterval(11))
         expect(stale.mode == .unavailable && stale.values.allSatisfy { $0.text == "—" }, "stale status and metrics")

@@ -76,6 +76,17 @@ import Foundation
                                               policyState: "idle", isCharging: false,
                                               externalConnected: true) == .sailing,
               "sailing state stays stable")
+        for (key, expected) in [("calibrating", ChargeMateShortcutState.calibration), ("discharging", .discharging),
+                                ("adapterCut", .discharging), ("heatPaused", .heatProtect), ("sailing", .sailing)] {
+            check(ChargeMateShortcutState.resolve(available: true, controlState: "pausedAtLimit", advancedState: key,
+                                                  policyState: "idle", isCharging: false,
+                                                  externalConnected: false) == expected,
+                  "adapter-cut engine state \(key) wins over the native state")
+        }
+        check(ChargeMateShortcutState.resolve(available: true, controlState: "idle", advancedState: "calibrating",
+                                              policyState: "recoveryRequired", isCharging: false,
+                                              externalConnected: true) == .error,
+              "recovery still wins over the engine state")
         check(ChargeMateShortcutState.resolve(available: true, controlState: "idle",
                                               policyState: "recoveryRequired", isCharging: false,
                                               externalConnected: true) == .error,

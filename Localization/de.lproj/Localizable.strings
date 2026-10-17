@@ -1023,3 +1023,32 @@
 "Yelken açık: adaptör hedefte kesilir, pil yelken aralığı kadar inince geri açılır. Pil daha seyrek şarj olur." = "Segeln an: Das Netzteil wird am Ziel getrennt und wieder eingeschaltet, wenn der Akku um den Segelbereich gesunken ist. Der Akku wird seltener geladen.";
 "Yelken kapalı: adaptör hedefte kesilir, pil 5 puan inince geri açılır." = "Segeln aus: Das Netzteil wird am Ziel getrennt und nach 5 Punkten Abfall wieder eingeschaltet.";
 "Yüzde %lld seviyesine deşarj et" = "Auf %lld Prozent entladen";
+
+/* Schedule, Shortcuts and menu bar states for discharge, calibration, sailing and heat */
+"%100 → 1 saat → %15 → %100; başlat veya iptal et" = "100 % → 1 Stunde → 15 % → 100 %; starten oder abbrechen";
+"10 eylem hazır" = "10 Aktionen bereit";
+"Bir deşarj zaten sürüyor." = "Eine Entladung läuft bereits.";
+"Deşarj başladı: pil %%%lld seviyesine iniyor" = "Entladung gestartet: Der Akku sinkt auf %lld %%";
+"Deşarj hedefi eksik." = "Das Entladeziel fehlt.";
+"Deşarj iptal edildi; adaptör geri açıldı." = "Entladung abgebrochen; das Netzteil ist wieder eingeschaltet.";
+"Deşarj kullanılamıyor." = "Entladen ist nicht verfügbar.";
+"Deşarj ve Kalibrasyon adaptörü keserek çalışır; şarj yardımcısı kurulu ve adaptör testi geçmiş olmalı. Değilse eylem nedenini söyleyerek durur." = "Entladen und Kalibrierung trennen das Netzteil; dafür muss das Lade-Hilfsprogramm installiert und der Netzteiltest bestanden sein. Sonst bricht die Aktion ab und nennt den Grund.";
+"Deşarjı Denetle" = "Entladen steuern";
+"Hedef yüzde" = "Zielprozent";
+"Isı koruması" = "Hitzeschutz";
+"Kablo takılıyken adaptörü keserek pili şarj sınırına (ya da verilen seviyeye) indirir veya süren deşarjı iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir." = "Trennt bei eingestecktem Kabel das Netzteil und entlädt den Akku bis zum Ladelimit (oder dem angegebenen Wert) oder bricht eine laufende Entladung ab. Erfordert das Lade-Hilfsprogramm und einen bestandenen Netzteiltest.";
+"Kablo takılıyken sınıra ya da verilen yüzdeye in; iptal et" = "Bei eingestecktem Kabel bis zum Limit oder einem Prozentwert entladen; abbrechen";
+"Kal. %lld/4" = "Kal. %lld/4";
+"Kalibrasyon başladı (en fazla 24 saat)." = "Kalibrierung gestartet (höchstens 24 Stunden).";
+"Kalibrasyon iptal edildi; sınır geri yükleniyor." = "Kalibrierung abgebrochen; das Limit wird wiederhergestellt.";
+"Kalibrasyon kullanılamıyor." = "Kalibrierung ist nicht verfügbar.";
+"Kalibrasyon sürüyor; deşarj başlatılmadı." = "Eine Kalibrierung läuft; es wurde keine Entladung gestartet.";
+"Kalibrasyon zaten sürüyor." = "Eine Kalibrierung läuft bereits.";
+"Kalibrasyonu Denetle" = "Kalibrierung steuern";
+"Kalibrasyonu başlatır (%100, 1 saat bekleme, %15, yeniden %100) veya iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir." = "Startet eine Kalibrierung (100 %, 1 Stunde halten, 15 %, erneut 100 %) oder bricht sie ab. Erfordert das Lade-Hilfsprogramm und einen bestandenen Netzteiltest.";
+"On yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır." = "Zehn native Aktionen. Abfragen liefern aktuelle Daten; Steuerungen nutzen den sicheren Ablauf von Healthy Battery.";
+"Süren bir deşarj yok." = "Es läuft keine Entladung.";
+"Süren bir kalibrasyon yok." = "Es läuft keine Kalibrierung.";
+"Yelken %%%lld–%%%lld" = "Segeln %lld–%lld %%";
+"Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü)." = "Das Lade-Hilfsprogramm muss installiert und der Netzteiltest bestanden sein (Einstellungen → Ladesteuerung).";
+"Şarj yardımcısı ve geçen adaptör testi gerekir" = "Erfordert das Lade-Hilfsprogramm und einen bestandenen Netzteiltest";

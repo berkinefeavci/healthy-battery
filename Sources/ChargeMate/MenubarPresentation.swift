@@ -13,8 +13,10 @@ struct MenubarPresentation {
     let lowPower: Bool
     let values: [MenubarValue]
 
+    /// `controlStates`: short live texts for calibration, heat protection and sailing; a missing entry means
+    /// the control is not acting right now ("—").
     init(preferences: MenubarPreferences, snapshot: BatterySnapshot, lowPower: Bool,
-         policyState: ChargePolicyState = .idle, now: Date = Date()) {
+         policyState: ChargePolicyState = .idle, controlStates: [MenubarMetric: String] = [:], now: Date = Date()) {
         self.preferences = preferences.normalized()
         self.mode = PowerFlowPresentation(snapshot: snapshot, now: now).mode
         self.percentage = snapshot.reading(.percentage, now: now).validValue
@@ -36,6 +38,8 @@ struct MenubarPresentation {
             case .adapterVoltageV: field = .adapterVoltage
             case .adapterWatts: field = .adapterPower
             case .topUp: return MenubarValue(metric: metric, text: policyState.menubarText)
+            case .calibration, .heatProtection, .sailing:
+                return MenubarValue(metric: metric, text: controlStates[metric] ?? "—")
             default: return MenubarValue(metric: metric, text: "—")
             }
             let reading = snapshot.reading(field, now: now)

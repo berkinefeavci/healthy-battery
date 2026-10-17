@@ -1023,3 +1023,32 @@
 "Yelken açık: adaptör hedefte kesilir, pil yelken aralığı kadar inince geri açılır. Pil daha seyrek şarj olur." = "Navegación activada: el adaptador se corta en el objetivo y vuelve cuando la batería baja el rango de navegación. La batería se carga con menos frecuencia.";
 "Yelken kapalı: adaptör hedefte kesilir, pil 5 puan inince geri açılır." = "Navegación desactivada: el adaptador se corta en el objetivo y vuelve cuando la batería baja 5 puntos.";
 "Yüzde %lld seviyesine deşarj et" = "Descargar hasta el %lld por ciento";
+
+/* Schedule, Shortcuts and menu bar states for discharge, calibration, sailing and heat */
+"%100 → 1 saat → %15 → %100; başlat veya iptal et" = "100 % → 1 hora → 15 % → 100 %; iniciar o cancelar";
+"10 eylem hazır" = "10 acciones listas";
+"Bir deşarj zaten sürüyor." = "Ya hay una descarga en curso.";
+"Deşarj başladı: pil %%%lld seviyesine iniyor" = "Descarga iniciada: la batería baja al %lld %%";
+"Deşarj hedefi eksik." = "Falta el objetivo de descarga.";
+"Deşarj iptal edildi; adaptör geri açıldı." = "Descarga cancelada; el adaptador vuelve a estar activo.";
+"Deşarj kullanılamıyor." = "La descarga no está disponible.";
+"Deşarj ve Kalibrasyon adaptörü keserek çalışır; şarj yardımcısı kurulu ve adaptör testi geçmiş olmalı. Değilse eylem nedenini söyleyerek durur." = "La descarga y la calibración cortan el adaptador; el ayudante de carga debe estar instalado y la prueba del adaptador superada. Si no, la acción se detiene e indica el motivo.";
+"Deşarjı Denetle" = "Controlar la descarga";
+"Hedef yüzde" = "Porcentaje objetivo";
+"Isı koruması" = "Protección térmica";
+"Kablo takılıyken adaptörü keserek pili şarj sınırına (ya da verilen seviyeye) indirir veya süren deşarjı iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir." = "Corta el adaptador con el cable enchufado y baja la batería hasta el límite de carga (o el nivel indicado), o cancela una descarga en curso. Requiere el ayudante de carga y una prueba del adaptador superada.";
+"Kablo takılıyken sınıra ya da verilen yüzdeye in; iptal et" = "Con el cable enchufado, bajar hasta el límite o un porcentaje; cancelar";
+"Kal. %lld/4" = "Cal. %lld/4";
+"Kalibrasyon başladı (en fazla 24 saat)." = "Calibración iniciada (24 horas como máximo).";
+"Kalibrasyon iptal edildi; sınır geri yükleniyor." = "Calibración cancelada; se está restableciendo el límite.";
+"Kalibrasyon kullanılamıyor." = "La calibración no está disponible.";
+"Kalibrasyon sürüyor; deşarj başlatılmadı." = "Hay una calibración en curso; no se inició la descarga.";
+"Kalibrasyon zaten sürüyor." = "Ya hay una calibración en curso.";
+"Kalibrasyonu Denetle" = "Controlar la calibración";
+"Kalibrasyonu başlatır (%100, 1 saat bekleme, %15, yeniden %100) veya iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir." = "Inicia una calibración (100 %, 1 hora de espera, 15 %, de nuevo 100 %) o la cancela. Requiere el ayudante de carga y una prueba del adaptador superada.";
+"On yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır." = "Diez acciones nativas. Las lecturas devuelven datos actuales; los controles usan la vía segura de Healthy Battery.";
+"Süren bir deşarj yok." = "No hay ninguna descarga en curso.";
+"Süren bir kalibrasyon yok." = "No hay ninguna calibración en curso.";
+"Yelken %%%lld–%%%lld" = "Navegación %lld–%lld %%";
+"Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü)." = "El ayudante de carga debe estar instalado y la prueba del adaptador superada (Ajustes → Control de carga).";
+"Şarj yardımcısı ve geçen adaptör testi gerekir" = "Requiere el ayudante de carga y una prueba del adaptador superada";
