@@ -99,7 +99,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             topUp: { [weak battery] executionID in
                 battery?.startScheduledTopUp(executionID: executionID)
                     ?? .init(operationID: UUID(), status: .rejected, state: nil, message: String(localized: "Healthy Battery kullanılamıyor."))
-            })
+            },
+            discharge: { AdapterModeController.shared.startDischarge(to: $0) },
+            calibration: { _ in AdapterModeController.shared.beginCalibration() })
         scheduleRuntime?.start()
         // A no-op when the user turned the daily release check off.
         UpdateNotifications.shared.start()
@@ -276,12 +278,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         MainActor.assumeIsolated { ReminderCenter.shared.systemWillSleep() }
     }
 
+    /// Live texts for the menu bar's control metrics; only what is acting right now.
+    private var menubarControlStates: [MenubarMetric: String] {
+        let runner = AdvancedChargeRunner.shared
+        var states: [MenubarMetric: String] = [:]
+        if let calibration = runner.memory.calibration {
+            states[.calibration] = String(localized: "Kal. \(calibration.phase.step)/4")
+        }
+        let heatEngaged = MainActor.assumeIsolated { HealthAutomation.shared.heatOverrideActive } // menu bar updates run on main
+        if heatEngaged || runner.display == .heatPaused {
+            states[.heatProtection] = String(localized: "Isı koruması")
+        }
+        if AdapterModeController.shared.active, runner.settings.sailingEnabled {
+            let target = AdvancedChargeLimits.normalizedTarget(runner.settings.targetLimit)
+            let resume = AdvancedChargeEngine.adapterResumeAt(target: target, settings: runner.settings)
+            states[.sailing] = String(localized: "Yelken %\(resume)–%\(target)")
+        }
+        return states
+    }
+
     private func updateMenuBar() {
         guard let button = statusItem?.button else { return }
         let budget = (button.window?.screen ?? NSScreen.main)?.visibleFrame.width ?? 1440
         let model = MenubarPresentation(preferences: menuPreferences, snapshot: battery.snapshot,
                                        lowPower: battery.selectedPowerMode == .lowPower,
-                                       policyState: battery.policyState)
+                                       policyState: battery.policyState,
+                                       controlStates: menubarControlStates)
         button.effectiveAppearance.performAsCurrentDrawingAppearance {
             let output = MenubarRenderer.render(model, maxWidth: budget * 0.35)
             button.title = ""

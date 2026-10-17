@@ -29,6 +29,10 @@ struct ShortcutsSettingsView: View {
                example: String(localized: "Çıktı: doğrulama sonucu ve işlem kimliği"), icon: "battery.100percent"),
         Action(title: String(localized: "Top Up Denetle"), detail: String(localized: "Başlat veya önceki limite dönerek iptal et"),
                example: String(localized: "Çıktı: başlatma/geri yükleme sonucu"), icon: "plus.circle"),
+        Action(title: String(localized: "Deşarjı Denetle"), detail: String(localized: "Kablo takılıyken sınıra ya da verilen yüzdeye in; iptal et"),
+               example: String(localized: "Şarj yardımcısı ve geçen adaptör testi gerekir"), icon: "minus.circle"),
+        Action(title: String(localized: "Kalibrasyonu Denetle"), detail: String(localized: "%100 → 1 saat → %15 → %100; başlat veya iptal et"),
+               example: String(localized: "Şarj yardımcısı ve geçen adaptör testi gerekir"), icon: "arrow.triangle.2.circlepath"),
         Action(title: String(localized: "Güç Modunu Ayarla"), detail: String(localized: "Otomatik, Tasarruf veya Turbo"),
                example: String(localized: "Önceden etkinleştirilmiş helper gerekir"), icon: "speedometer"),
         Action(title: String(localized: "MagSafe Işığını Ayarla"), detail: String(localized: "Sistem, yeşil, turuncu veya kapalı"),
@@ -44,7 +48,7 @@ struct ShortcutsSettingsView: View {
                     .background(.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
                 VStack(alignment: .leading, spacing: 5) {
                     Text("Apple Kestirmeler").font(.headline)
-                    Text("Sekiz yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır.")
+                    Text("On yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır.")
                         .font(.callout).foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -62,16 +66,17 @@ struct ShortcutsSettingsView: View {
                 }
             }
             Divider()
-            Text("Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez.")
-                .font(.caption).foregroundStyle(.secondary)
+            Text("Deşarj ve Kalibrasyon adaptörü keserek çalışır; şarj yardımcısı kurulu ve adaptör testi geçmiş olmalı. Değilse eylem nedenini söyleyerek durur.")
+                .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .chargeCard()
         // Checking the helpers launches a process, so it runs off the main thread, never while rendering.
         .task(id: battery.nativeLimits) {
             let limits = !battery.nativeLimits.isEmpty
+            let adapterCut = AdapterModeController.shared.adapterCutAvailable
             readyActions = await Task.detached(priority: .utility) {
-                ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: limits,
+                ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: limits, adapterCutVerified: adapterCut,
                                                   powerModeHelperInstalled: SystemPowerModeService.installed(),
                                                   magSafeHelperInstalled: MagSafeLEDHardwareService.installed())
             }.value

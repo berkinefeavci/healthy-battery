@@ -19,6 +19,11 @@
 - During a discharge or calibration the Mac does not idle-sleep. If the lid closes or the Mac sleeps anyway, the adapter comes back first and the work continues after waking.
 - Sailing in adapter mode: with Sailing on, the adapter comes back only after the battery drops by the sailing range (5–15 points) instead of 5, so the battery charges less often.
 - Heat protection in adapter mode: with Automatic protection on, the adapter is cut when the battery goes above 35 °C while charging, and charging continues below 32 °C. Never below 30% charge.
+- Schedules can run "Discharge to target" and "Start calibration" on Macs where the adapter cut is verified; elsewhere the editor says what is missing. "Pause charging" stays unavailable.
+- Two new Shortcuts actions: Control Discharge (start to the limit or a given percentage, or cancel) and Control Calibration (start or cancel). The status action now also reports calibration, discharge and heat protection driven by the adapter cut.
+- Menu bar: Calibration, Heat protection and Sailing can be shown and display their live state ("Cal. 3/4", "Sailing 70–80%").
+- Cancelling a calibration also ends the Top Up it started, even after the app was restarted in between.
+- The README describes discharge, calibration, adapter mode, sailing and heat protection as experimental features instead of "coming soon".
 
 - Schedule history: the "Run as a new attempt" button is gone. It only added another "not supported" entry and never ran the task. To run a task again, enable it or duplicate it.
 - Schedule: "Add task" starts with "Charge to full" instead of "Pause charging", and the calibration templates are gone. Pause charging, calibration and discharge to a target cannot run on any Mac yet, so the action picker no longer lists them (a task that already uses one keeps it and shows why it cannot be enabled).

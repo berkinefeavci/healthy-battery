@@ -321,6 +321,13 @@ extension Notification.Name {
     static let chargeMateScheduleRuntimeUpdated = Notification.Name("ChargeMateScheduleRuntimeUpdated")
 }
 
+/// Why a scheduled discharge or calibration did not start. `conflict`: the situation (no adapter, battery
+/// already low, another run active) rather than a fault.
+struct ScheduleAdapterRefusal: Error, Equatable {
+    var message: String
+    var conflict = true
+}
+
 #if canImport(AppKit)
 /// Main-run-loop host. Charge-limit, Top Up and power-mode tasks run through the injected dispatchers, which are
 /// the same coordinator-backed paths the manual buttons use. Every other action (pause charging, calibration,
@@ -332,6 +339,8 @@ final class ScheduleRuntime {
     typealias ChargeLimitDispatcher = (Int) -> ChargeControlCoordinator.Result
     typealias TopUpDispatcher = (UUID) -> ChargeControlCoordinator.Result
     typealias PowerDispatcher = (SystemPowerMode) -> Result<SystemPowerMode, SystemPowerModeService.WriteError>
+    /// Starts a discharge to the given level / a calibration; returns the started text or the reason it could not.
+    typealias AdapterDispatcher = (Int?) -> Result<String, ScheduleAdapterRefusal>
     private let scheduleStore: ScheduleStore
     private let engine: ScheduleEngine
     private let capabilities: () -> ScheduleCapabilities
@@ -348,7 +357,9 @@ final class ScheduleRuntime {
          topUp: @escaping TopUpDispatcher = { _ in
              .init(operationID: UUID(), status: .rejected, state: nil, message: String(localized: "Top Up kullanılamıyor."))
          },
-         powerMode: @escaping PowerDispatcher = SystemPowerModeService.applyInstalled) {
+         powerMode: @escaping PowerDispatcher = SystemPowerModeService.applyInstalled,
+         discharge: @escaping AdapterDispatcher = { _ in .failure(.init(message: String(localized: "Deşarj kullanılamıyor."))) },
+         calibration: @escaping AdapterDispatcher = { _ in .failure(.init(message: String(localized: "Kalibrasyon kullanılamıyor."))) }) {
         scheduleStore = ScheduleStore(url: directory.appendingPathComponent("schedules.json"))
         let executions = ScheduleExecutionStore(url: directory.appendingPathComponent("schedule-executions.json"))
         self.capabilities = capabilities
@@ -366,7 +377,12 @@ final class ScheduleRuntime {
                 return Self.outcome(powerMode(.automatic))
             case .enableHighPower:
                 return Self.outcome(powerMode(.turbo))
-            case .pauseCharging, .startCalibration, .dischargeTo:
+            case .dischargeTo:
+                guard let target = task.target else { return .unsupported(String(localized: "Deşarj hedefi eksik.")) }
+                return Self.outcome(discharge(target))
+            case .startCalibration:
+                return Self.outcome(calibration(nil))
+            case .pauseCharging:
                 return .unsupported(task.action.unavailableReason)
             }
         }
@@ -443,6 +459,18 @@ final class ScheduleRuntime {
         case .pending, .reconciled:
             return .init(status: .failed, observedResult: nil,
                          failureReason: result.message, operationID: result.operationID)
+        }
+    }
+
+    /// Discharge and calibration hand over to the advanced charge engine and finish there (they can take
+    /// hours and survive restarts), so a started request is the scheduled run's verified result.
+    static func outcome(_ result: Result<String, ScheduleAdapterRefusal>) -> ScheduleDispatchOutcome {
+        switch result {
+        case .success(let started):
+            return .init(status: .configurationVerified, observedResult: started, failureReason: nil, operationID: nil)
+        case .failure(let refusal):
+            return .init(status: refusal.conflict ? .skippedConflict : .failed, observedResult: nil,
+                         failureReason: refusal.message, operationID: nil)
         }
     }
 

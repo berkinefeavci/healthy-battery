@@ -28,10 +28,19 @@ enum ChargeMateShortcutState: String, CaseIterable {
     case monitoring, charging, paused, sailing, discharging, topUp
     case heatProtect, calibration, unavailable, error
 
-    static func resolve(available: Bool, controlState: String, policyState: String,
+    /// `advancedState`: what the adapter-cut engine is doing ("calibrating", "discharging", "heatPaused",
+    /// "sailing", "adapterCut"); it wins over the native control state, which cannot see the cut.
+    static func resolve(available: Bool, controlState: String, advancedState: String? = nil, policyState: String,
                         isCharging: Bool, externalConnected: Bool) -> Self {
         guard available else { return .unavailable }
         if policyState.hasPrefix("recoveryRequired") || policyState.hasPrefix("pausedByConflict") { return .error }
+        switch advancedState {
+        case "calibrating": return .calibration
+        case "discharging", "adapterCut": return .discharging
+        case "heatPaused": return .heatProtect
+        case "sailing": return .sailing
+        default: break
+        }
         switch controlState {
         case "topUp": return .topUp
         case "heatProtect": return .heatProtect
@@ -46,16 +55,18 @@ enum ChargeMateShortcutState: String, CaseIterable {
     }
 }
 
-/// How many of the eight Shortcuts actions can do their job on this Mac right now.
+/// How many of the ten Shortcuts actions can do their job on this Mac right now.
 enum ChargeMateShortcutReadiness {
     static let readActions = 4     // battery %, charge limit, state, temperature: always answer
-    static let controlActions = 4  // set limit, Top Up, power mode, MagSafe light
+    static let controlActions = 6  // set limit, Top Up, discharge, calibration, power mode, MagSafe light
     static var total: Int { readActions + controlActions }
 
-    /// The reads always work. Limit and Top Up need the native limits macOS reports; power mode and the
-    /// MagSafe light each need their (already installed) helper.
-    static func ready(nativeLimitsAvailable: Bool, powerModeHelperInstalled: Bool, magSafeHelperInstalled: Bool) -> Int {
-        readActions + (nativeLimitsAvailable ? 2 : 0) + (powerModeHelperInstalled ? 1 : 0) + (magSafeHelperInstalled ? 1 : 0)
+    /// The reads always work. Limit and Top Up need the native limits macOS reports; discharge and calibration
+    /// the verified adapter cut; power mode and the MagSafe light each need their (already installed) helper.
+    static func ready(nativeLimitsAvailable: Bool, adapterCutVerified: Bool = false,
+                      powerModeHelperInstalled: Bool, magSafeHelperInstalled: Bool) -> Int {
+        readActions + (nativeLimitsAvailable ? 2 : 0) + (adapterCutVerified ? 2 : 0)
+            + (powerModeHelperInstalled ? 1 : 0) + (magSafeHelperInstalled ? 1 : 0)
     }
 }
 

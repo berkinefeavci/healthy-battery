@@ -4,6 +4,8 @@ struct ScheduleCapabilities: Equatable {
     let chargeLimits: [Int]
     let topUpAvailable: Bool
     let powerModes: Set<SystemPowerMode>
+    /// The verified adapter cut (charge helper + passed adapter test): discharge and calibration can run.
+    var adapterCut = false
 
     static let unavailable = Self(chargeLimits: [], topUpAvailable: false, powerModes: [])
 }
@@ -25,15 +27,10 @@ enum ScheduleAction: String, Codable, CaseIterable, Identifiable {
         }
     }
     var needsTarget: Bool { self == .setChargeLimit || self == .dischargeTo }
-    /// True for the actions a task can really run (charge limit, Top Up, power modes). Pause charging,
-    /// calibration and discharge-to-target have no verified writer on any Mac yet: they are not offered for new
-    /// tasks, and a task saved with one of them still loads and is shown as unsupported.
-    var isRunnable: Bool {
-        switch self {
-        case .topUp, .setChargeLimit, .enableLowPower, .disableLowPower, .enableHighPower: return true
-        case .pauseCharging, .startCalibration, .dischargeTo: return false
-        }
-    }
+    /// True for the actions a task can really run. Pausing charging needs a charge-stop key that macOS 27
+    /// locks, so no Mac can; a task saved with it still loads and is shown as unsupported. Discharge and
+    /// calibration run through the adapter cut where it is verified (`availability` says when it is not).
+    var isRunnable: Bool { self != .pauseCharging }
     /// The actions the editor offers: every runnable one, plus `keeping` so an old task can still be edited.
     static func offered(keeping current: ScheduleAction? = nil) -> [ScheduleAction] {
         allCases.filter { $0.isRunnable || $0 == current }
@@ -51,7 +48,10 @@ enum ScheduleAction: String, Codable, CaseIterable, Identifiable {
             return capabilities.powerModes.contains(.automatic) ? nil : String(localized: "Otomatik güç modu kullanılamıyor.")
         case .enableHighPower:
             return capabilities.powerModes.contains(.turbo) ? nil : String(localized: "Bu Mac Yüksek Güç Modunu sunmuyor.")
-        case .pauseCharging, .startCalibration, .dischargeTo:
+        case .startCalibration, .dischargeTo:
+            return capabilities.adapterCut ? nil
+                : String(localized: "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü).")
+        case .pauseCharging:
             return String(localized: "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı.")
         }
     }

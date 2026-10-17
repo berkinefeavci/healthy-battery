@@ -195,6 +195,17 @@ final class AdvancedChargeRunner: ObservableObject {
         }
     }
 
+    /// Engine state for `ChargeMateShortcutState.resolve`; nil when the engine is not steering anything.
+    var shortcutKey: String? {
+        switch display {
+        case .calibrating: return "calibrating"
+        case .discharging: return "discharging"
+        case .heatPaused: return "heatPaused"
+        case .adapterCut: return settings.sailingEnabled ? "sailing" : "adapterCut"
+        default: return nil
+        }
+    }
+
     static func calibrationTitle(_ phase: CalibrationPhase) -> String {
         switch phase {
         case .chargeToFull: return String(localized: "Kalibrasyon 1/4: %100'e şarj")

@@ -76,6 +76,17 @@ import Foundation
                                               policyState: "idle", isCharging: false,
                                               externalConnected: true) == .sailing,
               "sailing state stays stable")
+        for (key, expected) in [("calibrating", ChargeMateShortcutState.calibration), ("discharging", .discharging),
+                                ("adapterCut", .discharging), ("heatPaused", .heatProtect), ("sailing", .sailing)] {
+            check(ChargeMateShortcutState.resolve(available: true, controlState: "pausedAtLimit", advancedState: key,
+                                                  policyState: "idle", isCharging: false,
+                                                  externalConnected: false) == expected,
+                  "adapter-cut engine state \(key) wins over the native state")
+        }
+        check(ChargeMateShortcutState.resolve(available: true, controlState: "idle", advancedState: "calibrating",
+                                              policyState: "recoveryRequired", isCharging: false,
+                                              externalConnected: true) == .error,
+              "recovery still wins over the engine state")
         check(ChargeMateShortcutState.resolve(available: true, controlState: "idle",
                                               policyState: "recoveryRequired", isCharging: false,
                                               externalConnected: true) == .error,
@@ -86,9 +97,11 @@ import Foundation
               "battery operation resolves to discharging")
 
         // The "actions ready" count follows what can really run: reads always, controls only with their prerequisite.
-        check(ChargeMateShortcutReadiness.total == 8, "eight shortcut actions in total")
+        check(ChargeMateShortcutReadiness.total == 10, "ten shortcut actions in total")
+        check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: true, adapterCutVerified: true, powerModeHelperInstalled: true,
+                                                magSafeHelperInstalled: true) == 10, "everything ready")
         check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: true, powerModeHelperInstalled: true,
-                                                magSafeHelperInstalled: true) == 8, "everything ready")
+                                                magSafeHelperInstalled: true) == 8, "no verified adapter cut costs discharge and calibration")
         check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: false, powerModeHelperInstalled: false,
                                                 magSafeHelperInstalled: false) == 4, "only reads without prerequisites")
         check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: true, powerModeHelperInstalled: false,

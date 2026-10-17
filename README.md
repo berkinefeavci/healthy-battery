@@ -40,8 +40,8 @@
 - **Power modes per source.** Automatic / High Power (Turbo) / Low Power (Battery Saver), tracked separately for "on battery" and "on adapter," backed by macOS's own `pmset` power profiles through a narrowly scoped, allowlisted helper.
 - **Sleep behavior.** Optional: while charging below your target with the adapter connected, Healthy Battery holds a public macOS idle-sleep assertion so your Mac keeps charging instead of going to sleep. It has an 8-hour safety cutoff and never touches lid-close or screen sleep. It does not pause charging by itself during sleep — see Limitations.
 - **MagSafe LED control.** Manual System / Green / Orange / Off control, plus an always-off or scheduled-hours policy, via a signed, narrowly scoped privileged helper that only writes one known SMC key.
-- **Schedules.** Recurring or one-off actions (apply a limit, start Top Up, switch power mode) with a filterable execution history and a retry that really re-runs the action.
-- **Apple Shortcuts actions.** Eight App Intents to read battery percentage, temperature, and status, and to apply a limit, start/cancel Top Up, switch power mode, or set the MagSafe LED.
+- **Schedules.** Recurring or one-off actions (apply a limit, start Top Up, switch power mode, discharge to a level, start a calibration) with a filterable execution history and a retry that really re-runs the action.
+- **Apple Shortcuts actions.** Ten App Intents to read battery percentage, temperature, and status, and to apply a limit, start/cancel Top Up, start/cancel a discharge or calibration, switch power mode, or set the MagSafe LED.
 - **High-energy apps, with Quit.** The energy list groups helper processes under their owning app, shows a real icon, and lets you quit an app straight from the list.
 - **Updates from inside the app.** Healthy Battery asks GitHub for the latest release number at most once a day and shows one notification when a new version is out; both can be turned off in Settings → About. Press **Update** and it downloads that release, checks its checksum, Developer ID signature and Apple notarization, then replaces itself and relaunches. Nothing is sent; see [PRIVACY.md](PRIVACY.md).
 - **Conflict guard.** When another charge-limit tool is running or installed (AlDente, Battery Toolkit, BatFi, batt, battery, bclm), Healthy Battery keeps monitoring but locks its own limit writes, so two apps never fight over the same setting.
@@ -49,13 +49,17 @@
 - **Languages.** English, Türkçe, Deutsch, Français and Español; Healthy Battery follows your macOS language and falls back to English.
 - **Customizable panel.** Long-press a card (or right-click → Edit cards) to reorder, add or remove cards, switch square/wide, and choose which rows the battery-info card shows.
 
-### Planned; needs hardware verification
+### Through the adapter cut (experimental)
 
-These are shown in the UI as locked and marked **"Yakında"** (Coming soon). They are **not working features** — do not expect them to do anything yet:
+macOS 27 does not let any app pause charging while plugged in. What still works is cutting the adapter in software, so the Mac runs from the battery with the cable in. These features use that, through a separate charge helper (one administrator prompt) that only answers Healthy Battery and restores the adapter on unplug, sleep, quit or a missed heartbeat. They unlock after an automatic adapter test passes on your Mac:
 
-- **Discharge / auto-discharge** — no verified way to force the battery to discharge on this hardware.
-- **Sailing** (oscillate within a range) — needs a working pause/resume primitive that hasn't been found.
-- **Calibration** — a long-running, restorable discharge/recharge cycle; not implemented.
+- **Discharge.** The minus button in the panel (or a schedule / Shortcut) runs the Mac from the battery down to the limit or a level you pick, then brings the adapter back.
+- **Calibration.** Charge to 100% (the macOS limit is lifted with Top Up), hold an hour, discharge to 15%, charge to 100% again, then restore the limit; 24 hours at most.
+- **Adapter mode.** Keeps a target from 20% to 100%: the adapter is cut at the target and restored 5 points lower.
+- **Sailing.** In adapter mode, widens that band to 5–15 points so the battery charges less often.
+- **Heat protection in adapter mode.** Above 35 °C while charging the adapter is cut until the battery is below 32 °C (never at or below 30%).
+
+All of them work only while the Mac is awake: the adapter is restored before sleep, and Discharge and Calibration keep the Mac from idle-sleeping while they run.
 
 ## Requirements
 
