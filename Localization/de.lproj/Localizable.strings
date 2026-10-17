@@ -52,7 +52,6 @@
 "%lld%%" = "%lld %%";
 "%lld. %@" = "%lld. %@";
 "(tümü)" = "(alle)";
-"8 eylem hazır" = "8 Aktionen bereit";
 "8 saatlik güvenlik süresi doldu" = "8-Stunden-Sicherheitsgrenze erreicht";
 ":" = ":";
 "Ad" = "Name";
@@ -176,9 +175,7 @@
 "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı." = "Die physische Wirkung dieser Hardwareaktion wurde noch nicht überprüft.";
 "Bu eylem hedef yüzdesi kullanmaz." = "Diese Aktion verwendet keinen Zielprozentsatz.";
 "Bu filtrede kayıt yok" = "Keine Einträge für diesen Filter";
-"Bu kontrol henüz etkin değil; doğrulanmış işlem durumu bekleniyor." = "Diese Steuerung ist noch nicht aktiv; warte auf einen überprüften Vorgangszustand.";
 "Bu kopya imzalı bir sürüm değil; güncellemeyi sürüm sayfasından indirin." = "Diese Kopie ist keine signierte Version; lade das Update von der Versionsseite.";
-"Bu sağ tık eylemi henüz kullanılamıyor. Menü ayarlarından başka bir eylem seçin." = "Diese Rechtsklick-Aktion ist noch nicht verfügbar. Wähle in den Menüeinstellungen eine andere Aktion.";
 "Bu ışık çıkışı desteklenmiyor." = "Diese Lichtausgabe wird nicht unterstützt.";
 "Bu şarj limiti desteklenmiyor." = "Dieses Ladelimit wird nicht unterstützt.";
 "Healthy Battery" = "Healthy Battery";
@@ -214,7 +211,6 @@
 "Devam eden macOS işleminin bitmesini bekleyin." = "Warte, bis der laufende macOS-Vorgang abgeschlossen ist.";
 "Devam ettir" = "Fortsetzen";
 "Deşarj" = "Entladen";
-"Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Entladen und Kalibrierung werden erst zu Kurzbefehle hinzugefügt, wenn ihre überprüften Abläufe fertig sind.";
 "Dil" = "Sprache";
 "Disk artık aynı bağlantıda bulunamadı; çıkarma yapılmadı." = "Das Laufwerk ist nicht mehr an derselben Verbindung; es wurde nicht ausgeworfen.";
 "Disk çıkarılamadı: %@" = "Das Laufwerk konnte nicht ausgeworfen werden: %@";
@@ -254,7 +250,6 @@
 "Düşük Güç Modu açıkken görünen bilgi" = "Wird angezeigt, solange der Stromsparmodus aktiv ist";
 "Düşük Güç Modu rengi" = "Farbe im Stromsparmodus";
 "Düşük Güç Modunu aç" = "Stromsparmodus einschalten";
-"Düşük Güç Modunu değiştir — henüz kullanılamıyor" = "Stromsparmodus umschalten – noch nicht verfügbar";
 "Düşük etki" = "Geringe Auswirkung";
 "DİĞER" = "SONSTIGES";
 "Eklenen döngü" = "Hinzugekommene Zyklen";
@@ -535,7 +530,6 @@
 "Sağlık" = "Zustand";
 "Sağlık değişimi" = "Zustandsänderung";
 "Sağlık eğilimi için en az iki günlük ölçüm gerekiyor. Healthy Battery açık kaldıkça her gün bir özet kaydedilir." = "Für den Zustandsverlauf werden Messwerte von mindestens zwei Tagen benötigt. Solange Healthy Battery geöffnet ist, wird täglich eine Zusammenfassung gespeichert.";
-"Sekiz yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır." = "Acht lokale Aktionen. Lesevorgänge liefern aktuelle Daten; Steuerungen nutzen Healthy Batterys sicheren Ablauf.";
 "Sensör yoksa, veri geçersizse veya ölçüm 10 saniyeden eskiyse Healthy Battery tahmin üretmez." = "Wenn kein Sensor vorhanden, die Daten ungültig oder der Messwert älter als 10 Sekunden ist, schätzt Healthy Battery keinen Wert.";
 "Ses cihazı" = "Audiogerät";
 "Seçilen %%%lld" = "Ausgewählt %lld %%";
@@ -706,7 +700,6 @@
 "macOS limiti · doğrulandı" = "macOS-Limit · überprüft";
 "macOS manuel limiti" = "Manuelles macOS-Limit";
 "macOS pil durumu" = "macOS-Batteriezustand";
-"macOS pil durumu için doğrulanmış veri kaynağı bulunmuyor." = "Für den macOS-Batteriezustand gibt es keine überprüfte Datenquelle.";
 "macOS pil yüzdesi" = "macOS-Batterieprozentsatz";
 "macOS renkli" = "macOS farbig";
 "macOS sade" = "macOS schlicht";
@@ -823,7 +816,6 @@
 "Şarj tamamlandığında" = "Wenn das Laden abgeschlossen ist";
 "Şarj ve boşalmayı hedef bandında dengeler." = "Hält Laden und Entladen innerhalb eines Zielbereichs im Gleichgewicht.";
 "Şarj yönetimi için başka bir uygulama açık." = "Eine andere App zur Ladeverwaltung ist geöffnet.";
-"Şarjı başlat / durdur — henüz kullanılamıyor" = "Laden starten / stoppen – noch nicht verfügbar";
 "Şarjı duraklat" = "Laden pausieren";
 "Şimdi denetle" = "Jetzt prüfen";
 "Şimdi yeniden başlat" = "Jetzt neu starten";
@@ -964,7 +956,6 @@
 "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "Noch keine Messung; die erste kommt innerhalb einer Minute.";
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Anteil an der letzten Messung. Hilfsprozesse einer App werden in einer Zeile zusammengefasst.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Anteil an der gesamten Energiewirkung des Zeitraums (macOS-Messung × Zeit; keine Watt). Daten aus %lld Tagen.";
-"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "Der Planer läuft. Aufgaben für Ladelimit, Vollladen und Energiemodus werden zur fälligen Zeit wirklich ausgeführt und ändern eine Mac-Einstellung; die Ergebnisse stehen im Aufgabenverlauf. Laden pausieren, Kalibrieren und Entladen bis zu einem Ziel sind noch nicht verfügbar.";
 "Şu yardımcı dosyalar silinemedi: %@" = "Diese Hilfsdateien konnten nicht gelöscht werden: %@";
 "Giriş öğesi kayıttan silinemedi: %@" = "Das Anmeldeobjekt konnte nicht abgemeldet werden: %@";
 "Şarj limiti sıfırlanamadı: %@" = "Das Ladelimit konnte nicht zurückgesetzt werden: %@";
@@ -1052,3 +1043,9 @@
 "Yelken %%%lld–%%%lld" = "Segeln %lld–%lld %%";
 "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü)." = "Das Lade-Hilfsprogramm muss installiert und der Netzteiltest bestanden sein (Einstellungen → Ladesteuerung).";
 "Şarj yardımcısı ve geçen adaptör testi gerekir" = "Erfordert das Lade-Hilfsprogramm und einen bestandenen Netzteiltest";
+
+/* Right-click actions, macOS battery condition, schedule note */
+"Deşarjı başlat / durdur" = "Entladen starten / stoppen";
+"Düşük Güç Modunu aç / kapat" = "Stromsparmodus ein / aus";
+"Servis önerilir" = "Service empfohlen";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma, güç modu, hedefe kadar boşaltma ve kalibrasyon görevleri zamanı gelince gerçekten çalışır; sonuçlar Görev geçmişinde görünür. Boşaltma ve kalibrasyon şarj yardımcısı ile geçen adaptör testi ister. Şarjı duraklatmaya macOS izin vermiyor." = "Der Zeitplaner läuft. Aufgaben für Ladelimit, Volladung, Energiemodus, Entladen bis zum Ziel und Kalibrierung laufen zur geplanten Zeit wirklich; die Ergebnisse stehen im Aufgabenverlauf. Entladen und Kalibrierung erfordern das Lade-Hilfsprogramm und einen bestandenen Netzteiltest. Das Pausieren des Ladens lässt macOS nicht zu.";

@@ -245,9 +245,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         case .none: break
         case .likeLeftClick: togglePanel(sender)
         case .openDashboard: showSettings(page: .dashboard)
-        case .toggleCharging, .toggleLowPower:
-            // Preferences may come from a newer build: never dispatch an unverified writer.
-            statusItem?.button?.toolTip = String(localized: "Bu sağ tık eylemi henüz kullanılamıyor. Menü ayarlarından başka bir eylem seçin.")
+        case .toggleCharging:
+            let adapter = AdapterModeController.shared
+            if adapter.dischargeRunning { adapter.toggleDischarge() }
+            else if case .failure(let refusal) = adapter.startDischarge() { statusItem?.button?.toolTip = refusal.message }
+        case .toggleLowPower:
+            battery.applyPowerMode(battery.selectedPowerMode == .lowPower ? .automatic : .lowPower)
         }
     }
 
@@ -266,6 +269,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var menubarControlStates: [MenubarMetric: String] {
         let runner = AdvancedChargeRunner.shared
         var states: [MenubarMetric: String] = [:]
+        if menuPreferences.metrics.contains(.macOSCondition) {
+            MacOSBatteryConditionReader.shared.refreshIfDue { [weak self] in self?.updateMenuBar() }
+            if let condition = MacOSBatteryConditionReader.shared.text { states[.macOSCondition] = condition }
+        }
         if let calibration = runner.memory.calibration {
             states[.calibration] = String(localized: "Kal. \(calibration.phase.step)/4")
         }

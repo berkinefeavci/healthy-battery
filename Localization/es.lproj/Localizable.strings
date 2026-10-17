@@ -52,7 +52,6 @@
 "%lld%%" = "%lld %%";
 "%lld. %@" = "%lld. %@";
 "(tümü)" = "(todo)";
-"8 eylem hazır" = "8 acciones listas";
 "8 saatlik güvenlik süresi doldu" = "Límite de seguridad de 8 horas alcanzado";
 ":" = ":";
 "Ad" = "Nombre";
@@ -176,9 +175,7 @@
 "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı." = "Aún no se ha verificado el efecto físico de esta acción de hardware.";
 "Bu eylem hedef yüzdesi kullanmaz." = "Esta acción no usa un porcentaje objetivo.";
 "Bu filtrede kayıt yok" = "No hay registros para este filtro";
-"Bu kontrol henüz etkin değil; doğrulanmış işlem durumu bekleniyor." = "Este control aún no está activo; esperando un estado de operación verificado.";
 "Bu kopya imzalı bir sürüm değil; güncellemeyi sürüm sayfasından indirin." = "Esta copia no es una versión firmada; descarga la actualización desde la página de la versión.";
-"Bu sağ tık eylemi henüz kullanılamıyor. Menü ayarlarından başka bir eylem seçin." = "Esta acción de clic derecho aún no está disponible. Elige otra en los ajustes del menú.";
 "Bu ışık çıkışı desteklenmiyor." = "Esta salida de luz no es compatible.";
 "Bu şarj limiti desteklenmiyor." = "Este límite de carga no es compatible.";
 "Healthy Battery" = "Healthy Battery";
@@ -214,7 +211,6 @@
 "Devam eden macOS işleminin bitmesini bekleyin." = "Espera a que termine la operación de macOS en curso.";
 "Devam ettir" = "Reanudar";
 "Deşarj" = "Descargar";
-"Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Descarga y Calibración no se añadirán a Atajos hasta que sus motores verificados estén terminados.";
 "Dil" = "Idioma";
 "Disk artık aynı bağlantıda bulunamadı; çıkarma yapılmadı." = "El disco ya no está en la misma conexión; no se expulsó.";
 "Disk çıkarılamadı: %@" = "No se pudo expulsar el disco: %@";
@@ -254,7 +250,6 @@
 "Düşük Güç Modu açıkken görünen bilgi" = "Se muestra mientras el modo de bajo consumo está activo";
 "Düşük Güç Modu rengi" = "Color del modo de bajo consumo";
 "Düşük Güç Modunu aç" = "Activar el modo de bajo consumo";
-"Düşük Güç Modunu değiştir — henüz kullanılamıyor" = "Alternar el modo de bajo consumo — aún no disponible";
 "Düşük etki" = "Impacto bajo";
 "DİĞER" = "OTROS";
 "Eklenen döngü" = "Ciclos añadidos";
@@ -535,7 +530,6 @@
 "Sağlık" = "Salud";
 "Sağlık değişimi" = "Cambio de salud";
 "Sağlık eğilimi için en az iki günlük ölçüm gerekiyor. Healthy Battery açık kaldıkça her gün bir özet kaydedilir." = "La tendencia de salud necesita lecturas de al menos dos días. Mientras Healthy Battery esté abierto, se guarda un resumen cada día.";
-"Sekiz yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır." = "Ocho acciones locales. Las lecturas devuelven datos actuales; los controles usan la vía segura de Healthy Battery.";
 "Sensör yoksa, veri geçersizse veya ölçüm 10 saniyeden eskiyse Healthy Battery tahmin üretmez." = "Si no hay sensor, los datos no son válidos o la lectura tiene más de 10 segundos, Healthy Battery no estima ningún valor.";
 "Ses cihazı" = "Dispositivo de audio";
 "Seçilen %%%lld" = "Seleccionado %lld %%";
@@ -706,7 +700,6 @@
 "macOS limiti · doğrulandı" = "Límite de macOS · verificado";
 "macOS manuel limiti" = "Límite manual de macOS";
 "macOS pil durumu" = "Estado de la batería de macOS";
-"macOS pil durumu için doğrulanmış veri kaynağı bulunmuyor." = "No hay una fuente de datos verificada para el estado de la batería de macOS.";
 "macOS pil yüzdesi" = "Porcentaje de batería de macOS";
 "macOS renkli" = "macOS en color";
 "macOS sade" = "macOS sencillo";
@@ -823,7 +816,6 @@
 "Şarj tamamlandığında" = "Cuando termina la carga";
 "Şarj ve boşalmayı hedef bandında dengeler." = "Equilibra la carga y la descarga dentro de un rango objetivo.";
 "Şarj yönetimi için başka bir uygulama açık." = "Hay otra app de gestión de carga abierta.";
-"Şarjı başlat / durdur — henüz kullanılamıyor" = "Iniciar / detener la carga — aún no disponible";
 "Şarjı duraklat" = "Pausar la carga";
 "Şimdi denetle" = "Comprobar ahora";
 "Şimdi yeniden başlat" = "Reiniciar ahora";
@@ -964,7 +956,6 @@
 "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "Aún no hay lecturas; la primera llega en un minuto.";
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Proporción de la última lectura. Los procesos auxiliares de una app se agrupan en una fila.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Proporción del impacto energético total del periodo (lectura de macOS × tiempo; no son vatios). %lld días de datos.";
-"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "El planificador está en marcha. Las tareas de límite de carga, carga completa y modo de energía se ejecutan de verdad a su hora y cambian un ajuste del Mac; los resultados aparecen en el historial de tareas. Pausar la carga, calibrar y descargar hasta un objetivo aún no están disponibles.";
 "Şu yardımcı dosyalar silinemedi: %@" = "No se pudieron borrar estos archivos auxiliares: %@";
 "Giriş öğesi kayıttan silinemedi: %@" = "No se pudo quitar el elemento de inicio: %@";
 "Şarj limiti sıfırlanamadı: %@" = "No se pudo restablecer el límite de carga: %@";
@@ -1052,3 +1043,9 @@
 "Yelken %%%lld–%%%lld" = "Navegación %lld–%lld %%";
 "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü)." = "El ayudante de carga debe estar instalado y la prueba del adaptador superada (Ajustes → Control de carga).";
 "Şarj yardımcısı ve geçen adaptör testi gerekir" = "Requiere el ayudante de carga y una prueba del adaptador superada";
+
+/* Right-click actions, macOS battery condition, schedule note */
+"Deşarjı başlat / durdur" = "Iniciar / detener la descarga";
+"Düşük Güç Modunu aç / kapat" = "Activar / desactivar el modo de bajo consumo";
+"Servis önerilir" = "Se recomienda revisión";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma, güç modu, hedefe kadar boşaltma ve kalibrasyon görevleri zamanı gelince gerçekten çalışır; sonuçlar Görev geçmişinde görünür. Boşaltma ve kalibrasyon şarj yardımcısı ile geçen adaptör testi ister. Şarjı duraklatmaya macOS izin vermiyor." = "El programador está activo. Las tareas de límite de carga, carga completa, modo de energía, descarga hasta el objetivo y calibración se ejecutan de verdad a su hora; los resultados aparecen en el historial. La descarga y la calibración requieren el ayudante de carga y una prueba del adaptador superada. macOS no permite pausar la carga.";
