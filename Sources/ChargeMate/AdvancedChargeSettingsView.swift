@@ -7,21 +7,27 @@ struct AdvancedChargeSettingsView: View {
     @ObservedObject private var adapter = AdapterModeController.shared
 
     private var supported: Bool { runner.capabilities.canInhibitCharging }
-    private var canDischarge: Bool { supported && runner.capabilities.canForceDischarge }
+    /// Verified adapter cut (helper + passed self-test): Discharge and Calibration work through it.
+    private var adapterCut: Bool { !supported && adapter.adapterCutAvailable }
+    private var canDischarge: Bool { (supported && runner.capabilities.canForceDischarge) || adapterCut }
+    private var limitControls: Bool { supported || adapter.active }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("Gelişmiş şarj (deneysel)", systemImage: "flask").font(.headline)
                 Spacer()
-                StatusBadge(text: statusText, color: (supported || adapter.active) ? .green : .secondary, icon: (supported || adapter.active) ? "checkmark.circle" : "lock.fill")
+                StatusBadge(text: statusText, color: (supported || adapterCut) ? .green : .secondary, icon: (supported || adapterCut) ? "checkmark.circle" : "lock.fill")
             }
             adapterModeSection
             Divider()
             if adapter.active {
                 // Adapter mode status replaces the generic "locked" text.
+            } else if adapterCut {
+                Text("Adaptör modu kapalı: sınırı macOS tutar. Deşarj ve kalibrasyon yine de aşağıdan adaptör kesilerek çalışır.")
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             } else if !supported && adapter.helperInstalled {
-                Text("Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır.")
+                Text("Bu Mac şarjı takılıyken durdurmaya izin vermiyor; Healthy Battery bunun yerine adaptörü keser. Deşarj, kalibrasyon ve adaptör modu, otomatik adaptör testi geçince açılır.")
                     .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             } else if !supported {
                 Text(runner.capabilities.reason ?? String(localized: "Şarj durdurma yardımcısı kurulu ya da doğrulanmış değil. Bu ayarlar şimdilik etkisizdir ve donanıma hiçbir şey yazmaz."))
@@ -29,8 +35,8 @@ struct AdvancedChargeSettingsView: View {
             } else if !runner.reason.isEmpty {
                 Text(runner.reason).font(.caption).foregroundStyle(.secondary)
             }
-            // Without a verified charge-inhibit key these controls cannot do anything: hidden, not greyed out.
-            if supported || adapter.active {
+            // Without a verified lever these controls cannot do anything: hidden, not greyed out.
+            if limitControls {
                 Divider()
                 Group {
                     if adapter.active {
@@ -46,9 +52,15 @@ struct AdvancedChargeSettingsView: View {
                     Toggle("Yelken modu", isOn: $runner.settings.sailingEnabled)
                     if runner.settings.sailingEnabled {
                         Stepper(value: $runner.settings.sailingDelta,
-                                in: AdvancedChargeLimits.minSailingDelta...AdvancedChargeLimits.maxSailingDelta) {
+                                in: (adapter.active ? AdvancedChargeLimits.adapterMinBand : AdvancedChargeLimits.minSailingDelta)...AdvancedChargeLimits.maxSailingDelta) {
                             Text("Yelken aralığı: %\(runner.settings.sailingDelta) (şarj %\(runner.settings.targetLimit - runner.settings.sailingDelta) altında yeniden başlar)")
                         }
+                    }
+                    if adapter.active {
+                        Text(runner.settings.sailingEnabled
+                             ? String(localized: "Yelken açık: adaptör hedefte kesilir, pil yelken aralığı kadar inince geri açılır. Pil daha seyrek şarj olur.")
+                             : String(localized: "Yelken kapalı: adaptör hedefte kesilir, pil 5 puan inince geri açılır."))
+                            .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                     }
                     Text("Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir.")
                         .font(.caption2).foregroundStyle(.secondary)
@@ -56,26 +68,38 @@ struct AdvancedChargeSettingsView: View {
                         Text("Uyku sırasında hedefin üstüne çıkabilir.").font(.caption2).foregroundStyle(.orange)
                     }
                 }
-                .disabled(!supported)
+            }
+            if canDischarge {
                 Divider()
                 HStack {
                     if runner.memory.discharge != nil {
                         Button("Deşarjı iptal et") { runner.cancelDischarge() }
+                    } else if adapterCut {
+                        Button("%\(adapter.dischargeLimit) seviyesine deşarj et") { adapter.toggleDischarge() }
+                            .disabled(adapter.dischargeBlockReason != nil)
+                            .help(adapter.dischargeBlockReason ?? "")
                     } else {
-                        Button("Hedefe kadar deşarj et") { runner.requestDischarge() }.disabled(!canDischarge)
+                        Button("Hedefe kadar deşarj et") { runner.requestDischarge() }
                     }
                     if runner.memory.calibration != nil {
                         Button("Kalibrasyonu iptal et") { runner.cancelCalibration() }
                     } else {
-                        Button("Kalibrasyonu başlat") { runner.startCalibration() }.disabled(!canDischarge)
+                        Button("Kalibrasyonu başlat") { adapterCut ? adapter.startCalibration() : runner.startCalibration() }
                     }
                     Spacer()
+                }
+                if let calibration = runner.memory.calibration {
+                    Text(AdvancedChargeRunner.calibrationTitle(calibration.phase)).font(.caption.weight(.medium))
                 }
                 if let error = runner.lastError {
                     Text(error).font(.caption).foregroundStyle(.red)
                 }
-                Text("Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat).")
+                Text("Kalibrasyon: %100'e şarj, 1 saat bekleme, %15 seviyesine deşarj, yeniden %100, ardından sınır geri yüklenir (en fazla 24 saat).")
                     .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                if adapterCut {
+                    Text("Deşarj ve kalibrasyon sürerken Mac boşta uyumaz. Kapak kapanır ya da Mac uyursa adaptör geri açılır; işlem Mac uyanınca kaldığı yerden sürer.")
+                        .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
             }
         }
         .chargeCard()
@@ -88,6 +112,10 @@ struct AdvancedChargeSettingsView: View {
             Text("Bu Mac'te macOS şarjı durdurmaya izin vermiyor. Adaptör modu, pil hedefe ulaşınca adaptörü yazılımla keser (Mac pilden çalışır) ve pil birkaç puan düşünce geri açar. Yalnızca Mac uyanıkken çalışır; uykudan önce adaptör geri açılır, bu yüzden uyku sırasında pil hedefin üstüne, macOS sınırına kadar çıkabilir. Pil günde yaklaşık 1 döngüyü sığ biçimde kullanır. Yardımcı kurulunca adaptör kesme bu Mac'te otomatik olarak test edilir.")
                 .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             selfTestRow
+            if adapter.active, runner.settings.heatProtectionEnabled {
+                Text("Isı koruması açık: şarj sırasında pil 35 °C'yi geçerse adaptör kesilir, 32 °C'nin altına inince şarj sürer.")
+                    .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
             if !adapter.helperInstalled {
                 HStack {
                     Button(adapter.installing ? String(localized: "Kuruluyor…") : String(localized: "Yardımcıyı kur")) {
@@ -132,10 +160,10 @@ struct AdvancedChargeSettingsView: View {
     }
 
     private var statusText: String {
-        if adapter.active {
+        if adapter.active, runner.display == .idle || runner.display == .adapterCut {
             return runner.display == .adapterCut ? String(localized: "Adaptör kesildi") : String(localized: "Adaptör modu")
         }
-        guard supported else { return String(localized: "Kullanılamıyor") }
+        guard supported || adapterCut else { return String(localized: "Kullanılamıyor") }
         switch runner.display {
         case .unavailable: return String(localized: "Kullanılamıyor")
         case .idle: return String(localized: "Hazır")

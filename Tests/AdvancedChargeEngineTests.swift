@@ -16,6 +16,10 @@ private final class FakeBackend: ChargeInhibitBackend {
     func heartbeat() throws { heartbeats += 1 }
 }
 
+private func plainSettingsForRunner(_ settings: AdvancedChargeSettings) -> AdvancedChargeSettings {
+    var s = settings; s.adapterModeEnabled = false; return s
+}
+
 @main enum AdvancedChargeEngineTests {
     static func main() {
         var count = 0
@@ -174,7 +178,7 @@ private final class FakeBackend: ChargeInhibitBackend {
                       sleep: sleep, topUp: topUp, memory: memory))
         }
         var plain = ad; plain.adapterModeEnabled = false
-        check(arun(95, plain).desired == .released && arun(95, plain).display == .unavailable, "adapter mode off stays unavailable")
+        check(arun(95, plain).desired == .released && arun(95, plain).display == .idle, "adapter mode off leaves the limit to macOS")
         check(run(input(95, settings: ad, caps: .unsupported)).desired == .released, "adapter mode needs force-discharge capability")
         check(arun(79).desired == .released && arun(79).display == .idle, "adapter below target charges")
         let a1 = arun(80)
@@ -194,7 +198,7 @@ private final class FakeBackend: ChargeInhibitBackend {
         check(AdvancedChargeEngine.adapterResumeAt(target: 80, sailingDelta: 2) == 75, "min band 5")
         let sm2 = arun(80, smallDelta).memory
         check(arun(76, smallDelta, memory: sm2).desired == cut && arun(75, smallDelta, memory: sm2).desired == .released, "small delta uses band 5")
-        var bigDelta = ad; bigDelta.sailingDelta = 10
+        var bigDelta = ad; bigDelta.sailingEnabled = true; bigDelta.sailingDelta = 10
         let bm = arun(80, bigDelta).memory
         check(arun(71, bigDelta, memory: bm).desired == cut && arun(70, bigDelta, memory: bm).desired == .released, "big delta widens band")
         check(AdvancedChargeEngine.adapterResumeAt(target: 80, sailingDelta: 15) == 65, "delta 15")
@@ -213,10 +217,48 @@ private final class FakeBackend: ChargeInhibitBackend {
         check(!arun(9, memory: latched).memory.adapterLatched, "critical clears latch")
         check(arun(90, topUp: true).desired == .released && arun(90, topUp: true).display == .topUp, "adapter top up releases")
         check(!arun(90, memory: latched, topUp: true).memory.adapterLatched, "top up clears latch")
-        // heat: no adapter action
+        // heat: adapter mode cuts the adapter while charging makes the battery hot
         var adHeat = ad; adHeat.heatProtectionEnabled = true
-        check(arun(50, adHeat, temp: 45).desired == .released && arun(50, adHeat, temp: 45).display == .idle, "adapter mode ignores heat")
+        let hotCut = arun(50, adHeat, temp: 45)
+        check(hotCut.desired == cut && hotCut.display == .heatPaused && hotCut.memory.heatLatched, "adapter mode cuts for heat")
+        check(arun(50, adHeat, memory: hotCut.memory, temp: 34).desired == cut, "adapter heat hysteresis")
+        check(arun(50, adHeat, memory: hotCut.memory, temp: 31).desired == .released, "adapter heat ends below 32")
+        check(arun(30, adHeat, temp: 45).desired == .released && !arun(30, adHeat, temp: 45).memory.heatLatched, "no heat cut at the floor")
+        check(arun(31, adHeat, memory: hotCut.memory, temp: 45).desired == cut, "heat cut above the floor")
+        check(arun(25, adHeat, memory: hotCut.memory, temp: 45).desired == .released, "heat latch dropped below the floor")
+        check(arun(50, ad, temp: 45).desired == .released, "heat switch off: no heat cut")
         check(arun(85, adHeat, temp: 45).desired == cut, "limit still cuts when hot")
+        var notCharging = input(50, temp: 45, settings: adHeat, caps: adapterCaps); notCharging.isCharging = false
+        check(run(notCharging).desired == .released, "heat cut starts only while charging")
+        var plainHeat = plain; plainHeat.heatProtectionEnabled = true
+        check(arun(50, plainHeat, temp: 45).desired == .released, "adapter mode off: native heat protection only")
+        // sailing widens the adapter band
+        var adSail = ad; adSail.sailingEnabled = true; adSail.sailingDelta = 10
+        var sl = arun(80, adSail).memory
+        for pct in [79, 75, 71] { let o = arun(pct, adSail, memory: sl); sl = o.memory; check(o.desired == cut, "sailing band holds cut at \(pct)") }
+        check(arun(70, adSail, memory: sl).desired == .released, "sailing band resumes at target-10")
+        var adSailOff = ad; adSailOff.sailingDelta = 10
+        check(AdvancedChargeEngine.adapterResumeAt(target: 80, settings: adSailOff) == 75, "sailing off keeps the 5 point band")
+        check(AdvancedChargeEngine.adapterResumeAt(target: 80, settings: adSail) == 70, "sailing on uses its range")
+        // on-demand discharge and calibration with adapter mode off
+        let toLimit = AdvancedChargeMemory(discharge: DischargeRequest(requestedAt: t0, target: 80))
+        check(arun(95, plain, memory: toLimit).desired == cut && arun(95, plain, memory: toLimit).display == .discharging, "discharge works without adapter mode")
+        let doneDis = arun(80, plain, memory: toLimit)
+        check(doneDis.desired == .released && doneDis.memory.discharge == nil && doneDis.display == .idle, "discharge ends and macOS holds the limit")
+        let storage = AdvancedChargeMemory(discharge: DischargeRequest(requestedAt: t0, target: 50))
+        check(arun(70, plain, memory: storage).desired == cut && arun(50, plain, memory: storage).memory.discharge == nil, "discharge to an explicit level")
+        check(arun(95, plain, memory: toLimit, sleep: .asleep).desired == .released, "sleep releases on-demand discharge")
+        check(arun(95, plain, memory: toLimit, sleep: .asleep).memory.discharge != nil, "discharge resumes after sleep")
+        let calLow = AdvancedChargeMemory(calibration: CalibrationSession(startedAt: t0, phase: .dischargeToLow, holdStartedAt: nil))
+        check(arun(50, plain, memory: calLow).desired == cut, "calibration discharge without adapter mode")
+        let calFull = AdvancedChargeMemory(calibration: CalibrationSession(startedAt: t0, phase: .chargeToFull, holdStartedAt: nil))
+        let calTop = arun(60, plain, memory: calFull, topUp: true)
+        check(calTop.desired == .released && calTop.display == .calibrating(.chargeToFull), "calibration keeps its phase during its Top Up")
+        check(arun(100, plain, memory: calFull, topUp: true).memory.calibration?.phase == .hold, "calibration advances during Top Up")
+        var at99 = input(99, settings: plain, caps: adapterCaps, memory: calFull); at99.isCharging = false
+        check(run(at99).memory.calibration?.phase == .hold, "99% with charging stopped counts as full")
+        check(arun(99, plain, memory: calFull).memory.calibration?.phase == .chargeToFull, "99% still charging is not full")
+        check(arun(50, plain, memory: calLow, topUp: true).desired == .released && arun(50, plain, memory: calLow, topUp: true).display == .topUp, "user Top Up beats calibration discharge")
         // discharge and calibration keep priority
         let adDis = AdvancedChargeMemory(discharge: DischargeRequest(requestedAt: t0))
         check(arun(90, memory: adDis).desired == cut && arun(90, memory: adDis).display == .discharging, "adapter discharge request")
@@ -255,6 +297,25 @@ private final class FakeBackend: ChargeInhibitBackend {
         check(adFake.state == cut, "runner re-cuts after wake")
         adRunner.update(percentage: 74, temperatureC: 25, externalConnected: true, isCharging: true, topUpActive: false, now: t0.addingTimeInterval(30))
         check(adFake.state == .released && adRunner.adapterStatusText == nil, "runner restores adapter at resume level")
+
+        // Runner: macOS reports no external power while we hold the cut; the helper's cable check decides
+        let cableFake = FakeBackend(); cableFake.caps = adapterCaps
+        let cableRunner = AdvancedChargeRunner(backend: cableFake, defaults: UserDefaults(suiteName: "adapter-cable-\(UUID())")!)
+        cableRunner.settings = ad
+        cableRunner.update(percentage: 82, temperatureC: 25, externalConnected: true, isCharging: true, topUpActive: false, now: t0)
+        check(cableFake.state == cut, "cut at target")
+        cableRunner.update(percentage: 81, temperatureC: 25, externalConnected: false, isCharging: false, topUpActive: false, now: t0.addingTimeInterval(5))
+        check(cableFake.state == cut && cableRunner.display == .adapterCut && cableFake.applies.count == 1, "own cut is not an unplug")
+        check(cableRunner.panelTitle?.contains("80") == true, "panel title names the adapter target")
+        cableFake.state = .released // helper saw the real unplug (AC-W) and released
+        cableRunner.update(percentage: 80, temperatureC: 25, externalConnected: false, isCharging: false, topUpActive: false, now: t0.addingTimeInterval(10))
+        check(cableRunner.display == .onBattery && cableRunner.applied == .released, "real unplug ends the cut")
+        cableRunner.settings = plainSettingsForRunner(ad)
+        cableRunner.update(percentage: 95, temperatureC: 25, externalConnected: true, isCharging: false, topUpActive: false, now: t0.addingTimeInterval(20))
+        cableRunner.requestDischarge(to: 85, now: t0.addingTimeInterval(21))
+        check(cableFake.state == cut && cableRunner.dischargeTarget == 85 && cableRunner.adapterStatusText?.contains("85") == true, "discharge to the macOS limit")
+        cableRunner.update(percentage: 85, temperatureC: 25, externalConnected: false, isCharging: false, topUpActive: false, now: t0.addingTimeInterval(30))
+        check(cableFake.state == .released && cableRunner.memory.discharge == nil, "discharge done restores the adapter")
 
         // Runner
         let defaults = UserDefaults(suiteName: "advanced-charge-tests-\(UUID())")!

@@ -45,11 +45,12 @@ grep -Fq '.focusable().focused($focused).quietVisualizationFocus()' Sources/Char
 grep -Fq '.allowsHitTesting(!battery.applyingPowerMode)' Sources/ChargeMate/PowerModeView.swift
 grep -Fq 'if let message = battery.powerModeMessage' Sources/ChargeMate/PowerModeView.swift
 ! grep -Eq 'Top Up.*disabled\(true\)|disabled\(true\).*Top Up' Sources/ChargeMate/Views.swift
-# Popover quick actions stay explicit: Top Up is shown as Doldur; unsupported
-# force-battery control is visible but cannot pretend to work.
-grep -Fq '.accessibilityLabel("Deşarj yakında; henüz kullanılamıyor")' Sources/ChargeMate/Views.swift
+# Popover quick actions stay explicit: Top Up is shown as Doldur; Discharge only acts through the
+# verified adapter cut and is disabled (with its reason) otherwise.
+grep -Fq 'Button { adapter.toggleDischarge() }' Sources/ChargeMate/Views.swift
+grep -Fq '.disabled(!adapter.dischargeRunning && adapter.dischargeBlockReason != nil)' Sources/ChargeMate/Views.swift
+grep -Fq 'var adapterCutAvailable: Bool { kind == .adapter && runner.capabilities.canForceDischarge }' Sources/ChargeMate/AdapterModeController.swift
 grep -Fq 'Text("Doldur")' Sources/ChargeMate/Views.swift
-grep -Fq '.popoverToolbarButtonStyle(iconOnly: true).disabled(true)' Sources/ChargeMate/Views.swift
 grep -Fq 'Text("Sınır: %\(shownLimit)")' Sources/ChargeMate/Views.swift
 # Panel must show the limit macOS really enforces, never only the saved preference.
 grep -Fq 'ChargeLimitDisplay.shown(native: battery.nativeLimit' Sources/ChargeMate/Views.swift

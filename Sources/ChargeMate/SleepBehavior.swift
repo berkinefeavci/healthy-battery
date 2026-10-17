@@ -73,12 +73,12 @@ enum SleepAssertionError: LocalizedError, Equatable {
 }
 
 enum SleepAssertionBackend {
-    static func acquire() throws -> UInt32 {
+    static func acquire(reason: String = String(localized: "Healthy Battery hedef doluluğa kadar şarjı izliyor")) throws -> UInt32 {
         var identifier = IOPMAssertionID(kIOPMNullAssertionID)
         let result = IOPMAssertionCreateWithName(
             "PreventUserIdleSystemSleep" as CFString,
             IOPMAssertionLevel(kIOPMAssertionLevelOn),
-            String(localized: "Healthy Battery hedef doluluğa kadar şarjı izliyor") as CFString,
+            reason as CFString,
             &identifier
         )
         guard result == kIOReturnSuccess else { throw SleepAssertionError.creationFailed(result) }
@@ -108,7 +108,7 @@ final class SleepInhibitionController: ObservableObject {
     private var blockedStatus: SleepInhibitionStatus?
     private var cancelTimeout: (() -> Void)?
 
-    init(acquire: @escaping Acquire = SleepAssertionBackend.acquire,
+    init(acquire: @escaping Acquire = { try SleepAssertionBackend.acquire() },
          release: @escaping Release = SleepAssertionBackend.release,
          scheduleTimeout: @escaping ScheduleTimeout = { delay, action in
              let timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in action() }

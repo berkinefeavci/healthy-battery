@@ -1548,6 +1548,10 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     }
     var statusSentence: String {
         guard snapshot.available else { return String(localized: "Batarya verisi bekleniyor.") }
+        // Our own adapter cut: macOS then reports no external power although the cable is in.
+        if adapterCutByApp {
+            return String(localized: "Healthy Battery adaptörü geçici olarak kesti: kablo takılı ama MacBook pilden çalışıyor. Adaptör kendiliğinden geri açılır.")
+        }
         switch snapshot.powerFlow.mode {
         case .charging:
             return String(localized: "Adaptör MacBook’u çalıştırıyor ve bataryayı şarj ediyor. \(otherControllerRunning ? String(localized: "Şarj yönetimi için başka bir uygulama açık.") : String(localized: "macOS’un bildirdiği şarj durumu izleniyor."))")
