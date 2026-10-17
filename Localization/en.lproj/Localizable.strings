@@ -837,7 +837,6 @@
 "Gelişmiş şarj (deneysel)" = "Advanced charging (experimental)";
 "Hedef sınır: %%%lld" = "Target limit: %lld%%";
 "Hedefe kadar deşarj et" = "Discharge to target";
-"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Heat protection: pause charging above 35 °C, resume below 32 °C";
 "Isı nedeniyle duraklatıldı" = "Paused because of heat";
 "Kalibrasyon sürüyor" = "Calibration in progress";
 "Kalibrasyonu başlat" = "Start calibration";
@@ -939,7 +938,6 @@
 "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "No reading yet; the first one arrives within a minute.";
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Share of the latest reading. Helper processes of an app are combined into one row.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Share of the period's total energy impact (macOS reading × time; not watts). %lld days of data.";
-"Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "This Mac does not let apps pause charging while plugged in, so sailing, heat pause, sleep behavior, discharge and calibration are not shown here. With adapter mode on, the target limit is applied through it.";
 "Yönetici onayı iptal edildi; yardımcı kurulmadı." = "Administrator approval was cancelled; the helper was not installed.";
 "Şarj durdurma yardımcısı kurulamadı." = "The charge-pause helper could not be installed.";
 "Şarj durdurma yardımcısı isteği anlamadı." = "The charge-pause helper did not understand the request.";
@@ -953,12 +951,8 @@
 "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor)." = "Pausing charging is still locked (experimental, waiting for a physical test).";
 "Giriş öğesi kayıttan silinemedi: %@" = "The login item could not be removed: %@";
 "Şarj limiti %%100'e sıfırlanamadı: %@" = "The charge limit could not be reset to 100%%: %@";
-"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "The scheduler is running. Charge limit, charge to full and power mode tasks really run when they are due and change a Mac setting; results appear in the task history. Pausing charging, calibration and discharging to a target are not available yet.";
-"Şu yardımcı dosyalar silinemedi: %@" = "These helper files could not be deleted: %@";
-"Şarj limiti sıfırlanamadı: %@" = "The charge limit could not be reset: %@";
 "Uygulama verileri silinemedi: %@" = "The app data could not be deleted: %@";
 "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:" = "Helpers and services were removed, but some steps did not finish:";
-"Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz." = "Enabled tasks run when they are due: charge limit, Top Up and power mode tasks change the macOS setting. Pausing charging, calibration and discharging to a target cannot run yet.";
 "Yeni çalışma %@ başladı; sonuç Görev geçmişinde güncellenir." = "New run %@ has started; the result will be updated in the task history.";
 "Yeni çalışma %@ tamamlanamadı: %@" = "New run %@ did not complete: %@";
 "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "New run %@ finished; the setting was verified by reading it back.";
@@ -1027,7 +1021,6 @@
 
 /* Schedule, Shortcuts and menu bar states for discharge, calibration, sailing and heat */
 "%100 → 1 saat → %15 → %100; başlat veya iptal et" = "100% → 1 hour → 15% → 100%; start or cancel";
-"10 eylem hazır" = "10 actions ready";
 "Bir deşarj zaten sürüyor." = "A discharge is already running.";
 "Deşarj başladı: pil %%%lld seviyesine iniyor" = "Discharge started: the battery goes down to %lld%%";
 "Deşarj hedefi eksik." = "The discharge target is missing.";

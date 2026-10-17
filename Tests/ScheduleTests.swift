@@ -86,7 +86,8 @@ enum ScheduleTests {
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
         let store = ScheduleStore(url: root.appendingPathComponent("schedules.json"))
-        legacy.enabled = false
+        // A task saved with an action no Mac can run (pause charging) still loads as is.
+        var legacy = fresh; legacy.action = .pauseCharging; legacy.name = "Eski duraklatma"
         try store.save([fresh, target, legacy])
         let loaded = store.load()
         check(loaded.warning == nil && loaded.tasks == [fresh, target, legacy], "store round trip keeps tasks with now-unsupported actions")

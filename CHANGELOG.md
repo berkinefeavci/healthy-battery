@@ -1,11 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.5.0
 
 - The power-mode and MagSafe light helpers (version 3) answer only Healthy Battery signed by the same developer, like the charge helper since 1.4.2. Before, any program running as your user could change the power mode or the light. Both ask for the administrator password once more, the next time you change the power mode or set up the light.
 - A dismissed administrator prompt is no longer shown as a failure. Uninstall says which steps did not finish instead of always reporting success, and keeps the app open when something is left.
 - The in-app updater checks the downloaded app against an explicit Developer ID requirement (your installed app's team and bundle id) and follows download redirects only to GitHub's own hosts.
-- Schedule: "Run as new execution" in the history now really runs the action again (limit, Top Up or power mode) and shows the real result. Pause charging, calibration and discharge to a target cannot run, so they are no longer offered; "Add task" starts from Top Up and the two calibration templates are gone. Tasks saved earlier with those actions still load and show as unsupported. The page text now says what runs.
+- Schedule: "Run as new execution" in the history now really runs the action again (limit, Top Up or power mode) and shows the real result. Pause charging cannot run on any Mac, so it is no longer offered; "Add task" starts from Top Up and the two calibration templates are gone. Tasks saved earlier with it still load and show as unsupported. The page text now says what runs.
 - Failures are no longer swallowed: a Top Up that did not start, a limit that macOS refused (also with the limit editor closed) and a long-term history file that could not be saved show their reason. Helper and policy error messages follow the app language.
 - Heat protection is one switch (Settings → Charge Control → Automatic protection); the locked "Soon" row, the unused heat/sailing/maximum-temperature preferences and the unused "sleep behaviour" advanced setting are gone. Discharge and calibration buttons appear only on Macs that can use them. The MagSafe "by state" policy, which could not be selected, is removed.
 - The history range (1 / 6 / 24 h) now applies to the charts at rest, on square cards too; hovering only adds the axes.
@@ -24,17 +24,6 @@
 - Menu bar: Calibration, Heat protection and Sailing can be shown and display their live state ("Cal. 3/4", "Sailing 70–80%").
 - Cancelling a calibration also ends the Top Up it started, even after the app was restarted in between.
 - The README describes discharge, calibration, adapter mode, sailing and heat protection as experimental features instead of "coming soon".
-
-- Schedule history: the "Run as a new attempt" button is gone. It only added another "not supported" entry and never ran the task. To run a task again, enable it or duplicate it.
-- Schedule: "Add task" starts with "Charge to full" instead of "Pause charging", and the calibration templates are gone. Pause charging, calibration and discharge to a target cannot run on any Mac yet, so the action picker no longer lists them (a task that already uses one keeps it and shows why it cannot be enabled).
-- Schedule page: the note said no task changes a macOS setting. That was wrong: charge limit, charge to full and power mode tasks run and do change the setting. The note now says what runs and what does not yet.
-- Heat protection is one switch now (Settings → Charge control → Automatic protection). The locked "Coming soon" heat row and the second heat switch in the experimental advanced charge card are gone; the README lists heat protection as a working feature.
-- Removed the "Sleep behavior" switch from the experimental advanced charge card. It was saved but never used. The real sleep setting (Sleep page) is unchanged.
-- When Top Up fails, the reason now shows under the buttons in the panel and on Settings → Charge control, and stays until you try again. Before, it was kept internally and never shown.
-- Uninstall no longer says "removed" when a step failed. It checks that the helper files are really gone and reports a failed login item, charge limit reset or data deletion; in that case the app stays open so you can try again.
-- Copy, paste, cut, select all and undo (⌘C, ⌘V, ⌘X, ⌘A, ⌘Z) now work in text fields such as the schedule editor. The app had no Edit menu, so macOS did not pass these shortcuts on.
-- Error texts from the charge helper (for example "The saved macOS limit could not be read") now appear in your language instead of Turkish.
-- The bug report template, SECURITY.md and CONTRIBUTING.md use the name Healthy Battery instead of Cellkeep.
 
 ## 1.4.2
 

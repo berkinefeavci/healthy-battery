@@ -837,7 +837,6 @@
 "Gelişmiş şarj (deneysel)" = "Charge avancée (expérimental)";
 "Hedef sınır: %%%lld" = "Limite cible : %lld %%";
 "Hedefe kadar deşarj et" = "Décharger jusqu'à la cible";
-"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Protection thermique : suspendre la charge au-dessus de 35 °C, reprendre sous 32 °C";
 "Isı nedeniyle duraklatıldı" = "Suspendu à cause de la chaleur";
 "Kalibrasyon sürüyor" = "Calibrage en cours";
 "Kalibrasyonu başlat" = "Démarrer le calibrage";
@@ -939,7 +938,6 @@
 "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "Aucune mesure pour l’instant ; la première arrive dans la minute.";
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Part de la dernière mesure. Les processus auxiliaires d’une app sont regroupés sur une ligne.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Part de l’impact énergétique total de la période (mesure macOS × durée ; pas des watts). %lld jours de données.";
-"Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Ce Mac ne permet pas de suspendre la charge sur secteur : la navigation, la pause thermique, le comportement en veille, la décharge et le calibrage ne sont donc pas affichés ici. Avec le mode adaptateur activé, la limite cible passe par lui.";
 "Yönetici onayı iptal edildi; yardımcı kurulmadı." = "L’autorisation d’administrateur a été annulée ; l’assistant n’a pas été installé.";
 "Şarj durdurma yardımcısı kurulamadı." = "L’assistant de pause de charge n’a pas pu être installé.";
 "Şarj durdurma yardımcısı isteği anlamadı." = "L’assistant de pause de charge n’a pas compris la demande.";
@@ -951,13 +949,10 @@
 "Şarj durdurma yardımcısı kurulu değil." = "L’assistant de pause de charge n’est pas installé.";
 "Şarj durdurma yardımcısı güvenli değil; işlem durduruldu." = "L’assistant de pause de charge n’est pas fiable ; l’opération a été arrêtée.";
 "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor)." = "La pause de charge est encore verrouillée (expérimental, en attente d’un test physique).";
-"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "Le planificateur fonctionne. Les tâches de limite de charge, de charge complète et de mode d’alimentation s’exécutent réellement à l’heure prévue et modifient un réglage du Mac ; les résultats apparaissent dans l’historique des tâches. La mise en pause de la charge, l’étalonnage et la décharge jusqu’à une cible ne sont pas encore disponibles.";
-"Şu yardımcı dosyalar silinemedi: %@" = "Ces fichiers d’assistance n’ont pas pu être supprimés : %@";
 "Giriş öğesi kayıttan silinemedi: %@" = "L’élément d’ouverture n’a pas pu être retiré : %@";
 "Şarj limiti %%100'e sıfırlanamadı: %@" = "La limite de charge n’a pas pu être remise à 100 %% : %@";
 "Uygulama verileri silinemedi: %@" = "Les données de l’app n’ont pas pu être supprimées : %@";
 "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:" = "Les assistants et services ont été retirés, mais certaines étapes ne se sont pas terminées :";
-"Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz." = "Les tâches activées s’exécutent à l’heure prévue : les tâches de limite de charge, Top Up et mode d’énergie modifient le réglage de macOS. La pause de charge, l’étalonnage et la décharge jusqu’à une cible ne peuvent pas encore s’exécuter.";
 "Yeni çalışma %@ başladı; sonuç Görev geçmişinde güncellenir." = "La nouvelle exécution %@ a démarré ; le résultat sera mis à jour dans l’historique des tâches.";
 "Yeni çalışma %@ tamamlanamadı: %@" = "La nouvelle exécution %@ ne s’est pas terminée : %@";
 "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "La nouvelle exécution %@ est terminée ; le réglage a été vérifié par relecture.";
@@ -988,7 +983,6 @@
 "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir." = "Les lectures sont toujours prêtes. La limite et Top Up nécessitent les limites proposées par macOS ; le mode d’énergie et le voyant MagSafe nécessitent leur assistant installé.";
 "Şarj Kontrolü bölümünden düzenleyin." = "Modifiez-la dans la section Contrôle de la charge.";
 "%@ bu Mac'te desteklenmiyor." = "%@ n’est pas pris en charge sur ce Mac.";
-"Tümünü seç" = "Tout sélectionner";
 
 /* Discharge, calibration, sailing and heat through the adapter cut */
 "%%%lld seviyesine deşarj et" = "Décharger jusqu'à %lld %%";
@@ -1027,7 +1021,6 @@
 
 /* Schedule, Shortcuts and menu bar states for discharge, calibration, sailing and heat */
 "%100 → 1 saat → %15 → %100; başlat veya iptal et" = "100 % → 1 heure → 15 % → 100 % ; démarrer ou annuler";
-"10 eylem hazır" = "10 actions prêtes";
 "Bir deşarj zaten sürüyor." = "Une décharge est déjà en cours.";
 "Deşarj başladı: pil %%%lld seviyesine iniyor" = "Décharge lancée : la batterie descend à %lld %%";
 "Deşarj hedefi eksik." = "La cible de décharge est manquante.";

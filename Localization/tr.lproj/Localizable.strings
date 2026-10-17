@@ -837,7 +837,6 @@
 "Gelişmiş şarj (deneysel)" = "Gelişmiş şarj (deneysel)";
 "Hedef sınır: %%%lld" = "Hedef sınır: %%%lld";
 "Hedefe kadar deşarj et" = "Hedefe kadar deşarj et";
-"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür";
 "Isı nedeniyle duraklatıldı" = "Isı nedeniyle duraklatıldı";
 "Kalibrasyon sürüyor" = "Kalibrasyon sürüyor";
 "Kalibrasyonu başlat" = "Kalibrasyonu başlat";
@@ -939,7 +938,6 @@
 "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir.";
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri.";
-"Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır.";
 "Yönetici onayı iptal edildi; yardımcı kurulmadı." = "Yönetici onayı iptal edildi; yardımcı kurulmadı.";
 "Şarj durdurma yardımcısı kurulamadı." = "Şarj durdurma yardımcısı kurulamadı.";
 "Şarj durdurma yardımcısı isteği anlamadı." = "Şarj durdurma yardımcısı isteği anlamadı.";
@@ -951,13 +949,10 @@
 "Şarj durdurma yardımcısı kurulu değil." = "Şarj durdurma yardımcısı kurulu değil.";
 "Şarj durdurma yardımcısı güvenli değil; işlem durduruldu." = "Şarj durdurma yardımcısı güvenli değil; işlem durduruldu.";
 "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor)." = "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor).";
-"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok.";
-"Şu yardımcı dosyalar silinemedi: %@" = "Şu yardımcı dosyalar silinemedi: %@";
 "Giriş öğesi kayıttan silinemedi: %@" = "Giriş öğesi kayıttan silinemedi: %@";
 "Şarj limiti %%100'e sıfırlanamadı: %@" = "Şarj limiti %%100'e sıfırlanamadı: %@";
 "Uygulama verileri silinemedi: %@" = "Uygulama verileri silinemedi: %@";
 "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:" = "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:";
-"Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz." = "Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz.";
 "Yeni çalışma %@ başladı; sonuç Görev geçmişinde güncellenir." = "Yeni çalışma %@ başladı; sonuç Görev geçmişinde güncellenir.";
 "Yeni çalışma %@ tamamlanamadı: %@" = "Yeni çalışma %@ tamamlanamadı: %@";
 "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı.";
@@ -1026,7 +1021,6 @@
 
 /* Schedule, Shortcuts and menu bar states for discharge, calibration, sailing and heat */
 "%100 → 1 saat → %15 → %100; başlat veya iptal et" = "%100 → 1 saat → %15 → %100; başlat veya iptal et";
-"10 eylem hazır" = "10 eylem hazır";
 "Bir deşarj zaten sürüyor." = "Bir deşarj zaten sürüyor.";
 "Deşarj başladı: pil %%%lld seviyesine iniyor" = "Deşarj başladı: pil %%%lld seviyesine iniyor";
 "Deşarj hedefi eksik." = "Deşarj hedefi eksik.";

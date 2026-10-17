@@ -837,7 +837,6 @@
 "Gelişmiş şarj (deneysel)" = "Carga avanzada (experimental)";
 "Hedef sınır: %%%lld" = "Límite objetivo: %lld %%";
 "Hedefe kadar deşarj et" = "Descargar hasta el objetivo";
-"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Protección térmica: pausar la carga por encima de 35 °C y reanudar por debajo de 32 °C";
 "Isı nedeniyle duraklatıldı" = "En pausa por calor";
 "Kalibrasyon sürüyor" = "Calibración en curso";
 "Kalibrasyonu başlat" = "Iniciar calibración";
@@ -939,7 +938,6 @@
 "Henüz ölçüm yok; ilk ölçüm bir dakika içinde gelir." = "Aún no hay lecturas; la primera llega en un minuto.";
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Proporción de la última lectura. Los procesos auxiliares de una app se agrupan en una fila.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Proporción del impacto energético total del periodo (lectura de macOS × tiempo; no son vatios). %lld días de datos.";
-"Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Este Mac no permite pausar la carga con el cargador conectado, así que la navegación, la pausa por calor, el reposo, la descarga y la calibración no se muestran aquí. Con el modo adaptador activado, el límite objetivo se aplica a través de él.";
 "Yönetici onayı iptal edildi; yardımcı kurulmadı." = "Se canceló la aprobación de administrador; el auxiliar no se instaló.";
 "Şarj durdurma yardımcısı kurulamadı." = "No se pudo instalar el auxiliar para pausar la carga.";
 "Şarj durdurma yardımcısı isteği anlamadı." = "El auxiliar para pausar la carga no entendió la solicitud.";
@@ -951,13 +949,10 @@
 "Şarj durdurma yardımcısı kurulu değil." = "El auxiliar para pausar la carga no está instalado.";
 "Şarj durdurma yardımcısı güvenli değil; işlem durduruldu." = "El auxiliar para pausar la carga no es de confianza; la operación se detuvo.";
 "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor)." = "La pausa de carga sigue bloqueada (experimental, a la espera de una prueba física).";
-"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "El planificador está en marcha. Las tareas de límite de carga, carga completa y modo de energía se ejecutan de verdad a su hora y cambian un ajuste del Mac; los resultados aparecen en el historial de tareas. Pausar la carga, calibrar y descargar hasta un objetivo aún no están disponibles.";
-"Şu yardımcı dosyalar silinemedi: %@" = "No se pudieron borrar estos archivos auxiliares: %@";
 "Giriş öğesi kayıttan silinemedi: %@" = "No se pudo quitar el elemento de inicio: %@";
 "Şarj limiti %%100'e sıfırlanamadı: %@" = "No se pudo restablecer el límite de carga al 100 %%: %@";
 "Uygulama verileri silinemedi: %@" = "No se pudieron eliminar los datos de la app: %@";
 "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:" = "Se quitaron los auxiliares y servicios, pero algunos pasos no se completaron:";
-"Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz." = "Las tareas activadas se ejecutan a su hora: las tareas de límite de carga, Top Up y modo de energía cambian el ajuste de macOS. Pausar la carga, calibrar y descargar hasta un objetivo aún no se pueden ejecutar.";
 "Yeni çalışma %@ başladı; sonuç Görev geçmişinde güncellenir." = "La nueva ejecución %@ ha empezado; el resultado se actualizará en el historial de tareas.";
 "Yeni çalışma %@ tamamlanamadı: %@" = "La nueva ejecución %@ no se completó: %@";
 "Yeni çalışma %@ tamamlandı; ayar okunarak doğrulandı." = "La nueva ejecución %@ terminó; el ajuste se verificó leyéndolo de nuevo.";
@@ -1026,7 +1021,6 @@
 
 /* Schedule, Shortcuts and menu bar states for discharge, calibration, sailing and heat */
 "%100 → 1 saat → %15 → %100; başlat veya iptal et" = "100 % → 1 hora → 15 % → 100 %; iniciar o cancelar";
-"10 eylem hazır" = "10 acciones listas";
 "Bir deşarj zaten sürüyor." = "Ya hay una descarga en curso.";
 "Deşarj başladı: pil %%%lld seviyesine iniyor" = "Descarga iniciada: la batería baja al %lld %%";
 "Deşarj hedefi eksik." = "Falta el objetivo de descarga.";
