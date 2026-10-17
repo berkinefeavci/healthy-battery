@@ -985,3 +985,14 @@
 "Kopyala" = "Kopyala";
 "Yapıştır" = "Yapıştır";
 "Tümünü seç" = "Tümünü seç";
+"Bu macOS sürümünde yerel limit arayüzü kullanılamıyor." = "Bu macOS sürümünde yerel limit arayüzü kullanılamıyor.";
+"Kayıtlı macOS limiti okunamadı." = "Kayıtlı macOS limiti okunamadı.";
+"Desteklenen limitler okunamadı." = "Desteklenen limitler okunamadı.";
+"Beklenmeyen macOS limit listesi." = "Beklenmeyen macOS limit listesi.";
+"macOS şarj durumu okunamadı." = "macOS şarj durumu okunamadı.";
+"Geçerli sistem limiti okunamadı." = "Geçerli sistem limiti okunamadı.";
+"Bu şarj limiti desteklenmiyor; değişiklik yapılmadı." = "Bu şarj limiti desteklenmiyor; değişiklik yapılmadı.";
+"macOS limit değişikliğini kabul etmedi." = "macOS limit değişikliğini kabul etmedi.";
+"Limit değişikliği okuma ile doğrulanamadı." = "Limit değişikliği okuma ile doğrulanamadı.";
+"Geçersiz yardımcı komutu." = "Geçersiz yardımcı komutu.";
+"Yanıt kodlanamadı." = "Yanıt kodlanamadı.";

@@ -94,6 +94,25 @@ import Foundation
         let observedState = try observed.readState()
         check(observedState.manualLimit == 81, "read accepts a real observed non-writable limit")
 
+        // The helper is a separate process without the app's language setting, so the app translates its
+        // fixed (Turkish) failure messages. Every such literal in the helper sources must be listed.
+        let literal = try NSRegularExpression(pattern: #""([^"\\]*\.)""#)
+        var helperMessages = Set<String>()
+        for path in ["Sources/PowerUIBridge/PowerUIBridge.m", "Sources/NativeChargeHelper/main.swift"] {
+            let text = try String(contentsOfFile: path, encoding: .utf8)
+            for line in text.split(separator: "\n") where line.contains("failure(") {
+                let line = String(line)
+                for match in literal.matches(in: line, range: NSRange(line.startIndex..., in: line)) {
+                    helperMessages.insert(String(line[Range(match.range(at: 1), in: line)!]))
+                }
+            }
+        }
+        check(helperMessages.count >= 11, "found the helper's fixed messages in its sources")
+        check(helperMessages.isSubset(of: Set(NativeHelperText.messages.keys)),
+              "every helper message is listed for translation: \(helperMessages.subtracting(NativeHelperText.messages.keys))")
+        check(NativeChargeBackendError.rejected("bilinmeyen ileti").errorDescription == "bilinmeyen ileti",
+              "unknown helper text passes through unchanged")
+
         print("Native charge backend: \(count) assertions passed; fake process only.")
     }
 }

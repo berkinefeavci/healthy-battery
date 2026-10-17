@@ -985,3 +985,14 @@
 "Kopyala" = "Copier";
 "Yapıştır" = "Coller";
 "Tümünü seç" = "Tout sélectionner";
+"Bu macOS sürümünde yerel limit arayüzü kullanılamıyor." = "L’interface native de limite n’est pas disponible sur cette version de macOS.";
+"Kayıtlı macOS limiti okunamadı." = "La limite macOS enregistrée n’a pas pu être lue.";
+"Desteklenen limitler okunamadı." = "Les limites prises en charge n’ont pas pu être lues.";
+"Beklenmeyen macOS limit listesi." = "Liste de limites macOS inattendue.";
+"macOS şarj durumu okunamadı." = "L’état de charge de macOS n’a pas pu être lu.";
+"Geçerli sistem limiti okunamadı." = "La limite système actuelle n’a pas pu être lue.";
+"Bu şarj limiti desteklenmiyor; değişiklik yapılmadı." = "Cette limite de charge n’est pas prise en charge ; rien n’a été modifié.";
+"macOS limit değişikliğini kabul etmedi." = "macOS n’a pas accepté la modification de la limite.";
+"Limit değişikliği okuma ile doğrulanamadı." = "La modification de la limite n’a pas pu être vérifiée par relecture.";
+"Geçersiz yardımcı komutu." = "Commande d’assistance non valide.";
+"Yanıt kodlanamadı." = "La réponse n’a pas pu être encodée.";

@@ -14,6 +14,26 @@ struct NativeChargeCapabilities: Equatable {
     let reason: String?
 }
 
+/// The charge helper is a separate process without the app's language setting, so its fixed failure
+/// messages (PowerUIBridge.m, NativeChargeHelper/main.swift) are Turkish source keys that the app translates.
+/// A new helper message must be added here; Tests/NativeChargeBackendTests.swift checks the sources.
+enum NativeHelperText {
+    static let messages: [String: String] = [
+        "Bu macOS sürümünde yerel limit arayüzü kullanılamıyor.": String(localized: "Bu macOS sürümünde yerel limit arayüzü kullanılamıyor."),
+        "Kayıtlı macOS limiti okunamadı.": String(localized: "Kayıtlı macOS limiti okunamadı."),
+        "Desteklenen limitler okunamadı.": String(localized: "Desteklenen limitler okunamadı."),
+        "Beklenmeyen macOS limit listesi.": String(localized: "Beklenmeyen macOS limit listesi."),
+        "macOS şarj durumu okunamadı.": String(localized: "macOS şarj durumu okunamadı."),
+        "Geçerli sistem limiti okunamadı.": String(localized: "Geçerli sistem limiti okunamadı."),
+        "Bu şarj limiti desteklenmiyor; değişiklik yapılmadı.": String(localized: "Bu şarj limiti desteklenmiyor; değişiklik yapılmadı."),
+        "macOS limit değişikliğini kabul etmedi.": String(localized: "macOS limit değişikliğini kabul etmedi."),
+        "Limit değişikliği okuma ile doğrulanamadı.": String(localized: "Limit değişikliği okuma ile doğrulanamadı."),
+        "Geçersiz yardımcı komutu.": String(localized: "Geçersiz yardımcı komutu."),
+        "Yanıt kodlanamadı.": String(localized: "Yanıt kodlanamadı.")
+    ]
+    static func localized(_ message: String) -> String { messages[message] ?? message }
+}
+
 enum NativeChargeBackendError: LocalizedError, Equatable {
     case helperMissing
     case timedOut
@@ -25,7 +45,7 @@ enum NativeChargeBackendError: LocalizedError, Equatable {
         switch self {
         case .helperMissing: return String(localized: "Yerel şarj yardımcısı bulunamadı.")
         case .timedOut: return String(localized: "Yerel şarj yardımcısı zaman aşımına uğradı.")
-        case .rejected(let message): return message
+        case .rejected(let message): return NativeHelperText.localized(message)
         case .malformedResponse: return String(localized: "Yerel şarj yardımcısı geçersiz yanıt verdi.")
         case .oversizedResponse: return String(localized: "Yerel şarj yardımcısının yanıtı sınırı aştı.")
         }
