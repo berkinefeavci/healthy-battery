@@ -180,7 +180,7 @@ enum ScheduleSchedulerTests {
         }
 
         do {
-            let url = root.appendingPathComponent("retry.json")
+            let url = root.appendingPathComponent("history.json")
             let store = ScheduleExecutionStore(url: url)
             let original = ScheduleExecutionRecord(executionID: UUID(), taskID: UUID(),
                 plannedAt: date("2026-09-20T06:00:00Z"), startedAt: date("2026-09-20T06:00:01Z"),
@@ -188,17 +188,10 @@ enum ScheduleSchedulerTests {
                 requestedValue: 85, timezoneIDSnapshot: "Europe/Istanbul", observedResult: nil,
                 status: .failed, failureReason: "fake failure", operationID: nil)
             try store.save([original], now: now)
-            let retry = try store.appendUnsupportedRetry(of: original, now: now)
-            let loaded = store.load().records
-            check(retry.executionID != original.executionID && loaded.count == 2, "retry creates a new execution identity")
-            check(loaded.first(where: { $0.executionID == original.executionID })?.status == .failed, "retry never rewrites old failure")
-            check(retry.actionSnapshot == .setChargeLimit && retry.requestedValue == 85 && retry.timezoneIDSnapshot == "Europe/Istanbul", "retry preserves immutable snapshots")
-            check(retry.status == .unsupported && retry.finishedAt == now, "unverified retry terminates safely without writer")
-
             let scheduleStore = ScheduleStore(url: root.appendingPathComponent("delete-history-schedules.json"))
             let task = enabledTask(id: original.taskID, catchUp: true, last: prior)
             try scheduleStore.save([task]); try scheduleStore.save([])
-            check(store.load().records.count == 2, "deleting task does not delete execution history")
+            check(store.load().records == [original], "deleting task does not delete execution history")
         }
 
         do {

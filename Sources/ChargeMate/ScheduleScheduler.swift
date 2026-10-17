@@ -108,21 +108,6 @@ struct ScheduleExecutionStore {
         try data.write(to: url, options: .atomic)
     }
 
-    /// A retry is an explicit new attempt. Until a coordinator-backed scheduled
-    /// writer is verified it terminates as unsupported and cannot touch hardware.
-    func appendUnsupportedRetry(of original: ScheduleExecutionRecord, now: Date) throws -> ScheduleExecutionRecord {
-        var records = load().records
-        let retry = ScheduleExecutionRecord(executionID: UUID(), taskID: original.taskID,
-            plannedAt: now, startedAt: now, finishedAt: now,
-            actionSnapshot: original.actionSnapshot, requestedValue: original.requestedValue,
-            timezoneIDSnapshot: original.timezoneIDSnapshot, observedResult: nil,
-            status: .unsupported, failureReason: original.actionSnapshot.unavailableReason,
-            operationID: nil)
-        records.append(retry)
-        try save(records, now: now)
-        return retry
-    }
-
     static func pruned(_ records: [ScheduleExecutionRecord], now: Date) -> [ScheduleExecutionRecord] {
         let cutoff = now.addingTimeInterval(-90 * 86_400)
         // A just-persisted planned/dispatched row is the idempotency barrier. It

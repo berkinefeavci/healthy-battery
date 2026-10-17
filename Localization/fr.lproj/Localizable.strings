@@ -655,11 +655,7 @@
 "Yeni görev" = "Nouvelle tâche";
 "Yeni sürüm var: %@" = "Nouvelle version disponible : %@";
 "Yeni sürüm var: %@ · Güncelle" = "Nouvelle version disponible : %@ · Mettre à jour";
-"Yeni çalışma %@ kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi." = "Une nouvelle exécution a été enregistrée avec l’ID %@. Le réglage système n’a pas été modifié faute d’écrivain vérifié.";
-"Yeni çalışma kaydedilemedi: %@" = "La nouvelle exécution n’a pas pu être enregistrée : %@";
-"Yeni çalışma olarak dene" = "Essayer comme nouvelle exécution";
 "Yeniden başlatılıyor…" = "Redémarrage…";
-"Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur." = "Réessayer ne modifie pas l’ancien enregistrement ; un nouvel ID d’exécution est créé.";
 "Yeniden denetle" = "Vérifier à nouveau";
 "Yenileme aralığı sensör örneklemesini değiştirmez. Geniş menülerde sağdaki öğeler +N altında toplanır; tüm değerler açıklamada bulunur." = "L’intervalle d’actualisation ne modifie pas l’échantillonnage des capteurs. Dans les menus larges, les éléments de droite sont regroupés sous +N ; toutes les valeurs figurent dans la description.";
 "Yerel limit yalnız macOS’un sunduğu değerlerde ve açık Uygula eylemiyle değişir." = "La limite native ne prend que des valeurs proposées par macOS, et uniquement lorsque vous appuyez sur Appliquer.";

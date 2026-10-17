@@ -273,3 +273,6 @@ done
 # SwiftUI views read power-mode capabilities while rendering; that path must never spin the
 # run loop (waitUntilExit re-entered layout and crashed with an AttributeGraph precondition).
 grep -Fq 'static func availableModes() -> Set<SystemPowerMode> { cachedModes }' Sources/ChargeMate/PowerMode.swift
+# Takvim geçmişinde, hiçbir şey çalıştırmayan "Yeni çalışma olarak dene" kaydı olmamalı.
+! grep -rFq 'appendUnsupportedRetry' Sources Tests
+! grep -Fq 'Yeni çalışma olarak dene' Sources/ChargeMate/ScheduleHistoryView.swift

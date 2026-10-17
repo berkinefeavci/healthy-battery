@@ -655,11 +655,7 @@
 "Yeni görev" = "New task";
 "Yeni sürüm var: %@" = "New version available: %@";
 "Yeni sürüm var: %@ · Güncelle" = "New version available: %@ · Update";
-"Yeni çalışma %@ kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi." = "A new run was saved with ID %@. The system setting was not changed because there is no verified writer.";
-"Yeni çalışma kaydedilemedi: %@" = "The new run could not be saved: %@";
-"Yeni çalışma olarak dene" = "Try as a new run";
 "Yeniden başlatılıyor…" = "Restarting…";
-"Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur." = "Retrying does not change the old record; it creates a new run ID.";
 "Yeniden denetle" = "Check again";
 "Yenileme aralığı sensör örneklemesini değiştirmez. Geniş menülerde sağdaki öğeler +N altında toplanır; tüm değerler açıklamada bulunur." = "The refresh interval does not change sensor sampling. In wide menus, items on the right are grouped under +N; all values are in the description.";
 "Yerel limit yalnız macOS’un sunduğu değerlerde ve açık Uygula eylemiyle değişir." = "The native limit only changes to values macOS offers, and only when you press Apply.";

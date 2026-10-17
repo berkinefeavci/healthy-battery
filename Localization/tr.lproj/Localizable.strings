@@ -655,11 +655,7 @@
 "Yeni görev" = "Yeni görev";
 "Yeni sürüm var: %@" = "Yeni sürüm var: %@";
 "Yeni sürüm var: %@ · Güncelle" = "Yeni sürüm var: %@ · Güncelle";
-"Yeni çalışma %@ kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi." = "Yeni çalışma %@ kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi.";
-"Yeni çalışma kaydedilemedi: %@" = "Yeni çalışma kaydedilemedi: %@";
-"Yeni çalışma olarak dene" = "Yeni çalışma olarak dene";
 "Yeniden başlatılıyor…" = "Yeniden başlatılıyor…";
-"Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur." = "Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur.";
 "Yeniden denetle" = "Yeniden denetle";
 "Yenileme aralığı sensör örneklemesini değiştirmez. Geniş menülerde sağdaki öğeler +N altında toplanır; tüm değerler açıklamada bulunur." = "Yenileme aralığı sensör örneklemesini değiştirmez. Geniş menülerde sağdaki öğeler +N altında toplanır; tüm değerler açıklamada bulunur.";
 "Yerel limit yalnız macOS’un sunduğu değerlerde ve açık Uygula eylemiyle değişir." = "Yerel limit yalnız macOS’un sunduğu değerlerde ve açık Uygula eylemiyle değişir.";

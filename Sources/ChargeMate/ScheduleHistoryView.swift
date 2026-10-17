@@ -137,8 +137,6 @@ struct ScheduleExecutionDetailView: View {
     @Environment(\.dismiss) private var dismiss
     let record: ScheduleExecutionRecord
     let taskName: String
-    let onRetry: (ScheduleExecutionRecord) -> String
-    @State private var retryMessage: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -164,20 +162,7 @@ struct ScheduleExecutionDetailView: View {
                 detail(String(localized: "Çalışma kimliği"), record.executionID.uuidString)
                 if let operationID = record.operationID { detail(String(localized: "İşlem kimliği"), operationID.uuidString) }
             }
-            if let retryMessage {
-                Label(retryMessage, systemImage: "info.circle")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
             Spacer(minLength: 0)
-            HStack {
-                Text("Yeniden deneme eski kaydı değiştirmez; yeni bir çalışma kimliği oluşturur.")
-                    .font(.caption).foregroundStyle(.secondary)
-                Spacer()
-                if canRetry {
-                    Button("Yeni çalışma olarak dene") { retryMessage = onRetry(record) }
-                        .chargeMateButtonStyle()
-                }
-            }
         }
         .padding(22)
         .frame(width: 590)
@@ -185,9 +170,6 @@ struct ScheduleExecutionDetailView: View {
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
-    private var canRetry: Bool {
-        record.status.isTerminal && ![.configurationVerified, .completed].contains(record.status)
-    }
     private var actionText: String {
         record.requestedValue.map { "\(record.actionSnapshot.title) — %\($0)" } ?? record.actionSnapshot.title
     }

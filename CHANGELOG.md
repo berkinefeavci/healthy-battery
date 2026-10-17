@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Schedule history: the "Run as a new attempt" button is gone. It only added another "not supported" entry and never ran the task. To run a task again, enable it or duplicate it.
+
 ## 1.4.2
 
 - Adapter mode tests itself. Right after the charge helper is installed (or the next time the adapter is plugged in), Healthy Battery cuts the adapter, waits for the battery gauge to report that the battery really powers the Mac (it reports only about once a minute), brings the adapter back, then cuts it once more without heartbeats and checks that the helper's 60-second safety timer restores it. It takes a few minutes and always ends with the adapter on. Adapter mode can be turned on only after this test passes; the result is shown in Settings → Charge Control.

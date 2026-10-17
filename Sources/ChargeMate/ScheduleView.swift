@@ -94,8 +94,7 @@ struct ScheduleView: View {
                 }, onCreate: { presentedSheet = .editor($0) }, onCancel: { presentedSheet = nil })
             case .execution(let record):
                 ScheduleExecutionDetailView(record: record,
-                    taskName: tasks.first(where: { $0.id == record.taskID })?.name ?? String(localized: "Silinmiş görev"),
-                    onRetry: retry)
+                    taskName: tasks.first(where: { $0.id == record.taskID })?.name ?? String(localized: "Silinmiş görev"))
             }
         }
     }
@@ -155,15 +154,6 @@ struct ScheduleView: View {
             NotificationCenter.default.post(name: .chargeMateScheduleChanged, object: nil)
         }
         catch { warning = String(localized: "Programlar kaydedilemedi: \(error.localizedDescription)") }
-    }
-    private func retry(_ record: ScheduleExecutionRecord) -> String {
-        do {
-            let retry = try executionStore.appendUnsupportedRetry(of: record, now: Date())
-            load()
-            return String(localized: "Yeni çalışma \(retry.executionID.uuidString.prefix(8)) kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi.")
-        } catch {
-            return String(localized: "Yeni çalışma kaydedilemedi: \(error.localizedDescription)")
-        }
     }
 }
 
