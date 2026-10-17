@@ -169,9 +169,7 @@
 "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı." = "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı.";
 "Bu eylem hedef yüzdesi kullanmaz." = "Bu eylem hedef yüzdesi kullanmaz.";
 "Bu filtrede kayıt yok" = "Bu filtrede kayıt yok";
-"Bu kontrol henüz etkin değil; doğrulanmış işlem durumu bekleniyor." = "Bu kontrol henüz etkin değil; doğrulanmış işlem durumu bekleniyor.";
 "Bu kopya imzalı bir sürüm değil; güncellemeyi sürüm sayfasından indirin." = "Bu kopya imzalı bir sürüm değil; güncellemeyi sürüm sayfasından indirin.";
-"Bu sağ tık eylemi henüz kullanılamıyor. Menü ayarlarından başka bir eylem seçin." = "Bu sağ tık eylemi henüz kullanılamıyor. Menü ayarlarından başka bir eylem seçin.";
 "Bu ışık çıkışı desteklenmiyor." = "Bu ışık çıkışı desteklenmiyor.";
 "Bu şarj limiti desteklenmiyor." = "Bu şarj limiti desteklenmiyor.";
 "Healthy Battery" = "Healthy Battery";
@@ -205,7 +203,6 @@
 "Devam eden macOS işleminin bitmesini bekleyin." = "Devam eden macOS işleminin bitmesini bekleyin.";
 "Devam ettir" = "Devam ettir";
 "Deşarj" = "Deşarj";
-"Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez.";
 "Dil" = "Dil";
 "Disk artık aynı bağlantıda bulunamadı; çıkarma yapılmadı." = "Disk artık aynı bağlantıda bulunamadı; çıkarma yapılmadı.";
 "Disk çıkarılamadı: %@" = "Disk çıkarılamadı: %@";
@@ -243,7 +240,6 @@
 "Düşük Güç Modu açıkken görünen bilgi" = "Düşük Güç Modu açıkken görünen bilgi";
 "Düşük Güç Modu rengi" = "Düşük Güç Modu rengi";
 "Düşük Güç Modunu aç" = "Düşük Güç Modunu aç";
-"Düşük Güç Modunu değiştir — henüz kullanılamıyor" = "Düşük Güç Modunu değiştir — henüz kullanılamıyor";
 "Düşük etki" = "Düşük etki";
 "DİĞER" = "DİĞER";
 "Eklenen döngü" = "Eklenen döngü";
@@ -521,7 +517,6 @@
 "Sağlık" = "Sağlık";
 "Sağlık değişimi" = "Sağlık değişimi";
 "Sağlık eğilimi için en az iki günlük ölçüm gerekiyor. Healthy Battery açık kaldıkça her gün bir özet kaydedilir." = "Sağlık eğilimi için en az iki günlük ölçüm gerekiyor. Healthy Battery açık kaldıkça her gün bir özet kaydedilir.";
-"Sekiz yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır." = "Sekiz yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır.";
 "Sensör yoksa, veri geçersizse veya ölçüm 10 saniyeden eskiyse Healthy Battery tahmin üretmez." = "Sensör yoksa, veri geçersizse veya ölçüm 10 saniyeden eskiyse Healthy Battery tahmin üretmez.";
 "Ses cihazı" = "Ses cihazı";
 "Seçilen %%%lld" = "Seçilen %%%lld";
@@ -691,7 +686,6 @@
 "macOS limiti · doğrulandı" = "macOS limiti · doğrulandı";
 "macOS manuel limiti" = "macOS manuel limiti";
 "macOS pil durumu" = "macOS pil durumu";
-"macOS pil durumu için doğrulanmış veri kaynağı bulunmuyor." = "macOS pil durumu için doğrulanmış veri kaynağı bulunmuyor.";
 "macOS pil yüzdesi" = "macOS pil yüzdesi";
 "macOS renkli" = "macOS renkli";
 "macOS sade" = "macOS sade";
@@ -804,7 +798,6 @@
 "Şarj sınırı" = "Şarj sınırı";
 "Şarj ve boşalmayı hedef bandında dengeler." = "Şarj ve boşalmayı hedef bandında dengeler.";
 "Şarj yönetimi için başka bir uygulama açık." = "Şarj yönetimi için başka bir uygulama açık.";
-"Şarjı başlat / durdur — henüz kullanılamıyor" = "Şarjı başlat / durdur — henüz kullanılamıyor";
 "Şarjı duraklat" = "Şarjı duraklat";
 "Şimdi denetle" = "Şimdi denetle";
 "Şimdi yeniden başlat" = "Şimdi yeniden başlat";
@@ -1059,3 +1052,9 @@
 "Yelken %%%lld–%%%lld" = "Yelken %%%lld–%%%lld";
 "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü)." = "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü).";
 "Şarj yardımcısı ve geçen adaptör testi gerekir" = "Şarj yardımcısı ve geçen adaptör testi gerekir";
+
+/* Right-click actions, macOS battery condition, schedule note */
+"Deşarjı başlat / durdur" = "Deşarjı başlat / durdur";
+"Düşük Güç Modunu aç / kapat" = "Düşük Güç Modunu aç / kapat";
+"Servis önerilir" = "Servis önerilir";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma, güç modu, hedefe kadar boşaltma ve kalibrasyon görevleri zamanı gelince gerçekten çalışır; sonuçlar Görev geçmişinde görünür. Boşaltma ve kalibrasyon şarj yardımcısı ile geçen adaptör testi ister. Şarjı duraklatmaya macOS izin vermiyor." = "Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma, güç modu, hedefe kadar boşaltma ve kalibrasyon görevleri zamanı gelince gerçekten çalışır; sonuçlar Görev geçmişinde görünür. Boşaltma ve kalibrasyon şarj yardımcısı ile geçen adaptör testi ister. Şarjı duraklatmaya macOS izin vermiyor.";

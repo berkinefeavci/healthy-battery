@@ -169,9 +169,7 @@
 "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı." = "The physical effect of this hardware action has not been verified yet.";
 "Bu eylem hedef yüzdesi kullanmaz." = "This action does not use a target percentage.";
 "Bu filtrede kayıt yok" = "No records for this filter";
-"Bu kontrol henüz etkin değil; doğrulanmış işlem durumu bekleniyor." = "This control is not active yet; waiting for a verified operation state.";
 "Bu kopya imzalı bir sürüm değil; güncellemeyi sürüm sayfasından indirin." = "This copy is not a signed release; download the update from the release page.";
-"Bu sağ tık eylemi henüz kullanılamıyor. Menü ayarlarından başka bir eylem seçin." = "This right-click action is not available yet. Choose another action in the menu settings.";
 "Bu ışık çıkışı desteklenmiyor." = "This light output is not supported.";
 "Bu şarj limiti desteklenmiyor." = "This charge limit is not supported.";
 "Healthy Battery" = "Healthy Battery";
@@ -205,7 +203,6 @@
 "Devam eden macOS işleminin bitmesini bekleyin." = "Wait for the ongoing macOS operation to finish.";
 "Devam ettir" = "Resume";
 "Deşarj" = "Discharge";
-"Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Discharge and Calibration will not be added to Shortcuts until their verified engines are complete.";
 "Dil" = "Language";
 "Disk artık aynı bağlantıda bulunamadı; çıkarma yapılmadı." = "The disk is no longer on the same connection; it was not ejected.";
 "Disk çıkarılamadı: %@" = "The disk could not be ejected: %@";
@@ -243,7 +240,6 @@
 "Düşük Güç Modu açıkken görünen bilgi" = "Shown while Low Power Mode is on";
 "Düşük Güç Modu rengi" = "Low Power Mode color";
 "Düşük Güç Modunu aç" = "Turn on Low Power Mode";
-"Düşük Güç Modunu değiştir — henüz kullanılamıyor" = "Toggle Low Power Mode — not available yet";
 "Düşük etki" = "Low impact";
 "DİĞER" = "OTHER";
 "Eklenen döngü" = "Cycles added";
@@ -521,7 +517,6 @@
 "Sağlık" = "Health";
 "Sağlık değişimi" = "Health change";
 "Sağlık eğilimi için en az iki günlük ölçüm gerekiyor. Healthy Battery açık kaldıkça her gün bir özet kaydedilir." = "The health trend needs readings from at least two days. While Healthy Battery is open, a summary is saved every day.";
-"Sekiz yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır." = "Eight local actions. Reads return current data; controls use Healthy Battery's safe operation path.";
 "Sensör yoksa, veri geçersizse veya ölçüm 10 saniyeden eskiyse Healthy Battery tahmin üretmez." = "If there is no sensor, the data is invalid or the reading is older than 10 seconds, Healthy Battery does not estimate a value.";
 "Ses cihazı" = "Audio device";
 "Seçilen %%%lld" = "Selected %lld%%";
@@ -691,7 +686,6 @@
 "macOS limiti · doğrulandı" = "macOS limit · verified";
 "macOS manuel limiti" = "macOS manual limit";
 "macOS pil durumu" = "macOS battery condition";
-"macOS pil durumu için doğrulanmış veri kaynağı bulunmuyor." = "There is no verified data source for the macOS battery condition.";
 "macOS pil yüzdesi" = "macOS battery percentage";
 "macOS renkli" = "macOS colored";
 "macOS sade" = "macOS plain";
@@ -804,7 +798,6 @@
 "Şarj sınırı" = "Charge limit";
 "Şarj ve boşalmayı hedef bandında dengeler." = "Balances charging and discharging within a target band.";
 "Şarj yönetimi için başka bir uygulama açık." = "Another app is open for charge management.";
-"Şarjı başlat / durdur — henüz kullanılamıyor" = "Start / stop charging — not available yet";
 "Şarjı duraklat" = "Pause charging";
 "Şimdi denetle" = "Check now";
 "Şimdi yeniden başlat" = "Restart now";
@@ -1060,3 +1053,9 @@
 "Yelken %%%lld–%%%lld" = "Sailing %lld–%lld%%";
 "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü)." = "The charge helper must be installed and the adapter test passed (Settings → Charge Control).";
 "Şarj yardımcısı ve geçen adaptör testi gerekir" = "Needs the charge helper and a passed adapter test";
+
+/* Right-click actions, macOS battery condition, schedule note */
+"Deşarjı başlat / durdur" = "Start / stop discharge";
+"Düşük Güç Modunu aç / kapat" = "Turn Low Power Mode on / off";
+"Servis önerilir" = "Service recommended";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma, güç modu, hedefe kadar boşaltma ve kalibrasyon görevleri zamanı gelince gerçekten çalışır; sonuçlar Görev geçmişinde görünür. Boşaltma ve kalibrasyon şarj yardımcısı ile geçen adaptör testi ister. Şarjı duraklatmaya macOS izin vermiyor." = "The scheduler is running. Charge limit, full charge, power mode, discharge to target and calibration tasks really run when their time comes; results appear in the task history. Discharge and calibration need the charge helper and a passed adapter test. macOS does not allow pausing charging.";

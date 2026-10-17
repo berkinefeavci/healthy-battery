@@ -49,14 +49,18 @@ enum MenubarTests {
         expect(MenubarPreferences.load(from: defaults).metrics.isEmpty, "explicit clear persists")
         expect(p.accessFallback && p.effectiveStyle == .chargeStatus, "hidden empty stays accessible")
         p.metrics = [.macOSCondition]
-        expect(p.accessFallback, "unsupported-only list stays accessible")
+        expect(!p.accessFallback, "macOS condition is a real metric now")
         p.toggle(.topUp)
         expect(p.metrics.contains(.topUp), "verified Top Up status can be added")
         p.metrics = [.percentage, .percentage]
         p.spacing = 90; p.interval = -1
         expect(p.normalized().metrics == [.percentage], "deduplicated order")
         expect(p.normalized().spacing == 20 && p.normalized().interval == 2, "range clamps")
-        expect(!MenubarRightClick.toggleCharging.supported && !MenubarRightClick.toggleLowPower.supported, "writes unavailable")
+        expect(MenubarRightClick.allCases.allSatisfy(\.supported), "every right-click action runs")
+        let profiler = Data(#"{"SPPowerDataType":[{"_name":"spbattery_information","sppower_battery_health_info":{"sppower_battery_cycle_count":19,"sppower_battery_health":"Good"}}]}"#.utf8)
+        expect(MacOSBatteryCondition.parse(profiler) == "Good", "condition parsed from system_profiler")
+        expect(MacOSBatteryCondition.parse(Data("{}".utf8)) == nil, "missing condition is nil")
+        expect(MacOSBatteryCondition.text(forHealth: "Good") != MacOSBatteryCondition.text(forHealth: "Service Recommended"), "non-good condition is flagged")
         expect(MenubarOverflow.visibleCount(widths: [40, 40, 40], iconWidth: 24, spacing: 5, budget: 200, indicatorWidth: { _ in 20 }) == 3, "no overflow")
         expect(MenubarOverflow.visibleCount(widths: [40, 40, 40], iconWidth: 24, spacing: 5, budget: 100, indicatorWidth: { _ in 20 }) == 1, "indicator fits budget")
         expect(MenubarOverflow.visibleCount(widths: [400], iconWidth: 0, spacing: 20, budget: 100, indicatorWidth: { _ in 20 }) == 0, "huge item hidden")

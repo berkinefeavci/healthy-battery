@@ -169,9 +169,7 @@
 "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı." = "L’effet physique de cette action matérielle n’a pas encore été vérifié.";
 "Bu eylem hedef yüzdesi kullanmaz." = "Cette action n’utilise pas de pourcentage cible.";
 "Bu filtrede kayıt yok" = "Aucun enregistrement pour ce filtre";
-"Bu kontrol henüz etkin değil; doğrulanmış işlem durumu bekleniyor." = "Ce contrôle n’est pas encore actif ; en attente d’un état d’opération vérifié.";
 "Bu kopya imzalı bir sürüm değil; güncellemeyi sürüm sayfasından indirin." = "Cette copie n’est pas une version signée ; téléchargez la mise à jour depuis la page de la version.";
-"Bu sağ tık eylemi henüz kullanılamıyor. Menü ayarlarından başka bir eylem seçin." = "Cette action de clic droit n’est pas encore disponible. Choisissez une autre action dans les réglages du menu.";
 "Bu ışık çıkışı desteklenmiyor." = "Cette sortie du voyant n’est pas prise en charge.";
 "Bu şarj limiti desteklenmiyor." = "Cette limite de charge n’est pas prise en charge.";
 "Healthy Battery" = "Healthy Battery";
@@ -205,7 +203,6 @@
 "Devam eden macOS işleminin bitmesini bekleyin." = "Attendez la fin de l’opération macOS en cours.";
 "Devam ettir" = "Reprendre";
 "Deşarj" = "Décharger";
-"Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Décharge et Calibrage ne seront ajoutés à Raccourcis qu’une fois leurs moteurs vérifiés terminés.";
 "Dil" = "Langue";
 "Disk artık aynı bağlantıda bulunamadı; çıkarma yapılmadı." = "Le disque n’est plus sur la même connexion ; il n’a pas été éjecté.";
 "Disk çıkarılamadı: %@" = "Le disque n’a pas pu être éjecté : %@";
@@ -243,7 +240,6 @@
 "Düşük Güç Modu açıkken görünen bilgi" = "Affiché lorsque le mode économie d’énergie est actif";
 "Düşük Güç Modu rengi" = "Couleur du mode économie d’énergie";
 "Düşük Güç Modunu aç" = "Activer le mode économie d’énergie";
-"Düşük Güç Modunu değiştir — henüz kullanılamıyor" = "Basculer le mode économie d’énergie — pas encore disponible";
 "Düşük etki" = "Faible impact";
 "DİĞER" = "AUTRE";
 "Eklenen döngü" = "Cycles ajoutés";
@@ -521,7 +517,6 @@
 "Sağlık" = "État";
 "Sağlık değişimi" = "Évolution de l’état";
 "Sağlık eğilimi için en az iki günlük ölçüm gerekiyor. Healthy Battery açık kaldıkça her gün bir özet kaydedilir." = "La tendance de l’état nécessite des mesures sur au moins deux jours. Tant que Healthy Battery est ouvert, un résumé est enregistré chaque jour.";
-"Sekiz yerel eylem. Okumalar güncel veri döndürür; denetimler Healthy Battery'in güvenli işlem hattını kullanır." = "Huit actions locales. Les lectures renvoient des données actuelles ; les commandes passent par le circuit sécurisé de Healthy Battery.";
 "Sensör yoksa, veri geçersizse veya ölçüm 10 saniyeden eskiyse Healthy Battery tahmin üretmez." = "S’il n’y a pas de capteur, si les données sont invalides ou si la mesure date de plus de 10 secondes, Healthy Battery n’estime aucune valeur.";
 "Ses cihazı" = "Appareil audio";
 "Seçilen %%%lld" = "Sélectionné %lld %%";
@@ -691,7 +686,6 @@
 "macOS limiti · doğrulandı" = "Limite macOS · vérifiée";
 "macOS manuel limiti" = "Limite manuelle de macOS";
 "macOS pil durumu" = "État de la batterie macOS";
-"macOS pil durumu için doğrulanmış veri kaynağı bulunmuyor." = "Aucune source de données vérifiée pour l’état de la batterie macOS.";
 "macOS pil yüzdesi" = "Pourcentage de batterie macOS";
 "macOS renkli" = "macOS en couleur";
 "macOS sade" = "macOS sobre";
@@ -804,7 +798,6 @@
 "Şarj sınırı" = "Limite de charge";
 "Şarj ve boşalmayı hedef bandında dengeler." = "Équilibre charge et décharge dans une plage cible.";
 "Şarj yönetimi için başka bir uygulama açık." = "Une autre app de gestion de la charge est ouverte.";
-"Şarjı başlat / durdur — henüz kullanılamıyor" = "Démarrer / arrêter la charge — pas encore disponible";
 "Şarjı duraklat" = "Mettre la charge en pause";
 "Şimdi denetle" = "Vérifier maintenant";
 "Şimdi yeniden başlat" = "Redémarrer maintenant";
@@ -1060,3 +1053,9 @@
 "Yelken %%%lld–%%%lld" = "Navigation %lld–%lld %%";
 "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü)." = "L'assistant de charge doit être installé et le test de l'adaptateur réussi (Réglages → Contrôle de charge).";
 "Şarj yardımcısı ve geçen adaptör testi gerekir" = "Nécessite l'assistant de charge et un test de l'adaptateur réussi";
+
+/* Right-click actions, macOS battery condition, schedule note */
+"Deşarjı başlat / durdur" = "Démarrer / arrêter la décharge";
+"Düşük Güç Modunu aç / kapat" = "Activer / désactiver le mode Économie d'énergie";
+"Servis önerilir" = "Réparation recommandée";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma, güç modu, hedefe kadar boşaltma ve kalibrasyon görevleri zamanı gelince gerçekten çalışır; sonuçlar Görev geçmişinde görünür. Boşaltma ve kalibrasyon şarj yardımcısı ile geçen adaptör testi ister. Şarjı duraklatmaya macOS izin vermiyor." = "Le planificateur fonctionne. Les tâches de limite de charge, charge complète, mode d'énergie, décharge jusqu'à la cible et calibrage s'exécutent réellement à l'heure prévue ; les résultats apparaissent dans l'historique. La décharge et le calibrage nécessitent l'assistant de charge et un test de l'adaptateur réussi. macOS ne permet pas de suspendre la charge.";

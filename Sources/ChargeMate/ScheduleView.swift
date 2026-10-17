@@ -71,7 +71,7 @@ struct ScheduleView: View {
                         .chargeMateButtonStyle()
                 }
             }
-            Label("Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz.", systemImage: "lock.shield")
+            Label("Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma, güç modu, hedefe kadar boşaltma ve kalibrasyon görevleri zamanı gelince gerçekten çalışır; sonuçlar Görev geçmişinde görünür. Boşaltma ve kalibrasyon şarj yardımcısı ile geçen adaptör testi ister. Şarjı duraklatmaya macOS izin vermiyor.", systemImage: "lock.shield")
                 .font(.caption).foregroundStyle(.secondary).chargeCard()
             ScheduleHistoryView(records: records,
                 taskNames: Dictionary(uniqueKeysWithValues: tasks.map { ($0.id, $0.name) }),

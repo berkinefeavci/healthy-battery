@@ -232,7 +232,7 @@ xcrun swiftc Sources/ChargeMate/SettingsLayout.swift Tests/SettingsLayoutTests.s
 xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
   Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift \
   Sources/ChargeMate/MenubarPreferences.swift Sources/ChargeMate/MenubarPresentation.swift \
-  Tests/MenubarTests.swift .build/checks/PowerUIBridge.o -o .build/checks/menubar-tests
+  Sources/ChargeMate/MacOSBatteryCondition.swift Tests/MenubarTests.swift .build/checks/PowerUIBridge.o -o .build/checks/menubar-tests
 .build/checks/menubar-tests "$PWD/.build/ChargeMate.app" "$PWD/.build/checks/menubar-preview.png"
 
 # Yardım/tanılama: geçici defaults ve dosyalar, sahte donanım; NSSavePanel açılmaz.
