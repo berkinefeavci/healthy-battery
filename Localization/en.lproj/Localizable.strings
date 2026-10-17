@@ -877,7 +877,6 @@
 "Kritik seviye" = "Critical level";
 "Pilden çalışıyor" = "Running on battery";
 "Sınırda tutuluyor" = "Holding at limit";
-"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Sleep behavior: stop charging above the target before sleeping";
 "Uyku sırasında hedefin üstüne çıkabilir." = "May exceed the target while asleep.";
 "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "During sleep the helper releases everything for safety; the battery may rise above the target while the Mac sleeps.";
 "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Sailing range: %lld%% (charging restarts below %lld%%)";

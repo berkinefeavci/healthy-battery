@@ -280,3 +280,5 @@ grep -Fq 'static func availableModes() -> Set<SystemPowerMode> { cachedModes }' 
 # Isı koruması tek anahtardır (Şarj kontrolü > Otomatik koruma); "Yakında" kilitli satırı ve gelişmiş karttaki ikinci anahtar olmamalı.
 ! grep -Fq 'lockedRow(String(localized: "Isı koruması")' Sources/ChargeMate/Views.swift
 ! grep -Fq 'heatProtectionEnabled' Sources/ChargeMate/AdvancedChargeSettingsView.swift
+# "Uyku davranışı" anahtarı hiçbir yerde okunmuyordu; ayar alanı geri gelmesin (gerçek uyku ayarı: SleepBehaviorPreferences).
+! grep -rFq "sleepBehaviorEnabled" Sources

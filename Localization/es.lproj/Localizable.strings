@@ -877,7 +877,6 @@
 "Kritik seviye" = "Nivel crítico";
 "Pilden çalışıyor" = "Funcionando con batería";
 "Sınırda tutuluyor" = "Manteniendo en el límite";
-"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Reposo: detener la carga por encima del objetivo antes de dormir";
 "Uyku sırasında hedefin üstüne çıkabilir." = "Puede superar el objetivo durante el reposo.";
 "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Durante el reposo el asistente lo libera todo por seguridad; la batería puede superar el objetivo mientras el Mac duerme.";
 "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Rango de navegación: %lld %% (la carga se reanuda por debajo de %lld %%)";

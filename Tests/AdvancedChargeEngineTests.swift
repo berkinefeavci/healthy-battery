@@ -238,6 +238,8 @@ private final class FakeBackend: ChargeInhibitBackend {
         // switch); a value saved by an older build must not keep acting invisibly.
         let legacyHeat = try! JSONDecoder().decode(AdvancedChargeSettings.self, from: Data("{\"heatProtectionEnabled\":true}".utf8))
         check(!legacyHeat.heatProtectionEnabled, "legacy advanced heat switch is ignored")
+        let withSleep = try! JSONDecoder().decode(AdvancedChargeSettings.self, from: Data("{\"targetLimit\":75,\"sleepBehaviorEnabled\":true}".utf8))
+        check(withSleep.targetLimit == 75, "saved settings that still contain the removed sleep switch decode")
         let oldMem = try! JSONDecoder().decode(AdvancedChargeMemory.self, from: Data("{\"limitLatched\":true,\"heatLatched\":false}".utf8))
         check(oldMem.limitLatched && !oldMem.adapterLatched, "old memory decodes")
 

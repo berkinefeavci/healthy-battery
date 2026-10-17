@@ -50,7 +50,6 @@ struct AdvancedChargeSettingsView: View {
                             Text("Yelken aralığı: %\(runner.settings.sailingDelta) (şarj %\(runner.settings.targetLimit - runner.settings.sailingDelta) altında yeniden başlar)")
                         }
                     }
-                    Toggle("Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur", isOn: $runner.settings.sleepBehaviorEnabled)
                     Text("Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir.")
                         .font(.caption2).foregroundStyle(.secondary)
                     if runner.sleepMayOvershoot {

@@ -38,7 +38,6 @@ struct AdvancedChargeSettings: Codable, Equatable {
     var heatProtectionEnabled = false
     var heatPauseAbove = AdvancedChargeLimits.defaultHeatHigh
     var heatResumeBelow = AdvancedChargeLimits.defaultHeatLow
-    var sleepBehaviorEnabled = false
     /// Opt-in adapter mode: cut wall power at the target, restore it below the band. Only used when the
     /// hardware cannot stop charging (`canInhibitCharging == false`) but can cut the adapter.
     var adapterModeEnabled = false
@@ -55,7 +54,6 @@ extension AdvancedChargeSettings {
         // heatProtectionEnabled is deliberately not read: Settings > Charge control has the one heat switch.
         d.heatPauseAbove = try c.decodeIfPresent(Double.self, forKey: .heatPauseAbove) ?? d.heatPauseAbove
         d.heatResumeBelow = try c.decodeIfPresent(Double.self, forKey: .heatResumeBelow) ?? d.heatResumeBelow
-        d.sleepBehaviorEnabled = try c.decodeIfPresent(Bool.self, forKey: .sleepBehaviorEnabled) ?? d.sleepBehaviorEnabled
         d.adapterModeEnabled = try c.decodeIfPresent(Bool.self, forKey: .adapterModeEnabled) ?? d.adapterModeEnabled
         self = d
     }

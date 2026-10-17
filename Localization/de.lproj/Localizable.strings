@@ -877,7 +877,6 @@
 "Kritik seviye" = "Kritischer Stand";
 "Pilden çalışıyor" = "Akkubetrieb";
 "Sınırda tutuluyor" = "Wird an der Grenze gehalten";
-"Uyku davranışı: hedefin üstünde uykuya dalmadan önce şarjı durdur" = "Ruhezustand: Laden über dem Ziel vor dem Einschlafen stoppen";
 "Uyku sırasında hedefin üstüne çıkabilir." = "Im Ruhezustand kann der Akku über das Ziel steigen.";
 "Uyku sırasında yardımcı güvenlik için her şeyi serbest bırakır; Mac uyurken pil hedefin üstüne çıkabilir." = "Im Ruhezustand gibt das Hilfsprogramm aus Sicherheitsgründen alles frei; der Akku kann dann über das Ziel steigen.";
 "Yelken aralığı: %%%lld (şarj %%%lld altında yeniden başlar)" = "Segelbereich: %lld %% (Laden startet unter %lld %% neu)";
