@@ -116,7 +116,6 @@
 "Batarya voltajı" = "Battery voltage";
 "Batarya yüzdesi" = "Battery percentage";
 "Batarya özellikleri" = "Battery properties";
-"Bataryadan çalışmayı zorlar; güvenli bataryadan çalışma kontrolü henüz doğrulanmadı." = "Forces running on battery; a safe way to control running on battery has not been verified yet.";
 "Bataryadan çalışıyor" = "Running on battery";
 "Bağlantı" = "Connection";
 "Bağlı" = "Connected";
@@ -142,7 +141,6 @@
 "Başlat veya önceki limite dönerek iptal et" = "Start, or cancel by returning to the previous limit";
 "Bekleniyor…" = "Waiting…";
 "Belirsiz işlemi kapat" = "Dismiss the uncertain operation";
-"Beş aşamalı tam şarj/deşarj döngüsünü otomatik yönetir." = "Automatically runs a five-stage full charge/discharge cycle.";
 "Bileşenler farklı anlarda ölçüldü; toplamla kısa süreli fark olabilir." = "Components were measured at different moments; they may briefly differ from the total.";
 "Bilinmeyen hata" = "Unknown error";
 "Bir görev oluşturun veya güvenli bir şablonla başlayın." = "Create a task or start from a safe template.";
@@ -208,7 +206,6 @@
 "Devam ettir" = "Resume";
 "Deşarj" = "Discharge";
 "Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Discharge and Calibration will not be added to Shortcuts until their verified engines are complete.";
-"Deşarj yakında; henüz kullanılamıyor" = "Discharge coming soon; not available yet";
 "Dil" = "Language";
 "Disk artık aynı bağlantıda bulunamadı; çıkarma yapılmadı." = "The disk is no longer on the same connection; it was not ejected.";
 "Disk çıkarılamadı: %@" = "The disk could not be ejected: %@";
@@ -264,7 +261,6 @@
 "Eylem" = "Action";
 "Eşik üzerinde uygulama yok" = "No apps above the threshold";
 "Fareyle inceleyin veya tıklayıp yön tuşlarını kullanın. Home/End ilk/son ölçüm; Escape seçimi temizler." = "Hover to inspect, or click and use the arrow keys. Home/End go to the first/last reading; Escape clears the selection.";
-"Fiziksel durdurma desteği doğrulanınca eklenecek. Etkisiz anahtar gösterilmez." = "Will be added once physical pause support is verified. Switches that would do nothing are not shown.";
 "Fiziksel ışık testi" = "Physical light test";
 "Fotoğraflar analizi" = "Photos analysis";
 "Gelişmiş" = "Advanced";
@@ -621,8 +617,6 @@
 "Uzun vadeli sağlık" = "Long-term health";
 "Vazgeç" = "Cancel";
 "Veriler ve sıfırlama" = "Data and reset";
-"Yakında · donanım doğrulaması bekliyor" = "Coming soon · awaiting hardware verification";
-"Yakında · güvenli bataryadan çalışma kontrolü henüz doğrulanmadı" = "Coming soon · safe control of running on battery not verified yet";
 "Yalnız Healthy Battery arayüz ayarları sıfırlansın mı?" = "Reset only Healthy Battery's interface settings?";
 "Yalnız ek etkinlik ve Gösterge Tablosu örneklemesini etkiler; şarj denetimini açmaz veya durdurmaz." = "Only affects extra activity and Dashboard sampling; it does not turn charge control on or off.";
 "Yalnız çok yüksek" = "Very high only";
@@ -853,7 +847,6 @@
 "Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Heat protection: pause charging above 35 °C, resume below 32 °C";
 "Isı nedeniyle duraklatıldı" = "Paused because of heat";
 "Kalibrasyon sürüyor" = "Calibration in progress";
-"Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat)." = "Calibration: charge to full, hold for 1 hour, discharge to 15, charge to full again, then the limit is restored (24 hours at most).";
 "Kalibrasyonu başlat" = "Start calibration";
 "Kalibrasyonu iptal et" = "Cancel calibration";
 "Kritik seviye" = "Critical level";
@@ -967,6 +960,9 @@
 "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor)." = "Pausing charging is still locked (experimental, waiting for a physical test).";
 "Giriş öğesi kayıttan silinemedi: %@" = "The login item could not be removed: %@";
 "Şarj limiti %%100'e sıfırlanamadı: %@" = "The charge limit could not be reset to 100%%: %@";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "The scheduler is running. Charge limit, charge to full and power mode tasks really run when they are due and change a Mac setting; results appear in the task history. Pausing charging, calibration and discharging to a target are not available yet.";
+"Şu yardımcı dosyalar silinemedi: %@" = "These helper files could not be deleted: %@";
+"Şarj limiti sıfırlanamadı: %@" = "The charge limit could not be reset: %@";
 "Uygulama verileri silinemedi: %@" = "The app data could not be deleted: %@";
 "Yardımcılar ve servisler kaldırıldı, ancak bazı adımlar tamamlanamadı:" = "Helpers and services were removed, but some steps did not finish:";
 "Etkin görevler zamanı gelince çalışır: şarj limiti, Top Up ve güç modu görevleri macOS ayarını değiştirir. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz çalıştırılamaz." = "Enabled tasks run when they are due: charge limit, Top Up and power mode tasks change the macOS setting. Pausing charging, calibration and discharging to a target cannot run yet.";
@@ -1000,3 +996,38 @@
 "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir." = "Reads are always ready. Limit and Top Up need the limits macOS offers; power mode and the MagSafe light need their installed helper.";
 "Şarj Kontrolü bölümünden düzenleyin." = "Edit it in the Charge Control section.";
 "%@ bu Mac'te desteklenmiyor." = "%@ is not supported on this Mac.";
+
+/* Discharge, calibration, sailing and heat through the adapter cut */
+"%%%lld seviyesine deşarj et" = "Discharge to %lld%%";
+"Adaptör modu kapalı: sınırı macOS tutar. Deşarj ve kalibrasyon yine de aşağıdan adaptör kesilerek çalışır." = "Adapter mode is off: macOS holds the limit. Discharge and calibration below still work by cutting the adapter.";
+"Adaptör modu: hedef %%%lld" = "Adapter mode: target %lld%%";
+"Adaptör modu: hedef %%%lld, pilden çalışıyor" = "Adapter mode: target %lld%%, running on battery";
+"Adaptör testi bekliyor" = "Waiting for the adapter test";
+"Başka bir şarj uygulaması açık ya da adaptör testi sürüyor" = "Another charging app is open or the adapter test is running";
+"Bu Mac şarjı takılıyken durdurmaya izin vermiyor; Healthy Battery bunun yerine adaptörü keser. Deşarj, kalibrasyon ve adaptör modu, otomatik adaptör testi geçince açılır." = "This Mac does not allow pausing charging while plugged in; Healthy Battery cuts the adapter instead. Discharge, calibration and adapter mode unlock once the automatic adapter test passes.";
+"Bunlar şarj yardımcısıyla adaptörü kesmeye dayanır: aşağıdan yardımcıyı kurun, otomatik adaptör testi geçince açılır." = "These rely on cutting the adapter with the charge helper: install the helper below; they unlock once the automatic adapter test passes.";
+"Deşarj için Ayarlar → Şarj Kontrolü'nden şarj yardımcısını kurun" = "To discharge, install the charge helper in Settings → Charge Control";
+"Deşarj ve kalibrasyon sürerken Mac boşta uyumaz. Kapak kapanır ya da Mac uyursa adaptör geri açılır; işlem Mac uyanınca kaldığı yerden sürer." = "While a discharge or calibration runs, the Mac does not idle-sleep. If the lid closes or the Mac sleeps, the adapter comes back; the process continues where it left off when the Mac wakes.";
+"Deşarj, adaptör testi geçince kullanılabilir" = "Discharge becomes available once the adapter test passes";
+"Deşarj: %%%lld seviyesine iniyor" = "Discharging to %lld%%";
+"Deşarj: adaptör kesildi, pil %%%lld seviyesine inince geri açılır" = "Discharge: adapter cut, restores when the battery reaches %lld%%";
+"Deşarjı iptal et; adaptör hemen geri açılır" = "Cancel the discharge; the adapter comes back right away";
+"Dört aşamalı tam şarj/deşarj döngüsünü otomatik yönetir." = "Runs a four-step full charge/discharge cycle automatically.";
+"Healthy Battery adaptörü geçici olarak kesti: kablo takılı ama MacBook pilden çalışıyor. Adaptör kendiliğinden geri açılır." = "Healthy Battery has cut the adapter for now: the cable is plugged in, but the MacBook runs on battery. The adapter comes back on its own.";
+"Healthy Battery deşarj ya da kalibrasyon yürütüyor" = "Healthy Battery is running a discharge or calibration";
+"Isı koruması açık: şarj sırasında pil 35 °C'yi geçerse adaptör kesilir, 32 °C'nin altına inince şarj sürer." = "Heat protection is on: if the battery goes above 35 °C while charging, the adapter is cut; charging continues below 32 °C.";
+"Isı koruması: adaptör kesildi" = "Heat protection: adapter cut";
+"Kablo takılıyken pilden çalış ve %%%lld seviyesine in" = "Run on battery with the cable plugged in, down to %lld%%";
+"Kablo takılıyken pilden çalışır ve sınıra iner." = "Runs on battery with the cable plugged in, down to the limit.";
+"Kalibrasyon 1/4: %100'e şarj" = "Calibration 1/4: charging to 100%";
+"Kalibrasyon 2/4: %100'de 1 saat bekleme" = "Calibration 2/4: holding at 100% for 1 hour";
+"Kalibrasyon 3/4: %%%lld seviyesine deşarj" = "Calibration 3/4: discharging to %lld%%";
+"Kalibrasyon 4/4: yeniden %100'e şarj" = "Calibration 4/4: charging to 100% again";
+"Kalibrasyon: %100'e şarj, 1 saat bekleme, %15 seviyesine deşarj, yeniden %100, ardından sınır geri yüklenir (en fazla 24 saat)." = "Calibration: charge to 100%, hold for 1 hour, discharge to 15%, charge to 100% again, then the limit is restored (24 hours at most).";
+"Kalibrasyon: adaptör kesildi, pil %%%lld seviyesine iniyor" = "Calibration: adapter cut, battery going down to %lld%%";
+"Pil sıcak: adaptör kesildi, pil soğuyunca şarj sürer" = "Battery is warm: adapter cut, charging continues once it cools";
+"Pil zaten %%%lld ya da altında" = "Battery is already at or below %lld%%";
+"Test için önce süren deşarjı ya da kalibrasyonu durdurun." = "Stop the running discharge or calibration before the test.";
+"Yelken açık: adaptör hedefte kesilir, pil yelken aralığı kadar inince geri açılır. Pil daha seyrek şarj olur." = "Sailing on: the adapter is cut at the target and comes back once the battery drops by the sailing range. The battery charges less often.";
+"Yelken kapalı: adaptör hedefte kesilir, pil 5 puan inince geri açılır." = "Sailing off: the adapter is cut at the target and comes back once the battery drops 5 points.";
+"Yüzde %lld seviyesine deşarj et" = "Discharge to %lld percent";

@@ -39,7 +39,7 @@ final class AdvancedChargeRunner: ObservableObject {
     @Published private(set) var memory: AdvancedChargeMemory
     @Published private(set) var lastError: String?
 
-    private(set) var applied = ChargeInhibitState.released
+    @Published private(set) var applied = ChargeInhibitState.released
     private var backend: ChargeInhibitBackend
     private let store: AdvancedChargeMemoryStore?
     private let defaults: UserDefaults
@@ -48,6 +48,10 @@ final class AdvancedChargeRunner: ObservableObject {
     private var lastInput: AdvancedChargeInput?
     private var timer: Timer?
     private var lastSaved = AdvancedChargeMemory()
+    /// The helper answers a capability query over IPC; telemetry arrives every few seconds, so ask at most
+    /// this often (a new backend, sleep/wake and every apply still check right away).
+    static let capabilityRefreshInterval: TimeInterval = 30
+    private var lastCapabilityCheck = Date.distantPast
 
     init(backend: ChargeInhibitBackend = UnsupportedChargeInhibitBackend(),
          store: AdvancedChargeMemoryStore? = nil, defaults: UserDefaults = .standard) {
@@ -71,6 +75,7 @@ final class AdvancedChargeRunner: ObservableObject {
         releaseAll()
         backend = newBackend
         capabilities = newBackend.capabilities()
+        lastCapabilityCheck = Date()
     }
 
     func start() {
@@ -88,9 +93,10 @@ final class AdvancedChargeRunner: ObservableObject {
 
     // MARK: Requests
 
-    func requestDischarge(now: Date = Date()) {
+    /// Runs from the battery down to `target` (default: the advanced target limit), then restores the adapter.
+    func requestDischarge(to target: Int? = nil, now: Date = Date()) {
         guard capabilities.canForceDischarge else { return }
-        memory.discharge = DischargeRequest(requestedAt: now)
+        memory.discharge = DischargeRequest(requestedAt: now, target: target)
         reevaluate(now: now)
     }
     func cancelDischarge(now: Date = Date()) { memory.discharge = nil; reevaluate(now: now) }
@@ -105,16 +111,26 @@ final class AdvancedChargeRunner: ObservableObject {
         sleep = state
         // Adapter mode: restore wall power before the Mac sleeps rather than relying on the helper alone.
         if state != .awake, applied.adapterInhibited { releaseAll() }
-        if state == .awake { resyncFromBackend(); reevaluate(now: now) } else { sleepMayOvershootUpdate(now: now) }
+        if state == .awake { capabilities = backend.capabilities(); resyncFromBackend(); reevaluate(now: now) } else { sleepMayOvershootUpdate(now: now) }
     }
 
     // MARK: Telemetry
 
     func update(percentage: Int, temperatureC: Double?, externalConnected: Bool, isCharging: Bool,
                 topUpActive: Bool, now: Date = Date()) {
-        capabilities = backend.capabilities()
+        if abs(now.timeIntervalSince(lastCapabilityCheck)) >= Self.capabilityRefreshInterval {
+            capabilities = backend.capabilities()
+            lastCapabilityCheck = now
+        }
+        // While we hold the adapter cut macOS reports no external power. The helper checks the cable itself
+        // (SMC AC-W) and releases on a real unplug, so a cut it still holds means the cable is in.
+        var plugged = externalConnected
+        if !plugged, applied.adapterInhibited {
+            resyncFromBackend()
+            plugged = applied.adapterInhibited
+        }
         lastInput = AdvancedChargeInput(percentage: percentage, temperatureC: temperatureC,
-                                        externalConnected: externalConnected, isCharging: isCharging,
+                                        externalConnected: plugged, isCharging: isCharging,
                                         sleep: sleep, now: now, settings: settings, capabilities: capabilities,
                                         current: applied, topUpActive: topUpActive, memory: memory)
         reevaluate(now: now)
@@ -140,12 +156,52 @@ final class AdvancedChargeRunner: ObservableObject {
         else { heartbeatIfDue(now: now) }
     }
 
-    /// Popover status line while adapter mode holds the adapter cut; nil otherwise.
+    /// Popover status line while Healthy Battery holds the adapter cut; nil otherwise.
     var adapterStatusText: String? {
-        guard display == .adapterCut else { return nil }
+        switch display {
+        case .adapterCut:
+            let target = AdvancedChargeLimits.normalizedTarget(settings.targetLimit)
+            let resume = AdvancedChargeEngine.adapterResumeAt(target: target, settings: settings)
+            return String(localized: "Adaptör kesildi — pilden çalışıyor, %\(resume) seviyesine inince açılır")
+        case .discharging:
+            return String(localized: "Deşarj: adaptör kesildi, pil %\(dischargeTarget) seviyesine inince geri açılır")
+        case .calibrating(.dischargeToLow):
+            return String(localized: "Kalibrasyon: adaptör kesildi, pil %\(AdvancedChargeLimits.calibrationLow) seviyesine iniyor")
+        case .heatPaused where !capabilities.canInhibitCharging:
+            return String(localized: "Pil sıcak: adaptör kesildi, pil soğuyunca şarj sürer")
+        default:
+            return nil
+        }
+    }
+
+    /// Level the running (or next) discharge stops at.
+    var dischargeTarget: Int {
+        memory.discharge?.target.map(AdvancedChargeLimits.normalizedTarget)
+            ?? AdvancedChargeLimits.normalizedTarget(settings.targetLimit)
+    }
+
+    /// Headline for the panel's status card while Healthy Battery itself steers the adapter; nil leaves
+    /// the macOS policy title (the native limit) in place.
+    var panelTitle: String? {
+        guard !capabilities.canInhibitCharging, capabilities.canForceDischarge else { return nil }
         let target = AdvancedChargeLimits.normalizedTarget(settings.targetLimit)
-        let resume = AdvancedChargeEngine.adapterResumeAt(target: target, sailingDelta: settings.sailingDelta)
-        return String(localized: "Adaptör kesildi — pilden çalışıyor, %\(resume) seviyesine inince açılır")
+        switch display {
+        case .adapterCut: return String(localized: "Adaptör modu: hedef %\(target), pilden çalışıyor")
+        case .idle where settings.adapterModeEnabled: return String(localized: "Adaptör modu: hedef %\(target)")
+        case .discharging: return String(localized: "Deşarj: %\(dischargeTarget) seviyesine iniyor")
+        case .heatPaused: return String(localized: "Isı koruması: adaptör kesildi")
+        case .calibrating(let phase): return Self.calibrationTitle(phase)
+        default: return nil
+        }
+    }
+
+    static func calibrationTitle(_ phase: CalibrationPhase) -> String {
+        switch phase {
+        case .chargeToFull: return String(localized: "Kalibrasyon 1/4: %100'e şarj")
+        case .hold: return String(localized: "Kalibrasyon 2/4: %100'de 1 saat bekleme")
+        case .dischargeToLow: return String(localized: "Kalibrasyon 3/4: %\(AdvancedChargeLimits.calibrationLow) seviyesine deşarj")
+        case .rechargeToFull: return String(localized: "Kalibrasyon 4/4: yeniden %100'e şarj")
+        }
     }
 
     private func sleepMayOvershootUpdate(now: Date) {

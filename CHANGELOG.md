@@ -12,6 +12,24 @@
 - An Edit menu makes ⌘C, ⌘V, ⌘X, ⌘Z and ⌘A work in text fields. The onboarding button opens the Dashboard, the Shortcuts page counts the actions that can really run, and the Dashboard status dot follows the real state.
 - Lower background cost: the 24-hour history is saved at most every 2 minutes (and when you quit or the Mac sleeps) instead of every 30 seconds, without re-reading and re-encoding the whole file each time; unchanged values no longer wake the interface. A crash can lose up to two minutes of chart points.
 - Docs: SECURITY.md lists all three helpers, the manual uninstall removes the charge helper too, and the Homebrew instructions agree.
+- Adapter mode no longer lets go of its own cut. While Healthy Battery cuts the adapter, macOS reports "no external power", and the app took that as the cable being pulled out: it brought the adapter back at the next battery reading and cut it again a moment later. It now asks the charge helper, which checks the cable itself, so the adapter stays cut until the battery reaches the resume level, and a real unplug still ends it at once.
+- The panel's status card no longer says "The adapter is not connected" and "Holding the limit: 80%" while adapter mode has cut the adapter. It says the cable is in, the Mac runs on battery and the adapter comes back on its own, and shows the adapter target.
+- Discharge works on Macs that only allow cutting the adapter (macOS 27): the minus button in the panel runs the Mac from the battery with the cable plugged in, down to the limit, then brings the adapter back. It needs the charge helper and a passed adapter test; adapter mode itself can stay off. Click again to cancel.
+- Calibration works the same way: charge to 100% (Healthy Battery lifts the macOS limit with Top Up), hold for an hour, discharge to 15%, charge to 100% again, then the limit comes back. 24 hours at most.
+- During a discharge or calibration the Mac does not idle-sleep. If the lid closes or the Mac sleeps anyway, the adapter comes back first and the work continues after waking.
+- Sailing in adapter mode: with Sailing on, the adapter comes back only after the battery drops by the sailing range (5–15 points) instead of 5, so the battery charges less often.
+- Heat protection in adapter mode: with Automatic protection on, the adapter is cut when the battery goes above 35 °C while charging, and charging continues below 32 °C. Never below 30% charge.
+
+- Schedule history: the "Run as a new attempt" button is gone. It only added another "not supported" entry and never ran the task. To run a task again, enable it or duplicate it.
+- Schedule: "Add task" starts with "Charge to full" instead of "Pause charging", and the calibration templates are gone. Pause charging, calibration and discharge to a target cannot run on any Mac yet, so the action picker no longer lists them (a task that already uses one keeps it and shows why it cannot be enabled).
+- Schedule page: the note said no task changes a macOS setting. That was wrong: charge limit, charge to full and power mode tasks run and do change the setting. The note now says what runs and what does not yet.
+- Heat protection is one switch now (Settings → Charge control → Automatic protection). The locked "Coming soon" heat row and the second heat switch in the experimental advanced charge card are gone; the README lists heat protection as a working feature.
+- Removed the "Sleep behavior" switch from the experimental advanced charge card. It was saved but never used. The real sleep setting (Sleep page) is unchanged.
+- When Top Up fails, the reason now shows under the buttons in the panel and on Settings → Charge control, and stays until you try again. Before, it was kept internally and never shown.
+- Uninstall no longer says "removed" when a step failed. It checks that the helper files are really gone and reports a failed login item, charge limit reset or data deletion; in that case the app stays open so you can try again.
+- Copy, paste, cut, select all and undo (⌘C, ⌘V, ⌘X, ⌘A, ⌘Z) now work in text fields such as the schedule editor. The app had no Edit menu, so macOS did not pass these shortcuts on.
+- Error texts from the charge helper (for example "The saved macOS limit could not be read") now appear in your language instead of Turkish.
+- The bug report template, SECURITY.md and CONTRIBUTING.md use the name Healthy Battery instead of Cellkeep.
 
 ## 1.4.2
 

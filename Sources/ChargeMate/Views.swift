@@ -16,6 +16,7 @@ struct PopoverView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var limitEditor = false
     @ObservedObject private var advanced = AdvancedChargeRunner.shared
+    @ObservedObject private var adapter = AdapterModeController.shared
     @State private var editing = false
     @State private var draft: [PlacedWidget] = []
     @State private var dragging: PanelWidget?
@@ -59,12 +60,17 @@ struct PopoverView: View {
                         .help(limitEditor ? String(localized: "Şarj hedefi düzenleyicisini kapat") : String(localized: "Şarj hedefini düzenle"))
                         .accessibilityLabel("Şarj hedefi yüzde \(shownLimit); düzenleyiciyi \(limitEditor ? String(localized: "kapat") : String(localized: "aç"))")
                         Spacer(minLength: 0)
-                        // Locked feature: icon only, so the usable actions keep their full labels in
-                        // every language within the 360 pt panel.
-                        Button {} label: { Image(systemName: "minus.circle") }
-                            .popoverToolbarButtonStyle(iconOnly: true).disabled(true)
-                            .accessibilityLabel("Deşarj yakında; henüz kullanılamıyor")
-                            .help("Yakında · güvenli bataryadan çalışma kontrolü henüz doğrulanmadı")
+                        // Icon only, so Doldur keeps its full label in every language within the 360 pt panel.
+                        // Works through the verified adapter cut (helper + self-test); explains itself otherwise.
+                        Button { adapter.toggleDischarge() } label: {
+                            Image(systemName: adapter.dischargeRunning ? "xmark.circle" : "minus.circle")
+                        }
+                            .popoverToolbarButtonStyle(active: adapter.dischargeRunning, iconOnly: true)
+                            .disabled(!adapter.dischargeRunning && adapter.dischargeBlockReason != nil)
+                            .accessibilityLabel(adapter.dischargeRunning ? String(localized: "Deşarjı iptal et")
+                                                : String(localized: "Yüzde \(adapter.dischargeLimit) seviyesine deşarj et"))
+                            .help(adapter.dischargeRunning ? String(localized: "Deşarjı iptal et; adaptör hemen geri açılır")
+                                  : adapter.dischargeBlockReason ?? String(localized: "Kablo takılıyken pilden çalış ve %\(adapter.dischargeLimit) seviyesine in"))
                         Button {
                             battery.topUpActive ? battery.stopTopUp() : battery.startTopUp()
                         } label: {
@@ -370,7 +376,7 @@ struct PopoverView: View {
         case .statusExplanation:
             VStack(alignment: .leading, spacing: 8) {
                 Text("Şu anda ne oluyor?").font(.system(size: 12, weight: .semibold))
-                Text(battery.policyState.title).font(.system(size: 12)).fixedSize(horizontal: false, vertical: true)
+                Text(advanced.panelTitle ?? battery.policyState.title).font(.system(size: 12)).fixedSize(horizontal: false, vertical: true)
                 Text(battery.statusSentence).font(.system(size: 10)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 Divider()
                 PowerModeQuickControl(compact: true)
@@ -818,7 +824,7 @@ struct SettingsView: View {
             ExternalChangeSettingsCard()
             topUpCard
             HealthSettingsCards()
-            advancedLockedCard
+            if !AdapterModeController.shared.adapterCutAvailable { advancedLockedCard }
             AdvancedChargeSettingsView(runner: AdvancedChargeRunner.shared)
         case .energy:
             EnergyUsageView()
@@ -984,13 +990,13 @@ struct SettingsView: View {
     private var advancedLockedCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Gelişmiş", systemImage: "lock.fill").font(.headline)
-            lockedRow(String(localized: "Deşarj"), icon: "minus.circle", detail: String(localized: "Bataryadan çalışmayı zorlar; güvenli bataryadan çalışma kontrolü henüz doğrulanmadı."))
+            lockedRow(String(localized: "Deşarj"), icon: "minus.circle", detail: String(localized: "Kablo takılıyken pilden çalışır ve sınıra iner."))
             Divider()
             lockedRow(String(localized: "Yelken modu"), icon: "sailboat", detail: String(localized: "Şarj ve boşalmayı hedef bandında dengeler."))
             Divider()
-            lockedRow(String(localized: "Kalibrasyon"), icon: "arrow.triangle.2.circlepath", detail: String(localized: "Beş aşamalı tam şarj/deşarj döngüsünü otomatik yönetir."))
-            Text("Fiziksel durdurma desteği doğrulanınca eklenecek. Etkisiz anahtar gösterilmez.")
-                .font(.caption).foregroundStyle(.secondary)
+            lockedRow(String(localized: "Kalibrasyon"), icon: "arrow.triangle.2.circlepath", detail: String(localized: "Dört aşamalı tam şarj/deşarj döngüsünü otomatik yönetir."))
+            Text("Bunlar şarj yardımcısıyla adaptörü kesmeye dayanır: aşağıdan yardımcıyı kurun, otomatik adaptör testi geçince açılır.")
+                .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
         }.chargeCard()
     }
 
@@ -999,7 +1005,7 @@ struct SettingsView: View {
             Image(systemName: icon).font(.system(size: 15)).foregroundStyle(.secondary).frame(width: 20)
             Text(title).font(.system(size: 12, weight: .semibold)).foregroundStyle(.secondary)
             Spacer()
-            StatusBadge(text: String(localized: "Yakında · donanım doğrulaması bekliyor"), color: .secondary, icon: "clock")
+            StatusBadge(text: String(localized: "Adaptör testi bekliyor"), color: .secondary, icon: "lock.fill")
         }
         .help(detail)
         .opacity(0.72)

@@ -116,7 +116,6 @@
 "Batarya voltajı" = "Batarya voltajı";
 "Batarya yüzdesi" = "Batarya yüzdesi";
 "Batarya özellikleri" = "Batarya özellikleri";
-"Bataryadan çalışmayı zorlar; güvenli bataryadan çalışma kontrolü henüz doğrulanmadı." = "Bataryadan çalışmayı zorlar; güvenli bataryadan çalışma kontrolü henüz doğrulanmadı.";
 "Bataryadan çalışıyor" = "Bataryadan çalışıyor";
 "Bağlantı" = "Bağlantı";
 "Bağlı" = "Bağlı";
@@ -142,7 +141,6 @@
 "Başlat veya önceki limite dönerek iptal et" = "Başlat veya önceki limite dönerek iptal et";
 "Bekleniyor…" = "Bekleniyor…";
 "Belirsiz işlemi kapat" = "Belirsiz işlemi kapat";
-"Beş aşamalı tam şarj/deşarj döngüsünü otomatik yönetir." = "Beş aşamalı tam şarj/deşarj döngüsünü otomatik yönetir.";
 "Bileşenler farklı anlarda ölçüldü; toplamla kısa süreli fark olabilir." = "Bileşenler farklı anlarda ölçüldü; toplamla kısa süreli fark olabilir.";
 "Bilinmeyen hata" = "Bilinmeyen hata";
 "Bir görev oluşturun veya güvenli bir şablonla başlayın." = "Bir görev oluşturun veya güvenli bir şablonla başlayın.";
@@ -208,7 +206,6 @@
 "Devam ettir" = "Devam ettir";
 "Deşarj" = "Deşarj";
 "Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez." = "Deşarj ve Kalibrasyon, doğrulanmış motorları tamamlanmadan Kestirmeler'e eklenmez.";
-"Deşarj yakında; henüz kullanılamıyor" = "Deşarj yakında; henüz kullanılamıyor";
 "Dil" = "Dil";
 "Disk artık aynı bağlantıda bulunamadı; çıkarma yapılmadı." = "Disk artık aynı bağlantıda bulunamadı; çıkarma yapılmadı.";
 "Disk çıkarılamadı: %@" = "Disk çıkarılamadı: %@";
@@ -264,7 +261,6 @@
 "Eylem" = "Eylem";
 "Eşik üzerinde uygulama yok" = "Eşik üzerinde uygulama yok";
 "Fareyle inceleyin veya tıklayıp yön tuşlarını kullanın. Home/End ilk/son ölçüm; Escape seçimi temizler." = "Fareyle inceleyin veya tıklayıp yön tuşlarını kullanın. Home/End ilk/son ölçüm; Escape seçimi temizler.";
-"Fiziksel durdurma desteği doğrulanınca eklenecek. Etkisiz anahtar gösterilmez." = "Fiziksel durdurma desteği doğrulanınca eklenecek. Etkisiz anahtar gösterilmez.";
 "Fiziksel ışık testi" = "Fiziksel ışık testi";
 "Fotoğraflar analizi" = "Fotoğraflar analizi";
 "Gelişmiş" = "Gelişmiş";
@@ -621,8 +617,6 @@
 "Uzun vadeli sağlık" = "Uzun vadeli sağlık";
 "Vazgeç" = "Vazgeç";
 "Veriler ve sıfırlama" = "Veriler ve sıfırlama";
-"Yakında · donanım doğrulaması bekliyor" = "Yakında · donanım doğrulaması bekliyor";
-"Yakında · güvenli bataryadan çalışma kontrolü henüz doğrulanmadı" = "Yakında · güvenli bataryadan çalışma kontrolü henüz doğrulanmadı";
 "Yalnız Healthy Battery arayüz ayarları sıfırlansın mı?" = "Yalnız Healthy Battery arayüz ayarları sıfırlansın mı?";
 "Yalnız ek etkinlik ve Gösterge Tablosu örneklemesini etkiler; şarj denetimini açmaz veya durdurmaz." = "Yalnız ek etkinlik ve Gösterge Tablosu örneklemesini etkiler; şarj denetimini açmaz veya durdurmaz.";
 "Yalnız çok yüksek" = "Yalnız çok yüksek";
@@ -853,7 +847,6 @@
 "Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür";
 "Isı nedeniyle duraklatıldı" = "Isı nedeniyle duraklatıldı";
 "Kalibrasyon sürüyor" = "Kalibrasyon sürüyor";
-"Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat)." = "Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat).";
 "Kalibrasyonu başlat" = "Kalibrasyonu başlat";
 "Kalibrasyonu iptal et" = "Kalibrasyonu iptal et";
 "Kritik seviye" = "Kritik seviye";
@@ -965,6 +958,8 @@
 "Şarj durdurma yardımcısı kurulu değil." = "Şarj durdurma yardımcısı kurulu değil.";
 "Şarj durdurma yardımcısı güvenli değil; işlem durduruldu." = "Şarj durdurma yardımcısı güvenli değil; işlem durduruldu.";
 "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor)." = "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor).";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok.";
+"Şu yardımcı dosyalar silinemedi: %@" = "Şu yardımcı dosyalar silinemedi: %@";
 "Giriş öğesi kayıttan silinemedi: %@" = "Giriş öğesi kayıttan silinemedi: %@";
 "Şarj limiti %%100'e sıfırlanamadı: %@" = "Şarj limiti %%100'e sıfırlanamadı: %@";
 "Uygulama verileri silinemedi: %@" = "Uygulama verileri silinemedi: %@";
@@ -1000,3 +995,38 @@
 "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir." = "Okumalar her zaman hazırdır. Limit ve Top Up için macOS'un sunduğu limitler, güç modu ve MagSafe ışığı için kurulu yardımcı gerekir.";
 "Şarj Kontrolü bölümünden düzenleyin." = "Şarj Kontrolü bölümünden düzenleyin.";
 "%@ bu Mac'te desteklenmiyor." = "%@ bu Mac'te desteklenmiyor.";
+
+/* Discharge, calibration, sailing and heat through the adapter cut */
+"%%%lld seviyesine deşarj et" = "%%%lld seviyesine deşarj et";
+"Adaptör modu kapalı: sınırı macOS tutar. Deşarj ve kalibrasyon yine de aşağıdan adaptör kesilerek çalışır." = "Adaptör modu kapalı: sınırı macOS tutar. Deşarj ve kalibrasyon yine de aşağıdan adaptör kesilerek çalışır.";
+"Adaptör modu: hedef %%%lld" = "Adaptör modu: hedef %%%lld";
+"Adaptör modu: hedef %%%lld, pilden çalışıyor" = "Adaptör modu: hedef %%%lld, pilden çalışıyor";
+"Adaptör testi bekliyor" = "Adaptör testi bekliyor";
+"Başka bir şarj uygulaması açık ya da adaptör testi sürüyor" = "Başka bir şarj uygulaması açık ya da adaptör testi sürüyor";
+"Bu Mac şarjı takılıyken durdurmaya izin vermiyor; Healthy Battery bunun yerine adaptörü keser. Deşarj, kalibrasyon ve adaptör modu, otomatik adaptör testi geçince açılır." = "Bu Mac şarjı takılıyken durdurmaya izin vermiyor; Healthy Battery bunun yerine adaptörü keser. Deşarj, kalibrasyon ve adaptör modu, otomatik adaptör testi geçince açılır.";
+"Bunlar şarj yardımcısıyla adaptörü kesmeye dayanır: aşağıdan yardımcıyı kurun, otomatik adaptör testi geçince açılır." = "Bunlar şarj yardımcısıyla adaptörü kesmeye dayanır: aşağıdan yardımcıyı kurun, otomatik adaptör testi geçince açılır.";
+"Deşarj için Ayarlar → Şarj Kontrolü'nden şarj yardımcısını kurun" = "Deşarj için Ayarlar → Şarj Kontrolü'nden şarj yardımcısını kurun";
+"Deşarj ve kalibrasyon sürerken Mac boşta uyumaz. Kapak kapanır ya da Mac uyursa adaptör geri açılır; işlem Mac uyanınca kaldığı yerden sürer." = "Deşarj ve kalibrasyon sürerken Mac boşta uyumaz. Kapak kapanır ya da Mac uyursa adaptör geri açılır; işlem Mac uyanınca kaldığı yerden sürer.";
+"Deşarj, adaptör testi geçince kullanılabilir" = "Deşarj, adaptör testi geçince kullanılabilir";
+"Deşarj: %%%lld seviyesine iniyor" = "Deşarj: %%%lld seviyesine iniyor";
+"Deşarj: adaptör kesildi, pil %%%lld seviyesine inince geri açılır" = "Deşarj: adaptör kesildi, pil %%%lld seviyesine inince geri açılır";
+"Deşarjı iptal et; adaptör hemen geri açılır" = "Deşarjı iptal et; adaptör hemen geri açılır";
+"Dört aşamalı tam şarj/deşarj döngüsünü otomatik yönetir." = "Dört aşamalı tam şarj/deşarj döngüsünü otomatik yönetir.";
+"Healthy Battery adaptörü geçici olarak kesti: kablo takılı ama MacBook pilden çalışıyor. Adaptör kendiliğinden geri açılır." = "Healthy Battery adaptörü geçici olarak kesti: kablo takılı ama MacBook pilden çalışıyor. Adaptör kendiliğinden geri açılır.";
+"Healthy Battery deşarj ya da kalibrasyon yürütüyor" = "Healthy Battery deşarj ya da kalibrasyon yürütüyor";
+"Isı koruması açık: şarj sırasında pil 35 °C'yi geçerse adaptör kesilir, 32 °C'nin altına inince şarj sürer." = "Isı koruması açık: şarj sırasında pil 35 °C'yi geçerse adaptör kesilir, 32 °C'nin altına inince şarj sürer.";
+"Isı koruması: adaptör kesildi" = "Isı koruması: adaptör kesildi";
+"Kablo takılıyken pilden çalış ve %%%lld seviyesine in" = "Kablo takılıyken pilden çalış ve %%%lld seviyesine in";
+"Kablo takılıyken pilden çalışır ve sınıra iner." = "Kablo takılıyken pilden çalışır ve sınıra iner.";
+"Kalibrasyon 1/4: %100'e şarj" = "Kalibrasyon 1/4: %100'e şarj";
+"Kalibrasyon 2/4: %100'de 1 saat bekleme" = "Kalibrasyon 2/4: %100'de 1 saat bekleme";
+"Kalibrasyon 3/4: %%%lld seviyesine deşarj" = "Kalibrasyon 3/4: %%%lld seviyesine deşarj";
+"Kalibrasyon 4/4: yeniden %100'e şarj" = "Kalibrasyon 4/4: yeniden %100'e şarj";
+"Kalibrasyon: %100'e şarj, 1 saat bekleme, %15 seviyesine deşarj, yeniden %100, ardından sınır geri yüklenir (en fazla 24 saat)." = "Kalibrasyon: %100'e şarj, 1 saat bekleme, %15 seviyesine deşarj, yeniden %100, ardından sınır geri yüklenir (en fazla 24 saat).";
+"Kalibrasyon: adaptör kesildi, pil %%%lld seviyesine iniyor" = "Kalibrasyon: adaptör kesildi, pil %%%lld seviyesine iniyor";
+"Pil sıcak: adaptör kesildi, pil soğuyunca şarj sürer" = "Pil sıcak: adaptör kesildi, pil soğuyunca şarj sürer";
+"Pil zaten %%%lld ya da altında" = "Pil zaten %%%lld ya da altında";
+"Test için önce süren deşarjı ya da kalibrasyonu durdurun." = "Test için önce süren deşarjı ya da kalibrasyonu durdurun.";
+"Yelken açık: adaptör hedefte kesilir, pil yelken aralığı kadar inince geri açılır. Pil daha seyrek şarj olur." = "Yelken açık: adaptör hedefte kesilir, pil yelken aralığı kadar inince geri açılır. Pil daha seyrek şarj olur.";
+"Yelken kapalı: adaptör hedefte kesilir, pil 5 puan inince geri açılır." = "Yelken kapalı: adaptör hedefte kesilir, pil 5 puan inince geri açılır.";
+"Yüzde %lld seviyesine deşarj et" = "Yüzde %lld seviyesine deşarj et";
