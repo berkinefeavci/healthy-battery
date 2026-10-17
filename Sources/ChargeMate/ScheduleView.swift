@@ -71,7 +71,7 @@ struct ScheduleView: View {
                         .chargeMateButtonStyle()
                 }
             }
-            Label("Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez.", systemImage: "lock.shield")
+            Label("Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok.", systemImage: "clock.badge.checkmark")
                 .font(.caption).foregroundStyle(.secondary).chargeCard()
             ScheduleHistoryView(records: records,
                 taskNames: Dictionary(uniqueKeysWithValues: tasks.map { ($0.id, $0.name) }),

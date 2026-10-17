@@ -680,7 +680,6 @@
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Charge to 100 percent and restore the previous limit";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Charges to 100 percent, then returns to the previous limit.";
 "Yüzdeyi göster" = "Show percentage";
-"Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez." = "The scheduler is ready; the task execution safety gate is closed. No task changes a macOS setting without a verified system writer.";
 "aç" = "open";
 "ağ bağlantıları" = "network connections";
 "bilinmiyor" = "unknown";
@@ -977,3 +976,4 @@
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Share of the latest reading. Helper processes of an app are combined into one row.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Share of the period's total energy impact (macOS reading × time; not watts). %lld days of data.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "This Mac does not let apps pause charging while plugged in, so sailing, heat pause, sleep behavior, discharge and calibration are not shown here. With adapter mode on, the target limit is applied through it.";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "The scheduler is running. Charge limit, charge to full and power mode tasks really run when they are due and change a Mac setting; results appear in the task history. Pausing charging, calibration and discharging to a target are not available yet.";

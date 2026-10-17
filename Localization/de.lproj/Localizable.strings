@@ -680,7 +680,6 @@
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Auf 100 Prozent laden und das vorherige Limit wiederherstellen";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Lädt auf 100 Prozent und kehrt dann zum vorherigen Limit zurück.";
 "Yüzdeyi göster" = "Prozent anzeigen";
-"Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez." = "Der Planer ist bereit; die Sicherheitssperre für die Aufgabenausführung ist geschlossen. Ohne überprüften Systemschreiber ändert keine Aufgabe eine macOS-Einstellung.";
 "aç" = "öffnen";
 "ağ bağlantıları" = "Netzwerkverbindungen";
 "bilinmiyor" = "unbekannt";
@@ -977,3 +976,4 @@
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Anteil an der letzten Messung. Hilfsprozesse einer App werden in einer Zeile zusammengefasst.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Anteil an der gesamten Energiewirkung des Zeitraums (macOS-Messung × Zeit; keine Watt). Daten aus %lld Tagen.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Dieser Mac erlaubt kein Pausieren des Ladens bei angeschlossenem Netzteil; Segeln, Hitzepause, Ruhezustand, Entladen und Kalibrierung werden daher hier nicht angezeigt. Mit eingeschaltetem Netzteilmodus wird das Ziel darüber umgesetzt.";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "Der Planer läuft. Aufgaben für Ladelimit, Vollladen und Energiemodus werden zur fälligen Zeit wirklich ausgeführt und ändern eine Mac-Einstellung; die Ergebnisse stehen im Aufgabenverlauf. Laden pausieren, Kalibrieren und Entladen bis zu einem Ziel sind noch nicht verfügbar.";

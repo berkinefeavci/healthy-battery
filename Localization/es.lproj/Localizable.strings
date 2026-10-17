@@ -680,7 +680,6 @@
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Cargar al 100 % y restaurar el límite anterior";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Carga al 100 % y luego vuelve al límite anterior.";
 "Yüzdeyi göster" = "Mostrar porcentaje";
-"Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez." = "El planificador está listo; el bloqueo de seguridad de ejecución está cerrado. Ninguna tarea cambia un ajuste de macOS sin un escritor del sistema verificado.";
 "aç" = "abrir";
 "ağ bağlantıları" = "conexiones de red";
 "bilinmiyor" = "desconocido";
@@ -977,3 +976,4 @@
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Proporción de la última lectura. Los procesos auxiliares de una app se agrupan en una fila.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Proporción del impacto energético total del periodo (lectura de macOS × tiempo; no son vatios). %lld días de datos.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Este Mac no permite pausar la carga con el cargador conectado, así que la navegación, la pausa por calor, el reposo, la descarga y la calibración no se muestran aquí. Con el modo adaptador activado, el límite objetivo se aplica a través de él.";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "El planificador está en marcha. Las tareas de límite de carga, carga completa y modo de energía se ejecutan de verdad a su hora y cambian un ajuste del Mac; los resultados aparecen en el historial de tareas. Pausar la carga, calibrar y descargar hasta un objetivo aún no están disponibles.";

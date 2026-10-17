@@ -276,3 +276,4 @@ grep -Fq 'static func availableModes() -> Set<SystemPowerMode> { cachedModes }' 
 # Takvim geçmişinde, hiçbir şey çalıştırmayan "Yeni çalışma olarak dene" kaydı olmamalı.
 ! grep -rFq 'appendUnsupportedRetry' Sources Tests
 ! grep -Fq 'Yeni çalışma olarak dene' Sources/ChargeMate/ScheduleHistoryView.swift
+! grep -Fq "hiçbir görev macOS ayarını değiştirmez" Sources/ChargeMate/ScheduleView.swift

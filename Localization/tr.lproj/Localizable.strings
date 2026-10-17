@@ -680,7 +680,6 @@
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Yüzde 100'e şarj et ve önceki limiti geri yükle";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Yüzde 100’e şarj eder, sonra önceki limite döner.";
 "Yüzdeyi göster" = "Yüzdeyi göster";
-"Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez." = "Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez.";
 "aç" = "aç";
 "ağ bağlantıları" = "ağ bağlantıları";
 "bilinmiyor" = "bilinmiyor";
@@ -977,3 +976,4 @@
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır.";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok.";

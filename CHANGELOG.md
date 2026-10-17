@@ -4,6 +4,7 @@
 
 - Schedule history: the "Run as a new attempt" button is gone. It only added another "not supported" entry and never ran the task. To run a task again, enable it or duplicate it.
 - Schedule: "Add task" starts with "Charge to full" instead of "Pause charging", and the calibration templates are gone. Pause charging, calibration and discharge to a target cannot run on any Mac yet, so the action picker no longer lists them (a task that already uses one keeps it and shows why it cannot be enabled).
+- Schedule page: the note said no task changes a macOS setting. That was wrong: charge limit, charge to full and power mode tasks run and do change the setting. The note now says what runs and what does not yet.
 
 ## 1.4.2
 

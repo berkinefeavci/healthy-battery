@@ -680,7 +680,6 @@
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Charger à 100 % puis rétablir la limite précédente";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Charge à 100 %, puis revient à la limite précédente.";
 "Yüzdeyi göster" = "Afficher le pourcentage";
-"Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez." = "Le planificateur est prêt ; le verrou de sécurité d’exécution des tâches est fermé. Aucune tâche ne modifie un réglage macOS sans écrivain système vérifié.";
 "aç" = "ouvrir";
 "ağ bağlantıları" = "connexions réseau";
 "bilinmiyor" = "inconnu";
@@ -977,3 +976,4 @@
 "Son ölçümdeki payı. Aynı uygulamanın yardımcı süreçleri tek satırda toplanır." = "Part de la dernière mesure. Les processus auxiliaires d’une app sont regroupés sur une ligne.";
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Part de l’impact énergétique total de la période (mesure macOS × durée ; pas des watts). %lld jours de données.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Ce Mac ne permet pas de suspendre la charge sur secteur : la navigation, la pause thermique, le comportement en veille, la décharge et le calibrage ne sont donc pas affichés ici. Avec le mode adaptateur activé, la limite cible passe par lui.";
+"Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "Le planificateur fonctionne. Les tâches de limite de charge, de charge complète et de mode d’alimentation s’exécutent réellement à l’heure prévue et modifient un réglage du Mac ; les résultats apparaissent dans l’historique des tâches. La mise en pause de la charge, l’étalonnage et la décharge jusqu’à une cible ne sont pas encore disponibles.";
