@@ -774,7 +774,6 @@
 "Öğeler arası boşluk: %lld pt" = "Espacio entre elementos: %lld pt";
 "Öğeleri sürükleyin; sıralama ve kaldırma seçenekleri için sağ tıklayın. Değişiklikler anında kaydedilir." = "Arrastra los elementos; haz clic derecho para reordenar o eliminar. Los cambios se guardan al instante.";
 "İki haftada bir" = "Cada dos semanas";
-"İki haftalık kalibrasyon" = "Calibración quincenal";
 "İki uygulama aynı şarj sınırını yazarsa birbirini bozar; bu yüzden düğmeler kilitli." = "Si dos apps escriben el mismo límite de carga se interfieren, por eso los botones están bloqueados.";
 "İmza bu uygulamanın geliştiricisine ait değil." = "La firma no pertenece al desarrollador de esta app.";
 "İmza ve Apple onayı doğrulanıyor…" = "Verificando firma y notarización de Apple…";

@@ -178,7 +178,7 @@ private struct ScheduleEditor: View {
             Form {
                 TextField("Ad", text: $task.name)
                 Picker("Eylem", selection: $task.action) {
-                    ForEach(ScheduleAction.allCases) { Text($0.title).tag($0) }
+                    ForEach(ScheduleAction.offered(keeping: task.action)) { Text($0.title).tag($0) }
                 }.onChange(of: task.action) { action in task.target = action.needsTarget ? (task.target ?? capabilities.chargeLimits.first ?? 80) : nil }
                 if task.action.needsTarget {
                     Stepper("Hedef: %\(task.target ?? 80)", value: Binding(get: { task.target ?? 80 }, set: { task.target = $0 }), in: 20...100, step: 5)

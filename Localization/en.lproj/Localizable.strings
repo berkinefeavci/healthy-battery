@@ -774,7 +774,6 @@
 "Öğeler arası boşluk: %lld pt" = "Spacing between items: %lld pt";
 "Öğeleri sürükleyin; sıralama ve kaldırma seçenekleri için sağ tıklayın. Değişiklikler anında kaydedilir." = "Drag items; right-click for reorder and remove options. Changes are saved immediately.";
 "İki haftada bir" = "Every two weeks";
-"İki haftalık kalibrasyon" = "Biweekly calibration";
 "İki uygulama aynı şarj sınırını yazarsa birbirini bozar; bu yüzden düğmeler kilitli." = "If two apps write the same charge limit they interfere with each other, so the buttons are locked.";
 "İmza bu uygulamanın geliştiricisine ait değil." = "The signature does not belong to this app’s developer.";
 "İmza ve Apple onayı doğrulanıyor…" = "Verifying signature and Apple notarization…";

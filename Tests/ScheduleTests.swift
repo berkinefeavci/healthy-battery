@@ -38,12 +38,15 @@ enum ScheduleTests {
 
         let now = date("2026-09-20T10:00:00Z")
         let fresh = ScheduleTask.new(now: now)
-        check(!fresh.enabled && fresh.action == .pauseCharging && fresh.recurrence == .daily, "new task safe defaults")
+        check(!fresh.enabled && fresh.action == .topUp && fresh.action.isImplemented && fresh.recurrence == .daily, "new task safe defaults")
         var enabledOriginal = fresh; enabledOriginal.enabled = true; enabledOriginal.activationStart = .distantPast; enabledOriginal.lastEvaluatedAt = .distantPast
         let copy = enabledOriginal.duplicated(now: now)
         check(copy.id != enabledOriginal.id && !copy.enabled && copy.name.hasSuffix(" kopyası"), "duplicate has safe identity and name")
         check(copy.createdAt == now && copy.activationStart == nil && copy.lastEvaluatedAt == nil, "duplicate resets runtime state")
-        for template in ScheduleTemplate.allCases { check(!template.task(now: now).enabled, "template disabled") }
+        for template in ScheduleTemplate.allCases {
+            check(!template.task(now: now).enabled, "template disabled")
+            check(template.task(now: now).action.isImplemented, "template uses an action this app can run")
+        }
         var target = fresh; target.action = .setChargeLimit; target.target = 85
         let capabilities = ScheduleCapabilities(chargeLimits: [80, 85, 90, 95, 100], topUpAvailable: true,
                                                 powerModes: [.automatic, .lowPower, .turbo])
@@ -63,6 +66,11 @@ enum ScheduleTests {
         for action in [ScheduleAction.pauseCharging, .startCalibration, .dischargeTo] {
             check(action.availability(in: capabilities) != nil, "unverified action remains unavailable")
         }
+        for action in ScheduleAction.allCases {
+            check(action.isImplemented == (action.availability(in: capabilities) == nil), "isImplemented matches availability with full capabilities")
+        }
+        check(ScheduleAction.offered(keeping: .topUp) == ScheduleAction.allCases.filter(\.isImplemented), "picker hides actions that cannot run")
+        check(ScheduleAction.offered(keeping: .pauseCharging).contains(.pauseCharging), "picker keeps the action of an existing task")
 
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("chargemate-schedule-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)

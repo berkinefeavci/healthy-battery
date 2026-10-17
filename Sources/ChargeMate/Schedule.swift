@@ -25,6 +25,12 @@ enum ScheduleAction: String, Codable, CaseIterable, Identifiable {
         }
     }
     var needsTarget: Bool { self == .setChargeLimit || self == .dischargeTo }
+    /// False for actions whose hardware effect was never verified: the runtime records them as unsupported.
+    var isImplemented: Bool { ![.pauseCharging, .startCalibration, .dischargeTo].contains(self) }
+    /// What the editor's picker offers: actions that can run, plus the one an existing task already has.
+    static func offered(keeping current: ScheduleAction) -> [ScheduleAction] {
+        allCases.filter { $0.isImplemented || $0 == current }
+    }
     func availability(in capabilities: ScheduleCapabilities) -> String? {
         switch self {
         case .topUp:
@@ -42,7 +48,6 @@ enum ScheduleAction: String, Codable, CaseIterable, Identifiable {
             return String(localized: "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı.")
         }
     }
-    var unavailableReason: String { availability(in: .unavailable) ?? "" }
 }
 
 enum ScheduleRecurrence: String, Codable, CaseIterable, Identifiable {
@@ -80,7 +85,7 @@ struct ScheduleTask: Codable, Identifiable, Equatable {
     static func new(now: Date, calendar: Calendar = .current) -> Self {
         let nextHour = calendar.date(bySetting: .minute, value: 0,
             of: calendar.date(byAdding: .hour, value: 1, to: now)!)!
-        return Self(name: String(localized: "Yeni görev"), action: .pauseCharging, target: nil, recurrence: .daily,
+        return Self(name: String(localized: "Yeni görev"), action: .topUp, target: nil, recurrence: .daily,
                     startLocalComponents: localComponents(nextHour, calendar: calendar),
                     timezoneID: calendar.timeZone.identifier, createdAt: now, modifiedAt: now)
     }
@@ -230,38 +235,19 @@ struct ScheduleStore {
 }
 
 enum ScheduleTemplate: String, CaseIterable, Identifiable {
-    case monthlyCalibration, biweeklyCalibration, mondayTopUp, weekendFull
+    case mondayTopUp, weekendFull
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .monthlyCalibration: return String(localized: "Aylık kalibrasyon")
-        case .biweeklyCalibration: return String(localized: "İki haftalık kalibrasyon")
         case .mondayTopUp: return String(localized: "Pazartesi tam dolum")
         case .weekendFull: return String(localized: "Hafta sonu tam dolum")
         }
     }
-    func task(now: Date, calendar source: Calendar = .current) -> ScheduleTask {
-        let calendar = source
-        let action: ScheduleAction
-        let recurrence: ScheduleRecurrence
-        let targetWeekday: Int?
-        let hour: Int
-        switch self {
-        case .monthlyCalibration: action = .startCalibration; recurrence = .monthly; targetWeekday = nil; hour = 9
-        case .biweeklyCalibration: action = .startCalibration; recurrence = .biweekly; targetWeekday = 7; hour = 9
-        case .mondayTopUp: action = .topUp; recurrence = .weekly; targetWeekday = 2; hour = 7
-        case .weekendFull: action = .topUp; recurrence = .weekly; targetWeekday = 6; hour = 18
-        }
-        var start: Date
-        if self == .monthlyCalibration {
-            let nextMonth = calendar.date(byAdding: .month, value: 1, to: now)!
-            var c = calendar.dateComponents([.year, .month], from: nextMonth); c.day = 1; c.hour = hour; c.minute = 0
-            start = calendar.date(from: c)!
-        } else {
-            var match = DateComponents(); match.weekday = targetWeekday; match.hour = hour; match.minute = 0
-            start = calendar.nextDate(after: now, matching: match, matchingPolicy: .nextTime, repeatedTimePolicy: .first)!
-        }
-        return ScheduleTask(name: title, action: action, target: nil, recurrence: recurrence,
+    func task(now: Date, calendar: Calendar = .current) -> ScheduleTask {
+        let (weekday, hour) = self == .mondayTopUp ? (2, 7) : (6, 18)
+        var match = DateComponents(); match.weekday = weekday; match.hour = hour; match.minute = 0
+        let start = calendar.nextDate(after: now, matching: match, matchingPolicy: .nextTime, repeatedTimePolicy: .first)!
+        return ScheduleTask(name: title, action: .topUp, target: nil, recurrence: .weekly,
             startLocalComponents: ScheduleTask.localComponents(start, calendar: calendar),
             timezoneID: calendar.timeZone.identifier, createdAt: now, modifiedAt: now)
     }
