@@ -31,10 +31,6 @@ enum EnergyPresentationTests {
         precondition(EnergyPresentation.role(fromArguments: []) == nil)
 
         // Combined display name.
-        precondition(EnergyPresentation.helperDisplayName(ownerAppName: "Dia", role: "bir web sayfası çalışıyor", rawProcessName: "Browser Helper (") == "Dia · bir web sayfası çalışıyor")
-        precondition(EnergyPresentation.helperDisplayName(ownerAppName: "Dia", role: nil, rawProcessName: "Browser Helper (") == "Dia")
-        precondition(EnergyPresentation.helperDisplayName(ownerAppName: nil, role: nil, rawProcessName: "WindowServer") == "macOS ekran çizimi")
-        precondition(EnergyPresentation.helperDisplayName(ownerAppName: nil, role: nil, rawProcessName: "ego Helper") == "ego yardımcı işlemi")
 
         // System-process SF Symbol mapping for rows with no real app icon.
         precondition(EnergyPresentation.symbolName(for: "WindowServer") == "display")

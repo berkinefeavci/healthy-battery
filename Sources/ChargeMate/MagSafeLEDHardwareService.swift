@@ -11,17 +11,21 @@ final class MagSafeLEDHardwareService {
     static let legacyLaunchDaemonLabel = "local.chargemate.led"
     private static let legacySocketPath = "/var/run/local.chargemate.led.sock"
     /// Matches LED_HELPER_VERSION in Tools/LEDControllers.h. Version 2 also backs off for Battery
-    /// Toolkit, BatFi and batt, not just AlDente; older helpers show as not installed so the user reinstalls.
-    private static let minimumHelperVersion = 2
+    /// Toolkit, BatFi and batt, not just AlDente; version 3 answers only the app signed by its own team.
+    /// Older helpers show as not installed so the user reinstalls.
+    private static let minimumHelperVersion = 3
 
     enum ServiceError: Error, LocalizedError {
         case helperMissing
         case helperNotTrusted
         case unsupportedValue
         case commandFailed(String)
+        /// The user dismissed the administrator prompt; nothing was installed or changed.
+        case cancelled
 
         var errorDescription: String? {
             switch self {
+            case .cancelled: return String(localized: "Yönetici onayı iptal edildi; yardımcı kurulmadı.")
             case .helperMissing: return String(localized: "LED yardımcısı kurulmamış. Önce denetimi etkinleştirin.")
             case .helperNotTrusted: return String(localized: "LED yardımcısı yöneticiye ait değil; kullanılamaz.")
             case .unsupportedValue: return String(localized: "Bu ışık çıkışı desteklenmiyor.")
@@ -57,17 +61,7 @@ final class MagSafeLEDHardwareService {
     }
 
     private static func helperVersion() -> Int? {
-        let process = Process()
-        let pipe = Pipe()
-        process.executableURL = URL(fileURLWithPath: installedPath)
-        process.arguments = ["--version"]
-        process.standardOutput = pipe
-        process.standardError = pipe
-        guard (try? process.run()) != nil else { return nil }
-        process.waitUntilExit()
-        guard process.terminationStatus == 0,
-              let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) else { return nil }
-        return Int(output.trimmingCharacters(in: .whitespacesAndNewlines))
+        HelperInstallState.cachedVersion(atPath: installedPath) { HelperInstallState.readVersion(ofHelperAt: installedPath) }
     }
 
     private static func trusted(atPath path: String, socketPath: String) -> Bool {
@@ -87,20 +81,12 @@ final class MagSafeLEDHardwareService {
         let bundled = executable.deletingLastPathComponent().deletingLastPathComponent()
             .appendingPathComponent("Resources/CellkeepLEDHelper")
         guard FileManager.default.fileExists(atPath: bundled.path) else { throw ServiceError.helperMissing }
-        let legacyCleanup = legacyInstalled()
-            ? "(/bin/launchctl bootout system/\(legacyLaunchDaemonLabel) 2>/dev/null || true) && " +
-              "/bin/rm -f \(shellQuote(legacyInstalledPath)) /Library/LaunchDaemons/\(legacyLaunchDaemonLabel).plist && "
-            : ""
-        let command = legacyCleanup +
-            "/usr/bin/install -d -o root -g wheel -m 755 /Library/PrivilegedHelperTools && " +
-            "/usr/bin/install -o root -g wheel -m 755 \(shellQuote(bundled.path)) \(shellQuote(installedPath)) && " +
-            HelperInstallState.signatureCheckCommand(installedPath: installedPath,
-                                                     teamIdentifier: HelperInstallState.currentTeamIdentifier()) + " && " +
-            HelperInstallState.writeLaunchDaemonPlistCommand(label: "io.github.berkinefeavci.cellkeep.led",
-                                                             helperPath: installedPath) + " && " +
-            "\(shellQuote(installedPath)) --authorize-uid \(getuid()) && " +
-            "(/bin/launchctl bootout system/io.github.berkinefeavci.cellkeep.led 2>/dev/null || true) && " +
-            "/bin/launchctl bootstrap system /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.led.plist"
+        let command = HelperInstallState.installCommand(
+            label: "io.github.berkinefeavci.cellkeep.led", helperPath: installedPath,
+            bundledHelperPath: bundled.path, teamIdentifier: HelperInstallState.currentTeamIdentifier(), uid: getuid(),
+            legacyCleanup: legacyInstalled()
+                ? HelperInstallState.legacyCleanupCommand(daemonLabel: legacyLaunchDaemonLabel, binaryPath: legacyInstalledPath)
+                : "")
         try authorized(command)
         guard installed() else { throw ServiceError.helperNotTrusted }
     }
@@ -127,11 +113,11 @@ final class MagSafeLEDHardwareService {
 
     private func resumeSavedPolicy() -> MagSafeLEDControlCoordinator.Outcome {
         let defaults = UserDefaults.standard
-        let saved = MagSafeLEDPolicy(rawValue: defaults.string(forKey: MagSafeLEDPreferences.policyKey) ?? "") ?? .system
+        let saved = MagSafeLEDPolicy(rawValue: defaults.string(forKey: MagSafeLEDPolicy.storageKey) ?? "") ?? .system
         let start = defaults.object(forKey: MagSafeLEDTimeWindow.startKey) as? Int ?? MagSafeLEDTimeWindow.defaultStart
         let end = defaults.object(forKey: MagSafeLEDTimeWindow.endKey) as? Int ?? MagSafeLEDTimeWindow.defaultEnd
         do {
-            try Self.configure(policy: saved == .status ? .system : saved, start: start, end: end)
+            try Self.configure(policy: saved, start: start, end: end)
             return .restored
         } catch {
             return .blocked(error.localizedDescription)
@@ -154,7 +140,6 @@ final class MagSafeLEDHardwareService {
         case .system: mode = 0
         case .alwaysOff: mode = 1
         case .scheduled: mode = 2
-        case .status: throw ServiceError.unsupportedValue
         }
         try request("P \(mode) \(start) \(end)")
         // An explicit policy selection transfers ownership from a manual test.
@@ -185,7 +170,7 @@ final class MagSafeLEDHardwareService {
 
     private static func writeLED(_ output: MagSafeLEDOutput) throws {
         guard installed() else { throw ServiceError.helperNotTrusted }
-        guard let value = MagSafeLEDRawCodec.encode(output) else { throw ServiceError.unsupportedValue }
+        let value = MagSafeLEDRawCodec.encode(output)
         // The helper only answers after eight settled 1 s samples (~8.5 s), though the light changes
         // at once. Send without waiting for that answer and confirm with our own read instead; a
         // press right after another waits for the helper to free up, hence the 12 s limit.
@@ -244,23 +229,10 @@ final class MagSafeLEDHardwareService {
     }
 
     private static func authorized(_ command: String) throws {
-        let escaped = command.replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "\"", with: "\\\"")
-        let script = "do shell script \"\(escaped)\" with administrator privileges"
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
-        process.arguments = ["-e", script]
-        let output = Pipe()
-        process.standardOutput = output
-        process.standardError = output
-        try process.run()
-        process.waitUntilExit()
-        let detail = String(data: output.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
-            .trimmingCharacters(in: .whitespacesAndNewlines) ?? String(localized: "Bilinmeyen hata")
-        guard process.terminationStatus == 0 else { throw ServiceError.commandFailed(detail) }
-    }
-
-    private static func shellQuote(_ value: String) -> String {
-        "'" + value.replacingOccurrences(of: "'", with: "'\\''") + "'"
+        do { try AdminAuthorization.run(command) }
+        catch AdminAuthorization.Failure.cancelled { throw ServiceError.cancelled }
+        catch AdminAuthorization.Failure.failed(let detail) {
+            throw ServiceError.commandFailed(detail.isEmpty ? String(localized: "Bilinmeyen hata") : detail)
+        }
     }
 }

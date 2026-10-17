@@ -15,6 +15,28 @@ enum UpdatePackage {
         return URL(string: "https://github.com/berkinefeavci/healthy-battery/releases/download/v\(version)/\(file)")
     }
 
+    /// GitHub serves release assets from github.com and redirects to its own download hosts. Nothing else is
+    /// ever followed: a redirect to another host, or to plain http, ends the download.
+    static func isAllowedDownloadLocation(_ url: URL) -> Bool {
+        guard url.scheme == "https", let host = url.host?.lowercased() else { return false }
+        return host == "github.com" || host.hasSuffix(".githubusercontent.com")
+    }
+
+    /// Code requirement the downloaded app must satisfy: signed by a Developer ID Application certificate
+    /// (Apple's Developer ID CA, 1.2.840.113635.100.6.2.6, and the Developer ID Application leaf,
+    /// 1.2.840.113635.100.6.1.13) of the running app's own team, with the running app's bundle identifier.
+    /// Checked here, not left to Gatekeeper alone: `spctl` answers "yes" for everything when assessments
+    /// are switched off on the Mac, and a self-made certificate can carry any team name.
+    static func developerIDRequirement(teamIdentifier: String, bundleIdentifier: String?) -> String? {
+        guard HelperInstallState.isValidTeamIdentifier(teamIdentifier), let bundleIdentifier, !bundleIdentifier.isEmpty,
+              bundleIdentifier.unicodeScalars.allSatisfy({ ($0.isASCII && $0.properties.isAlphabetic) || ("0"..."9").contains($0) || $0 == "." || $0 == "-" })
+        else { return nil }
+        return "anchor apple generic and identifier \"\(bundleIdentifier)\""
+            + " and certificate 1[field.1.2.840.113635.100.6.2.6] exists"
+            + " and certificate leaf[field.1.2.840.113635.100.6.1.13] exists"
+            + " and certificate leaf[subject.OU] = \"\(teamIdentifier)\""
+    }
+
     /// `shasum -a 256` output ("<64 hex>  <name>"); only the line for `name` counts.
     static func expectedChecksum(in text: String, for name: String) -> String? {
         for line in text.split(whereSeparator: \.isNewline) {
@@ -52,10 +74,18 @@ enum UpdatePackage {
     """
 }
 
+/// Refuses any redirect that leaves GitHub's download hosts or drops to plain http.
+private final class DownloadRedirectGuard: NSObject, URLSessionTaskDelegate {
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+        completionHandler(request.url.map(UpdatePackage.isAllowedDownloadLocation) == true ? request : nil)
+    }
+}
+
 /// Downloads, verifies and installs a newer release when the user presses "Update". Nothing is
 /// installed unless the DMG matches the published SHA-256, the app inside is validly signed with
-/// the same Team ID as the running app, Gatekeeper accepts it (notarized), and it reports the
-/// expected version and bundle identifier. Anything else falls back to the release page.
+/// a Developer ID certificate of the same team as the running app (checked against an explicit code
+/// requirement), Gatekeeper accepts it (notarized), and it reports the expected version and bundle identifier. Anything else falls back to the release page.
 final class UpdateInstaller: ObservableObject {
     static let shared = UpdateInstaller()
 
@@ -133,12 +163,15 @@ final class UpdateInstaller: ObservableObject {
         let name = UpdatePackage.dmgName(version)
         guard let dmgURL = UpdatePackage.downloadURL(version: version, file: name),
               let sumURL = UpdatePackage.downloadURL(version: version, file: name + ".sha256") else { throw InstallError.download }
-        let (sumData, sumResponse) = try await URLSession.shared.data(from: sumURL)
+        let redirects = DownloadRedirectGuard()
+        let (sumData, sumResponse) = try await URLSession.shared.data(from: sumURL, delegate: redirects)
         guard (sumResponse as? HTTPURLResponse)?.statusCode == 200,
+              sumResponse.url.map(UpdatePackage.isAllowedDownloadLocation) == true,
               let expected = UpdatePackage.expectedChecksum(in: String(decoding: sumData, as: UTF8.self), for: name)
         else { throw InstallError.download }
-        let (temporary, response) = try await URLSession.shared.download(from: dmgURL)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw InstallError.download }
+        let (temporary, response) = try await URLSession.shared.download(from: dmgURL, delegate: redirects)
+        guard (response as? HTTPURLResponse)?.statusCode == 200,
+              response.url.map(UpdatePackage.isAllowedDownloadLocation) == true else { throw InstallError.download }
         let dmg = work.appendingPathComponent(name)
         try FileManager.default.moveItem(at: temporary, to: dmg)
         guard try UpdatePackage.sha256Hex(of: dmg) == expected else { throw InstallError.checksum }
@@ -158,7 +191,8 @@ final class UpdateInstaller: ObservableObject {
               info["CFBundleShortVersionString"] as? String == version else {
             throw InstallError.verification(String(localized: "Sürüm veya paket kimliği beklenen değil."))
         }
-        guard signingTeam(of: app) == teamIdentifier else {
+        guard signingTeam(of: app, requirement: UpdatePackage.developerIDRequirement(teamIdentifier: teamIdentifier,
+                                                                                    bundleIdentifier: bundleIdentifier)) == teamIdentifier else {
             throw InstallError.verification(String(localized: "İmza bu uygulamanın geliştiricisine ait değil."))
         }
         guard run("/usr/sbin/spctl", ["--assess", "--type", "execute", app.path]) == 0 else {
@@ -169,13 +203,17 @@ final class UpdateInstaller: ObservableObject {
         return staged
     }
 
-    /// Team ID of a bundle whose signature, including nested code, is valid; nil otherwise.
-    static func signingTeam(of bundle: URL) -> String? {
+    /// Team ID of a bundle whose signature, including nested code, is valid and satisfies `requirement`
+    /// (see `UpdatePackage.developerIDRequirement`); nil otherwise, and nil when there is no requirement.
+    static func signingTeam(of bundle: URL, requirement text: String?) -> String? {
+        guard let text else { return nil }
+        var requirement: SecRequirement?
+        guard SecRequirementCreateWithString(text as CFString, [], &requirement) == errSecSuccess, let requirement else { return nil }
         var code: SecStaticCode?
         guard SecStaticCodeCreateWithPath(bundle as CFURL, [], &code) == errSecSuccess, let code else { return nil }
         let strict = SecCSFlags(rawValue: UInt32(kSecCSCheckAllArchitectures) | UInt32(kSecCSCheckNestedCode)
                                     | UInt32(kSecCSStrictValidate))
-        guard SecStaticCodeCheckValidity(code, strict, nil) == errSecSuccess else { return nil }
+        guard SecStaticCodeCheckValidity(code, strict, requirement) == errSecSuccess else { return nil }
         var information: CFDictionary?
         guard SecCodeCopySigningInformation(code, SecCSFlags(rawValue: kSecCSSigningInformation), &information) == errSecSuccess,
               let values = information as? [String: Any] else { return nil }

@@ -4,6 +4,20 @@ import Foundation
 /// (both current and any leftover legacy "ChargeMate" ones), and which optional steps run based
 /// on the user's checkbox choices. Building the plan never touches the file system, launchctl,
 /// or an admin prompt — only `UninstallExecutor` (not covered by unit tests) actually runs it.
+/// What an uninstall run really achieved. Only `.completed` may tell the user everything was removed.
+enum UninstallOutcome: Equatable {
+    /// Every helper, daemon and optional step finished.
+    case completed
+    /// The user dismissed the administrator prompt. Nothing was changed.
+    case cancelled
+    /// The administrator step failed; the associated text is what the system reported.
+    case failed(String)
+    /// Helpers and daemons are gone, but these follow-up steps did not finish (one sentence each).
+    case incomplete([String])
+
+    static func finish(problems: [String]) -> Self { problems.isEmpty ? .completed : .incomplete(problems) }
+}
+
 enum UninstallPlan {
     struct HelperTarget: Equatable {
         let daemonLabel: String

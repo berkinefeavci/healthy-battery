@@ -136,8 +136,6 @@ enum LongTermHistory {
         var days: [DailySummary]
     }
 
-    enum StoreError: Error { case unsupportedVersion }
-
     /// Reads the stored summaries. A missing file is an empty history; an unreadable one is kept
     /// aside as `<name>.corrupt-<timestamp>` so a bug never silently destroys months of data.
     static func read(_ url: URL, now: Date = Date()) -> [DailySummary] {

@@ -306,9 +306,12 @@ struct HistoryArchive: Codable {
                     measurements: Array(unique.values.sorted { $0.date < $1.date }.suffix(2881)),
                     limitEvents: (baseline.map { [$0] } ?? []) + events.filter { $0.date >= lower })
     }
-    func write(_ url: URL) throws {
+    /// `verifyPrior: false` skips the decode-before-replace guard; the monitor passes it once this session has
+    /// already written the file itself (the guard then re-decoded a ~6 MB file every 30 seconds for nothing).
+    /// `encodingCache` reuses the JSON of points already encoded by an earlier write.
+    func write(_ url: URL, verifyPrior: Bool = true, encodingCache: HistoryEncodingCache? = nil) throws {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        if FileManager.default.fileExists(atPath: url.path) {
+        if verifyPrior, FileManager.default.fileExists(atPath: url.path) {
             // Decode before replacement: never erase a corrupt or unknown user's history.
             let prior = try Self.read(url)
             let backup = url.appendingPathExtension("v1.backup")
@@ -321,7 +324,35 @@ struct HistoryArchive: Codable {
                 try FileManager.default.copyItem(at: url, to: qualityBackup)
             }
         }
-        try JSONEncoder().encode(self).write(to: url, options: .atomic)
+        let data = try encodingCache?.encode(self) ?? JSONEncoder().encode(self)
+        try data.write(to: url, options: .atomic)
+    }
+}
+
+/// A recorded history point never changes, so its JSON is produced once and reused by every later write of the
+/// archive: a full 24 hours (about 2,900 points, ~6.5 MB) is written without re-encoding them all every 30 s.
+/// The output is the same JSON object `JSONEncoder` produces for `HistoryArchive`. Use from one queue only.
+final class HistoryEncodingCache {
+    private var fragments: [Date: Data] = [:]
+    private let encoder = JSONEncoder()
+
+    func encode(_ archive: HistoryArchive) throws -> Data {
+        var kept: [Date: Data] = [:]
+        kept.reserveCapacity(archive.measurements.count)
+        var output = Data()
+        output.reserveCapacity(max(1024, (fragments.values.first?.count ?? 2_400) * archive.measurements.count))
+        output.append(contentsOf: Array("{\"schemaVersion\":\(archive.schemaVersion),\"measurements\":[".utf8))
+        for (index, point) in archive.measurements.enumerated() {
+            let fragment = try fragments[point.date] ?? encoder.encode(point)
+            kept[point.date] = fragment
+            if index > 0 { output.append(0x2C) }
+            output.append(fragment)
+        }
+        output.append(contentsOf: Array("],\"limitEvents\":".utf8))
+        output.append(try encoder.encode(archive.limitEvents))
+        output.append(0x7D)
+        fragments = kept
+        return output
     }
 }
 
@@ -357,6 +388,9 @@ enum MonitorCadence {
     static let policyInterval: TimeInterval = 30
     static let energyInterval: TimeInterval = 60
     static let backgroundEnergyInterval: TimeInterval = 300
+    /// The 24-hour archive is rewritten as a whole (about 6.5 MB when full), so it is saved at most this often
+    /// instead of with every 30-second point; quitting and sleeping save it at once.
+    static let historySaveInterval: TimeInterval = 120
 
     static func shouldEvaluatePolicy(topUpActive: Bool, trigger: ChargePolicyTrigger,
                                      elapsed: TimeInterval) -> Bool {
@@ -376,6 +410,10 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     @Published private(set) var otherControllerRunning = false
     @Published private(set) var applyingLimit = false
     @Published private(set) var limitMessage: String?
+    /// True while `limitMessage` explains a write that did not go through (set before the message itself).
+    private var limitMessageIsFailure = false
+    /// The reason the last limit write failed, for the popover (which only has room for failures).
+    var limitFailureMessage: String? { limitMessageIsFailure ? limitMessage : nil }
     @Published private(set) var controlRecoveryRequired = false
     /// Adapter mode (opt-in, set by the wiring controller): `chargeLimit` is the adapter target (20-100) and the
     /// native macOS limit is only a sleep ceiling derived from it.
@@ -448,6 +486,8 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     private let connectedDeviceReader: () -> [ConnectedDevice]
     private let powerModeReader: () -> SystemPowerModeProfiles?
     private let powerModeWriter: (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError>
+    /// Used by automations (heat protection): only an already installed helper, never an installer prompt.
+    private let automationPowerModeWriter: (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError>
     private let historyURL: URL
     private var pendingRequest: ChargeControlCoordinator.Request?
     @Published private(set) var cancellationRequested = false
@@ -459,6 +499,13 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     @Published private(set) var historyError: String?
     @Published private(set) var historyBackupAvailable = false
     private var historyWritable = true
+    /// Main thread only: a point was recorded since the archive was last handed to the writer.
+    private var historyDirty = false
+    private var lastHistorySave = Date.distantPast
+    /// Touched only on `readerQueue`: encoded points of the 24-hour archive, and whether this session already
+    /// wrote `history.json` itself (so later writes skip the decode-before-replace guard).
+    private let historyEncodingCache = HistoryEncodingCache()
+    private var historyFileWrittenThisSession = false
     private var lastHistoryBackupURL: URL?
     @Published private(set) var energyApps: [EnergyApp] = []
     @Published private(set) var energySampleDate: Date?
@@ -476,19 +523,6 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     }
     /// A Healthy Battery target is only committed after the explicit native Apply readback succeeds.
     @Published private(set) var committedLimit: Int?
-    @Published var sailingEnabled: Bool {
-        didSet { defaults.set(sailingEnabled, forKey: "sailingEnabled") }
-    }
-    @Published var sailingDelta: Double {
-        didSet { defaults.set(sailingDelta, forKey: "sailingDelta") }
-    }
-    @Published var heatProtection: Bool {
-        didSet { defaults.set(heatProtection, forKey: "heatProtection") }
-    }
-    @Published var maxTemp: Double {
-        didSet { defaults.set(maxTemp, forKey: "maxTemp") }
-    }
-    @Published private(set) var heatActive = false
     @Published private(set) var topUpActive = false
     @Published private(set) var topUpRestoreLimit: Int?
     @Published var externalChangeResponse: ExternalChangeResponse {
@@ -501,6 +535,8 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     @Published private(set) var policyState: ChargePolicyState = .idle
     @Published private(set) var policyConflict: (expected: Int, observed: Int)?
     @Published private(set) var controlState: ControlState = .idle
+    /// Why the last Top Up (or the automatic Top Up step) did not go through; nil when it worked. Shown under
+    /// the charge bar in the panel and on the Top Up card in settings.
     @Published private(set) var actionMessage: String?
     enum ControlState: String { case idle, charging, pausedAtLimit, discharging, topUp, sailing, heatProtect }
     private var timer: Timer?
@@ -555,6 +591,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
          },
          powerModeWriter: @escaping (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError> = {
              SystemPowerModeService.apply($0, source: $1)
+         },
+         automationPowerModeWriter: @escaping (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError> = {
+             SystemPowerModeService.applyInstalled($0, source: $1)
          }) {
         self.defaults = defaults; self.policyController = policyController; self.historyURL = historyURL
         self.batteryReader = batteryReader; self.nativeReader = nativeReader
@@ -562,15 +601,12 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         self.connectedDeviceReader = connectedDeviceReader
         self.powerModeReader = powerModeReader
         self.powerModeWriter = powerModeWriter
+        self.automationPowerModeWriter = automationPowerModeWriter
         chargeLimit = Self.saved(defaults, "chargeLimit", fallback: 80, range: 20...100)
         let storedResponse = ExternalChangeResponse(stored: defaults.string(forKey: ExternalChangeResponse.storageKey))
         externalChangeResponse = storedResponse
         policyController.externalChangeResponse = storedResponse
         committedLimit = policyController.policy?.desiredLimit
-        sailingEnabled = defaults.bool(forKey: "sailingEnabled")
-        sailingDelta = Self.saved(defaults, "sailingDelta", fallback: 5, range: 2...15)
-        heatProtection = defaults.object(forKey: "heatProtection") as? Bool ?? false
-        maxTemp = Self.saved(defaults, "maxTemp", fallback: 35, range: 25...45)
         controlRecoveryRequired = policyController.requiresRecovery
         topUpActive = policyController.topUpActive
         topUpRestoreLimit = policyController.topUpRestoreLimit
@@ -595,6 +631,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                      },
                      powerModeWriter: @escaping (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError> = {
                          SystemPowerModeService.apply($0, source: $1)
+                     },
+                     automationPowerModeWriter: @escaping (SystemPowerMode, SystemPowerSource) -> Result<SystemPowerMode, SystemPowerModeService.WriteError> = {
+                         SystemPowerModeService.applyInstalled($0, source: $1)
                      }) {
         let directory = historyURL.deletingLastPathComponent()
         let controller = ChargePolicyController(
@@ -606,7 +645,8 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                   batteryReader: batteryReader, nativeReader: nativeReader,
                   controllerRunning: controllerRunning, energyReader: energyReader,
                   connectedDeviceReader: connectedDeviceReader,
-                  powerModeReader: powerModeReader, powerModeWriter: powerModeWriter)
+                  powerModeReader: powerModeReader, powerModeWriter: powerModeWriter,
+                  automationPowerModeWriter: automationPowerModeWriter)
     }
 
     static func loadHistory(from url: URL, now: Date = Date()) -> [BatteryHistoryPoint] {
@@ -759,19 +799,57 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     }
 
     private func receiveNativeState(_ state: NativeChargeState) {
-        nativeLimit = state.manualLimit
+        update(\.nativeLimit, to: state.manualLimit)
         if (0...100).contains(state.manualLimit), limitEvents.last?.value != state.manualLimit {
             // Observation time, never an inferred historical date or a draft edit.
             limitEvents.append(LimitEvent(date: Date(), value: state.manualLimit))
         }
-        currentSystemLimit = state.currentLimit
-        nativeLimits = state.availableLimits
+        update(\.currentSystemLimit, to: state.currentLimit)
+        update(\.nativeLimits, to: state.availableLimits)
+    }
+
+    /// Assigns a published property only when the value really changes. Every assignment to a `@Published`
+    /// property wakes every SwiftUI view that observes the monitor, even when the new value equals the old one;
+    /// the five-second refresh used to do that for a dozen unchanged properties.
+    private func update<Value: Equatable>(_ keyPath: ReferenceWritableKeyPath<BatteryMonitor, Value>, to value: Value) {
+        if self[keyPath: keyPath] != value { self[keyPath: keyPath] = value }
+    }
+
+    /// Verified writes (and a reconciled readback) are not failures; a user's own cancel is not one either.
+    private static func isFailure(_ result: ChargeControlCoordinator.Result) -> Bool {
+        ![.configurationVerified, .reconciled, .cancelled].contains(result.status)
+    }
+
+    private func present(limit result: ChargeControlCoordinator.Result) {
+        limitMessageIsFailure = Self.isFailure(result)
+        limitMessage = result.message
+    }
+
+    /// After a Top Up start/cancel: an explicit failure result is shown; otherwise the reason the policy state
+    /// already put there stays (a refused start such as "adapter must be connected" comes back as a read-only
+    /// result, with the real reason in the policy state); a clean run clears the line.
+    private func presentTopUp(_ result: ChargeControlCoordinator.Result) {
+        if Self.isFailure(result) { actionMessage = result.message; return }
+        if case .recoveryRequired = policyState { return }
+        actionMessage = nil
+    }
+
+    private func clearLimitMessage() {
+        limitMessageIsFailure = false
+        limitMessage = nil
+    }
+
+    /// The panel was closed: failures it showed have been seen, so they do not greet the user hours later.
+    func dismissFailureMessages() {
+        precondition(Thread.isMainThread)
+        if actionMessage != nil { actionMessage = nil }
+        if limitMessageIsFailure { clearLimitMessage() }
     }
 
     /// Only called by an explicit Apply action. Merely opening the app never writes.
     func applyNativeLimit() {
         precondition(Thread.isMainThread)
-        otherControllerRunning = controllerRunning()
+        update(\.otherControllerRunning, to: controllerRunning())
         guard hardwareControlAvailable else { return }
         let requested = requestedNativeLimit
         // Adapter mode re-applies on every target change; skip when the ceiling already holds.
@@ -781,7 +859,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         cancellationRequested = false
         nativeObservationGeneration += 1
         applyingLimit = true
-        limitMessage = nil
+        clearLimitMessage()
         controlQueue.async {
             let result = self.policyController.applyManualLimit(requested, request: request)
             DispatchQueue.main.async {
@@ -790,15 +868,15 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 self.cancellationRequested = false
                 self.applyingLimit = false
                 self.lastNativeRead = .distantPast
-                self.controlRecoveryRequired = self.policyController.requiresRecovery
-                self.otherControllerRunning = self.controllerRunning()
+                self.update(\.controlRecoveryRequired, to: self.policyController.requiresRecovery)
+                self.update(\.otherControllerRunning, to: self.controllerRunning())
                 if let state = result.state { self.receiveNativeState(state) }
                 if result.status == .configurationVerified {
                     self.committedLimit = requested
                     self.defaults.set(requested, forKey: "committedChargeLimit")
                 }
                 self.updatePolicyPresentation()
-                self.limitMessage = result.message
+                self.present(limit: result)
             }
         }
     }
@@ -827,11 +905,11 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
             DispatchQueue.main.async {
                 self.applyingLimit = false
                 self.lastNativeRead = .distantPast
-                self.controlRecoveryRequired = self.policyController.requiresRecovery
-                self.otherControllerRunning = self.controllerRunning()
+                self.update(\.controlRecoveryRequired, to: self.policyController.requiresRecovery)
+                self.update(\.otherControllerRunning, to: self.controllerRunning())
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
-                self.limitMessage = result.message
+                self.present(limit: result)
             }
         }
     }
@@ -849,7 +927,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         for delay in [1.5, 4.0] {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
                 guard let self else { return }
-                self.otherControllerRunning = self.controllerRunning()
+                self.update(\.otherControllerRunning, to: self.controllerRunning())
             }
         }
     }
@@ -869,7 +947,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 self.lastNativeRead = .distantPast
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
-                self.actionMessage = result.message
+                self.presentTopUp(result)
             }
         }
     }
@@ -887,7 +965,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 self.lastNativeRead = .distantPast
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
-                self.actionMessage = result.message
+                self.presentTopUp(result)
             }
         }
     }
@@ -905,8 +983,11 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         .init(chargeLimits: nativeLimits,
               topUpAvailable: nativeLimits.contains(100) && nativeLimit.map(nativeLimits.contains) == true
                   && !controlRecoveryRequired && !otherControllerRunning,
-              powerModes: SystemPowerModeService.availableModes())
+              powerModes: SystemPowerModeService.availableModes(),
+              adapterCut: scheduleAdapterCut())
     }
+    /// Set by the adapter wiring (the monitor must not reference the helper itself).
+    var scheduleAdapterCut: () -> Bool = { false }
 
     func applyScheduledLimit(_ limit: Int) -> ChargeControlCoordinator.Result {
         controlQueue.sync { policyController.applyManualLimit(limit, source: .schedule) }
@@ -937,7 +1018,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     func applyShortcutLimit(_ limit: Int) async -> ChargeControlCoordinator.Result {
         guard !applyingLimit else { return busyShortcutResult() }
         applyingLimit = true
-        limitMessage = nil
+        clearLimitMessage()
         return await withCheckedContinuation { continuation in
             controlQueue.async { [weak self] in
                 guard let self else {
@@ -948,12 +1029,12 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 DispatchQueue.main.async {
                     self.applyingLimit = false
                     self.lastNativeRead = .distantPast
-                    self.controlRecoveryRequired = self.policyController.requiresRecovery
-                    self.otherControllerRunning = self.controllerRunning()
+                    self.update(\.controlRecoveryRequired, to: self.policyController.requiresRecovery)
+                    self.update(\.otherControllerRunning, to: self.controllerRunning())
                     if let state = result.state { self.receiveNativeState(state) }
                     if result.status == .configurationVerified { self.chargeLimit = Double(limit) }
                     self.updatePolicyPresentation()
-                    self.limitMessage = result.message
+                    self.present(limit: result)
                     continuation.resume(returning: result)
                 }
             }
@@ -997,7 +1078,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     self.lastNativeRead = .distantPast
                     if let state = result.state { self.receiveNativeState(state) }
                     self.updatePolicyPresentation()
-                    self.actionMessage = result.message
+                    self.presentTopUp(result)
                     continuation.resume(returning: result)
                 }
             }
@@ -1025,7 +1106,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 self.applyingLimit = false
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
-                self.limitMessage = result.message
+                self.present(limit: result)
             }
         }
     }
@@ -1037,11 +1118,13 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         controlQueue.async { [weak self] in
             guard let self else { return }
             let message: String
+            var failed = false
             do { try self.policyController.adoptObservedLimit(); message = String(localized: "macOS limiti Healthy Battery hedefi olarak benimsendi.") }
-            catch { message = String(localized: "macOS limiti benimsenemedi: \(error.localizedDescription)") }
+            catch { failed = true; message = String(localized: "macOS limiti benimsenemedi: \(error.localizedDescription)") }
             DispatchQueue.main.async {
                 self.applyingLimit = false
                 self.updatePolicyPresentation()
+                self.limitMessageIsFailure = failed
                 self.limitMessage = message
             }
         }
@@ -1068,7 +1151,40 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         timer?.tolerance = 1
     }
 
-    func stop() { timer?.invalidate(); timer = nil }
+    func stop() {
+        timer?.invalidate(); timer = nil
+        flushHistory()
+    }
+
+    /// Saves points that are still only in memory and waits until they are written. Called when the app quits
+    /// and before the Mac sleeps; a crash or power loss in between loses at most `historySaveInterval` of points.
+    func flushHistory() {
+        precondition(Thread.isMainThread)
+        guard historyDirty else { return }
+        persistHistory(now: Date(), force: true)
+        readerQueue.sync { }
+    }
+
+    private func persistHistory(now: Date, force: Bool) {
+        guard historyWritable, historyDirty,
+              force || now.timeIntervalSince(lastHistorySave) >= MonitorCadence.historySaveInterval else { return }
+        lastHistorySave = now
+        historyDirty = false
+        let archive = HistoryArchive(schemaVersion: 2, measurements: history, limitEvents: limitEvents)
+        let summaries = dailySummaries
+        readerQueue.async {
+            // The 24-hour archive and the long-term summary are separate files: either one failing is shown.
+            var failure: Error?
+            do { try LongTermHistory.write(summaries, to: self.dailySummaryURL) } catch { failure = error }
+            do {
+                try archive.write(self.historyURL, verifyPrior: !self.historyFileWrittenThisSession,
+                                  encodingCache: self.historyEncodingCache)
+                self.historyFileWrittenThisSession = true
+            } catch { failure = failure ?? error }
+            let message = failure.map { String(localized: "Geçmiş kaydedilemiyor: \($0.localizedDescription)") }
+            DispatchQueue.main.async { if self.historyError != message { self.historyError = message } }
+        }
+    }
 
     private var dailySummaryURL: URL {
         historyURL.deletingLastPathComponent().appendingPathComponent("daily-summary.json")
@@ -1082,9 +1198,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                                    fullCapacityMAh: point.fullCapacityMAh, cycleCount: point.cycleCount,
                                    temperatureC: point.temperatureC)
         }
-        dailySummaries = LongTermHistory.merge(stored: dailySummaries,
-                                               fresh: LongTermHistory.summarize(samples, calendar: .current),
-                                               newestDay: LongTermHistory.dayKey(now, calendar: .current))
+        update(\.dailySummaries, to: LongTermHistory.merge(stored: dailySummaries,
+                                                             fresh: LongTermHistory.summarize(samples, calendar: .current),
+                                                             newestDay: LongTermHistory.dayKey(now, calendar: .current)))
     }
 
     /// User-initiated only. Serialize behind pending history writes, create a local backup,
@@ -1142,6 +1258,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
             do {
                 let archive = try HistoryArchive.read(backup)
                 try Data(contentsOf: backup).write(to: url, options: .atomic)
+                self.historyFileWrittenThisSession = false // the restored file may be an older schema: verify again
                 DispatchQueue.main.async {
                     self.history = archive.measurements
                     self.limitEvents = archive.limitEvents
@@ -1164,7 +1281,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         precondition(Thread.isMainThread)
         guard !reading else { return }
         reading = true
-        otherControllerRunning = controllerRunning()
+        update(\.otherControllerRunning, to: controllerRunning())
         let readNative = !applyingLimit && Date().timeIntervalSince(lastNativeRead) >= 30
         let nativeGeneration = nativeObservationGeneration
         let wantsEnergy = panelVisible || settingsVisible || defaults.bool(forKey: "backgroundDashboardUpdates")
@@ -1208,13 +1325,13 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 self.reading = false
                 self.snapshot = value
                 self.snapshotObserver?(value)
-                if let devices { self.connectedDevices = devices }
-                self.lowPowerModeEnabled = ProcessInfo.processInfo.isLowPowerModeEnabled
+                if let devices { self.update(\.connectedDevices, to: devices) }
+                self.update(\.lowPowerModeEnabled, to: ProcessInfo.processInfo.isLowPowerModeEnabled)
                 if let powerModes {
-                    self.batteryPowerMode = powerModes.battery
-                    self.adapterPowerMode = powerModes.adapter
+                    self.update(\.batteryPowerMode, to: powerModes.battery)
+                    self.update(\.adapterPowerMode, to: powerModes.adapter)
                 }
-                self.selectedPowerMode = value.externalConnected ? self.adapterPowerMode : self.batteryPowerMode
+                self.update(\.selectedPowerMode, to: value.externalConnected ? self.adapterPowerMode : self.batteryPowerMode)
                 if let native, nativeGeneration == self.nativeObservationGeneration, !self.applyingLimit {
                     self.receiveNativeState(native)
                 }
@@ -1248,26 +1365,17 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     }
                 }
                 // Observed hardware state only. Saved preferences cannot claim control before a writer exists.
-                self.controlState = !value.available ? .idle : value.isCharging ? .charging : value.state == .paused ? .pausedAtLimit : .discharging
+                self.update(\.controlState, to: !value.available ? .idle : value.isCharging ? .charging : value.state == .paused ? .pausedAtLimit : .discharging)
                 let now = Date()
                 if value.available && (self.history.last.map { now.timeIntervalSince($0.date) >= 30 } ?? true) {
                     self.history.append(Self.historyPoint(value, now: now))
                     self.history.removeAll { now.timeIntervalSince($0.date) > 86400 }
                     let lower = now.addingTimeInterval(-86400)
                     let baseline = self.limitEvents.last { $0.date < lower }
-                    self.limitEvents = (baseline.map { [$0] } ?? []) + self.limitEvents.filter { $0.date >= lower }
-                    let archive = HistoryArchive(schemaVersion: 2, measurements: self.history, limitEvents: self.limitEvents)
+                    self.update(\.limitEvents, to: (baseline.map { [$0] } ?? []) + self.limitEvents.filter { $0.date >= lower })
                     self.updateDailySummaries(now: now)
-                    let summaries = self.dailySummaries
-                    if self.historyWritable { self.readerQueue.async {
-                        try? LongTermHistory.write(summaries, to: self.dailySummaryURL)
-                        do {
-                            try archive.write(self.historyURL)
-                            DispatchQueue.main.async { self.historyError = nil }
-                        } catch {
-                            DispatchQueue.main.async { self.historyError = String(localized: "Geçmiş kaydedilemiyor: \(error.localizedDescription)") }
-                        }
-                    } }
+                    self.historyDirty = true
+                    self.persistHistory(now: now, force: false)
                 }
             }
         }
@@ -1285,26 +1393,25 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
 
     private func updatePolicyPresentation(event: ChargePolicyEvent? = nil) {
         precondition(Thread.isMainThread)
-        policyState = policyController.state
-        policyConflict = policyController.conflict
-        topUpActive = policyController.topUpActive
-        topUpRestoreLimit = policyController.topUpRestoreLimit
-        controlRecoveryRequired = policyController.requiresRecovery
+        update(\.policyState, to: policyController.state)
+        let conflict = policyController.conflict
+        if conflict?.expected != policyConflict?.expected || conflict?.observed != policyConflict?.observed { policyConflict = conflict }
+        update(\.topUpActive, to: policyController.topUpActive)
+        update(\.topUpRestoreLimit, to: policyController.topUpRestoreLimit)
+        update(\.controlRecoveryRequired, to: policyController.requiresRecovery)
         if let desired = policyController.policy?.desiredLimit {
-            committedLimit = desired
+            update(\.committedLimit, to: desired)
             defaults.set(desired, forKey: "committedChargeLimit")
         }
         switch policyState {
-        case .topUpStarting, .topUpCharging: controlState = .topUp
-        case .topUpRestoring: controlState = .topUp
+        case .topUpStarting, .topUpCharging, .topUpRestoring: update(\.controlState, to: .topUp)
         case .recoveryRequired(let message): actionMessage = message
-        case .pausedByConflict(let expected, let observed):
-            actionMessage = String(localized: "Healthy Battery hedefi %\(expected), macOS ayarı %\(observed). Seçiminizi yapın.")
+        case .pausedByConflict: break // The conflict banner already says what differs and offers the choices.
         case .maintainingLimit: if !topUpActive { actionMessage = nil }
-        case .idle: break
+        case .idle: actionMessage = nil
         }
         guard let event else { return }
-        actionMessage = event.message
+        actionMessage = event.kind == .topUpFailed ? event.message : nil
         NotificationCenter.default.post(name: .chargeMatePolicyEvent, object: event)
     }
 
@@ -1312,14 +1419,17 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         applyPowerMode(mode, source: .all)
     }
 
-    func applyPowerMode(_ mode: SystemPowerMode, source: SystemPowerSource) {
+    /// `interactive: false` is for automations: they only use a helper that is already installed and never raise
+    /// an administrator prompt at a moment the user did not choose (and stay quiet when it is missing).
+    func applyPowerMode(_ mode: SystemPowerMode, source: SystemPowerSource, interactive: Bool = true) {
         precondition(Thread.isMainThread)
         guard !applyingPowerMode else { return }
         applyingPowerMode = true
         powerModeMessage = nil
+        let writer = interactive ? powerModeWriter : automationPowerModeWriter
         controlQueue.async { [weak self] in
             guard let self else { return }
-            let result = self.powerModeWriter(mode, source)
+            let result = writer(mode, source)
             DispatchQueue.main.async {
                 switch result {
                 case .success(let confirmed):
@@ -1333,7 +1443,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     self.selectedPowerMode = self.snapshot.externalConnected ? self.adapterPowerMode : self.batteryPowerMode
                     self.powerModeMessage = nil
                 case .failure(let error):
-                    self.powerModeMessage = error.localizedDescription
+                    // A dismissed administrator prompt is the user's own choice, not a failure to report.
+                    if case .cancelled = error { self.powerModeMessage = nil }
+                    else if interactive { self.powerModeMessage = error.localizedDescription }
                 }
                 self.applyingPowerMode = false
                 self.lastPowerModeRead = .distantPast
@@ -1537,6 +1649,10 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     }
     var statusSentence: String {
         guard snapshot.available else { return String(localized: "Batarya verisi bekleniyor.") }
+        // Our own adapter cut: macOS then reports no external power although the cable is in.
+        if adapterCutByApp {
+            return String(localized: "Healthy Battery adaptörü geçici olarak kesti: kablo takılı ama MacBook pilden çalışıyor. Adaptör kendiliğinden geri açılır.")
+        }
         switch snapshot.powerFlow.mode {
         case .charging:
             return String(localized: "Adaptör MacBook’u çalıştırıyor ve bataryayı şarj ediyor. \(otherControllerRunning ? String(localized: "Şarj yönetimi için başka bir uygulama açık.") : String(localized: "macOS’un bildirdiği şarj durumu izleniyor."))")

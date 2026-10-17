@@ -23,6 +23,11 @@ enum ChargeMateApp {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         IdentityMigration.runIfNeeded(oldSupportDirectory: support.appendingPathComponent("ChargeMate"),
                                        newSupportDirectory: support.appendingPathComponent("Cellkeep"))
+        // History, schedules and journals live here; nobody but this user needs to read or traverse it.
+        let dataDirectory = support.appendingPathComponent("Cellkeep")
+        try? FileManager.default.createDirectory(at: dataDirectory, withIntermediateDirectories: true,
+                                                 attributes: [.posixPermissions: 0o700])
+        try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: dataDirectory.path)
         let app = NSApplication.shared
         let delegate = AppDelegate()
         app.delegate = delegate
@@ -75,10 +80,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         Self.shared = self
         ChargeMateAppShortcuts.updateAppShortcutParameters()
         if UserDefaults.standard.object(forKey: MenubarPreferences.storageKey) == nil { menuPreferences.save() }
-        if !UserDefaults.standard.bool(forKey: "chartHoverOverviewMigrationV1") {
-            UserDefaults.standard.set(ChartRange.defaultHours, forKey: "historyHours")
-            UserDefaults.standard.set(true, forKey: "chartHoverOverviewMigrationV1")
-        }
         battery.start()
         DispatchQueue.global(qos: .utility).async { MagSafeLEDHardwareService.resumeIfPausedByTest() }
         sleepObservation = battery.$snapshot
@@ -98,7 +99,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             topUp: { [weak battery] executionID in
                 battery?.startScheduledTopUp(executionID: executionID)
                     ?? .init(operationID: UUID(), status: .rejected, state: nil, message: String(localized: "Healthy Battery kullanılamıyor."))
-            })
+            },
+            discharge: { AdapterModeController.shared.startDischarge(to: $0) },
+            calibration: { _ in AdapterModeController.shared.beginCalibration() })
         scheduleRuntime?.start()
         // A no-op when the user turned the daily release check off.
         UpdateNotifications.shared.start()
@@ -190,7 +193,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                                                           name: NSWorkspace.didWakeNotification, object: nil)
         NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(workspaceWillSleep),
                                                           name: NSWorkspace.willSleepNotification, object: nil)
-        // Inert until a supported ChargeInhibitBackend is injected into AdvancedChargeRunner.shared.
+        // The runner stays inert (unsupported backend) until adapter mode injects the helper backend.
         AdvancedChargeRunner.shared.start()
         AdapterModeController.shared.start()
         battery.snapshotObserver = { [weak battery] snapshot in
@@ -228,11 +231,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         appMenu.addItem(withTitle: String(localized: "Healthy Battery’ten çık"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         item.submenu = appMenu
         menu.addItem(item)
+        menu.addItem(editMenuItem())
         NSApp.mainMenu = menu
     }
 
+    /// The standard Edit menu. Without it ⌘Z/⌘X/⌘C/⌘V/⌘A have nothing to dispatch to, so text fields (schedule
+    /// name, time zone) could not copy or paste; the actions travel the responder chain to the focused field.
+    private func editMenuItem() -> NSMenuItem {
+        let item = NSMenuItem()
+        let menu = NSMenu(title: String(localized: "Düzenle"))
+        menu.addItem(withTitle: String(localized: "Geri Al"), action: Selector(("undo:")), keyEquivalent: "z")
+        let redo = menu.addItem(withTitle: String(localized: "Yinele"), action: Selector(("redo:")), keyEquivalent: "z")
+        redo.keyEquivalentModifierMask = [.command, .shift]
+        menu.addItem(.separator())
+        menu.addItem(withTitle: String(localized: "Kes"), action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+        menu.addItem(withTitle: String(localized: "Kopyala"), action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        menu.addItem(withTitle: String(localized: "Yapıştır"), action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        menu.addItem(withTitle: String(localized: "Tümünü Seç"), action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        item.submenu = menu
+        return item
+    }
+
     @objc private func openDashboard() { showSettings(page: .dashboard) }
-    @objc private func openChargeSettings() { showSettings(page: .charge) }
 
     @objc private func statusItemClicked(_ sender: Any?) {
         guard NSApp.currentEvent?.type == .rightMouseUp else { togglePanel(sender); return }
@@ -240,9 +260,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         case .none: break
         case .likeLeftClick: togglePanel(sender)
         case .openDashboard: showSettings(page: .dashboard)
-        case .toggleCharging, .toggleLowPower:
-            // Preferences may come from a newer build: never dispatch an unverified writer.
-            statusItem?.button?.toolTip = String(localized: "Bu sağ tık eylemi henüz kullanılamıyor. Menü ayarlarından başka bir eylem seçin.")
+        case .toggleCharging:
+            let adapter = AdapterModeController.shared
+            if adapter.dischargeRunning { adapter.toggleDischarge() }
+            else if case .failure(let refusal) = adapter.startDischarge() { statusItem?.button?.toolTip = refusal.message }
+        case .toggleLowPower:
+            battery.applyPowerMode(battery.selectedPowerMode == .lowPower ? .automatic : .lowPower)
         }
     }
 
@@ -253,8 +276,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         battery.handleWake()
     }
     @objc private func workspaceWillSleep() {
+        battery.flushHistory()
         AdvancedChargeRunner.shared.setSleepState(.asleep)
         MainActor.assumeIsolated { ReminderCenter.shared.systemWillSleep() }
+    }
+
+    /// Live texts for the menu bar's control metrics; only what is acting right now.
+    private var menubarControlStates: [MenubarMetric: String] {
+        let runner = AdvancedChargeRunner.shared
+        var states: [MenubarMetric: String] = [:]
+        if menuPreferences.metrics.contains(.macOSCondition) {
+            MacOSBatteryConditionReader.shared.refreshIfDue { [weak self] in self?.updateMenuBar() }
+            if let condition = MacOSBatteryConditionReader.shared.text { states[.macOSCondition] = condition }
+        }
+        if let calibration = runner.memory.calibration {
+            states[.calibration] = String(localized: "Kal. \(calibration.phase.step)/4")
+        }
+        let heatEngaged = MainActor.assumeIsolated { HealthAutomation.shared.heatOverrideActive } // menu bar updates run on main
+        if heatEngaged || runner.display == .heatPaused {
+            states[.heatProtection] = String(localized: "Isı koruması")
+        }
+        if AdapterModeController.shared.active, runner.settings.sailingEnabled {
+            let target = AdvancedChargeLimits.normalizedTarget(runner.settings.targetLimit)
+            let resume = AdvancedChargeEngine.adapterResumeAt(target: target, settings: runner.settings)
+            states[.sailing] = String(localized: "Yelken %\(resume)–%\(target)")
+        }
+        return states
     }
 
     private func updateMenuBar() {
@@ -262,7 +309,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let budget = (button.window?.screen ?? NSScreen.main)?.visibleFrame.width ?? 1440
         let model = MenubarPresentation(preferences: menuPreferences, snapshot: battery.snapshot,
                                        lowPower: battery.selectedPowerMode == .lowPower,
-                                       policyState: battery.policyState)
+                                       policyState: battery.policyState,
+                                       controlStates: menubarControlStates)
         button.effectiveAppearance.performAsCurrentDrawingAppearance {
             let output = MenubarRenderer.render(model, maxWidth: budget * 0.35)
             button.title = ""

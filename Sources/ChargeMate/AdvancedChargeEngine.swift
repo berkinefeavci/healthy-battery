@@ -23,6 +23,9 @@ enum AdvancedChargeLimits {
     static let calibrationHold: TimeInterval = 3600
     static let calibrationMaxDuration: TimeInterval = 24 * 3600
     static let dischargeMaxDuration: TimeInterval = 6 * 3600
+    /// Adapter-only Macs pause for heat by cutting the adapter (running from the battery). Never at or
+    /// below this level: a low battery is charged even when warm.
+    static let heatCutFloor = 30
 
     static func normalizedTarget(_ value: Int) -> Int {
         let stepped = Int((Double(value) / Double(targetStep)).rounded()) * targetStep
@@ -38,7 +41,6 @@ struct AdvancedChargeSettings: Codable, Equatable {
     var heatProtectionEnabled = false
     var heatPauseAbove = AdvancedChargeLimits.defaultHeatHigh
     var heatResumeBelow = AdvancedChargeLimits.defaultHeatLow
-    var sleepBehaviorEnabled = false
     /// Opt-in adapter mode: cut wall power at the target, restore it below the band. Only used when the
     /// hardware cannot stop charging (`canInhibitCharging == false`) but can cut the adapter.
     var adapterModeEnabled = false
@@ -55,7 +57,6 @@ extension AdvancedChargeSettings {
         d.heatProtectionEnabled = try c.decodeIfPresent(Bool.self, forKey: .heatProtectionEnabled) ?? d.heatProtectionEnabled
         d.heatPauseAbove = try c.decodeIfPresent(Double.self, forKey: .heatPauseAbove) ?? d.heatPauseAbove
         d.heatResumeBelow = try c.decodeIfPresent(Double.self, forKey: .heatResumeBelow) ?? d.heatResumeBelow
-        d.sleepBehaviorEnabled = try c.decodeIfPresent(Bool.self, forKey: .sleepBehaviorEnabled) ?? d.sleepBehaviorEnabled
         d.adapterModeEnabled = try c.decodeIfPresent(Bool.self, forKey: .adapterModeEnabled) ?? d.adapterModeEnabled
         self = d
     }
@@ -63,6 +64,16 @@ extension AdvancedChargeSettings {
 
 enum CalibrationPhase: String, Codable, Equatable {
     case chargeToFull, hold, dischargeToLow, rechargeToFull
+
+    /// 1-based step out of four, for status texts.
+    var step: Int {
+        switch self {
+        case .chargeToFull: return 1
+        case .hold: return 2
+        case .dischargeToLow: return 3
+        case .rechargeToFull: return 4
+        }
+    }
 }
 
 struct CalibrationSession: Codable, Equatable {
@@ -73,6 +84,8 @@ struct CalibrationSession: Codable, Equatable {
 
 struct DischargeRequest: Codable, Equatable {
     var requestedAt: Date
+    /// Level to discharge to; nil (older saved requests) means the advanced target limit.
+    var target: Int?
 }
 
 /// State carried between evaluations. Only `discharge` and `calibration` are worth persisting; the
@@ -145,12 +158,16 @@ enum AdvancedChargeEngine {
                                  sleepMayOvershoot: sleepNote)
         }
 
-        let adapterMode = !input.capabilities.canInhibitCharging && input.capabilities.canForceDischarge
-            && settings.adapterModeEnabled
-        guard input.capabilities.canInhibitCharging || adapterMode else {
+        // macOS 27 locks the charge-stop keys on this hardware generation; cutting the adapter is then the
+        // only lever. It drives discharge and calibration on request, and the opt-in adapter mode all the time.
+        let adapterOnly = !input.capabilities.canInhibitCharging && input.capabilities.canForceDischarge
+        let adapterMode = adapterOnly && settings.adapterModeEnabled
+        guard input.capabilities.canInhibitCharging || adapterOnly else {
             return out(released, .unavailable, input.capabilities.reason ?? "Charge control is not available.")
         }
         let cutAdapter = ChargeInhibitState(chargingInhibited: false, adapterInhibited: true)
+        // "Stop charging": inhibit where the hardware allows it, otherwise run from the battery.
+        let pause = adapterOnly ? cutAdapter : ChargeInhibitState(chargingInhibited: true, adapterInhibited: false)
 
         // Timeouts first: a stale request can never keep the adapter cut.
         if let d = memory.discharge, input.now.timeIntervalSince(d.requestedAt) > AdvancedChargeLimits.dischargeMaxDuration {
@@ -178,6 +195,47 @@ enum AdvancedChargeEngine {
             memory.discharge = nil
             return out(released, .onBattery, "Adapter is not connected.")
         }
+        if adapterOnly && input.sleep != .awake {
+            // The adapter must be back before the Mac sleeps; the latch survives so it re-cuts on wake.
+            return out(released, .idle, "Adapter restored while the Mac sleeps.")
+        }
+
+        // Heat latch (hysteresis). Missing sensor drops the latch rather than blocking charging forever.
+        // On adapter-only Macs only adapter mode acts on heat (native heat protection covers the rest), and
+        // only for heat that charging causes: the cut runs the Mac from the battery until it cools.
+        if settings.heatProtectionEnabled, input.capabilities.canInhibitCharging || adapterMode,
+           let t = input.temperatureC {
+            if t > settings.heatPauseAbove, !adapterOnly || input.isCharging { memory.heatLatched = true }
+            else if t < settings.heatResumeBelow { memory.heatLatched = false }
+        } else {
+            memory.heatLatched = false
+        }
+        if adapterOnly, input.percentage <= AdvancedChargeLimits.heatCutFloor { memory.heatLatched = false }
+        let heat = memory.heatLatched
+
+        // Calibration (takes precedence over the user limit and discharge request).
+        if let session = memory.calibration {
+            let full = input.percentage >= 100 || (input.percentage >= 99 && !input.isCharging)
+            memory.calibration = advance(session, percentage: input.percentage, full: full, now: input.now)
+            if let cal = memory.calibration {
+                if input.topUpActive {
+                    // Calibration lifts the macOS limit with Top Up for its full-charge phases. A Top Up
+                    // the user starts during the discharge phase wins: charging is released.
+                    return out(released, cal.phase == .dischargeToLow ? .topUp : .calibrating(cal.phase),
+                               "Calibration: \(cal.phase.rawValue); Top Up is active.")
+                }
+                if cal.phase == .dischargeToLow {
+                    return out(cutAdapter, .calibrating(cal.phase),
+                               "Calibration: discharging to \(AdvancedChargeLimits.calibrationLow)%.")
+                }
+                if heat {
+                    return out(pause, .heatPaused, "Calibration paused: battery is too warm.")
+                }
+                return out(released, .calibrating(cal.phase), "Calibration: \(cal.phase.rawValue).")
+            }
+            // Calibration finished: fall through and restore the user limit.
+        }
+
         if input.topUpActive {
             memory.limitLatched = false
             memory.heatLatched = false
@@ -185,50 +243,25 @@ enum AdvancedChargeEngine {
             return out(released, .topUp, "Top Up is active; charge inhibit is released.")
         }
 
-        if adapterMode && input.sleep != .awake {
-            // The adapter must be back before the Mac sleeps; the latch survives so it re-cuts on wake.
-            return out(released, .idle, "Adapter mode: adapter restored while the Mac sleeps.")
-        }
-
-        // Heat latch (hysteresis). Missing sensor drops the latch rather than blocking charging forever.
-        // Adapter mode has no heat action: native heat protection (Faz 2) handles it.
-        if settings.heatProtectionEnabled, !adapterMode, let t = input.temperatureC {
-            if t > settings.heatPauseAbove { memory.heatLatched = true }
-            else if t < settings.heatResumeBelow { memory.heatLatched = false }
-        } else {
-            memory.heatLatched = false
-        }
-        let heat = memory.heatLatched
-
-        // Calibration (takes precedence over the user limit and discharge request).
-        if let session = memory.calibration {
-            memory.calibration = advance(session, percentage: input.percentage, now: input.now)
-            if let cal = memory.calibration {
-                if cal.phase == .dischargeToLow {
-                    return out(ChargeInhibitState(chargingInhibited: false, adapterInhibited: true),
-                               .calibrating(cal.phase), "Calibration: discharging to \(AdvancedChargeLimits.calibrationLow)%.")
-                }
-                if heat {
-                    return out(ChargeInhibitState(chargingInhibited: true, adapterInhibited: false),
-                               .heatPaused, "Calibration paused: battery is too warm.")
-                }
-                return out(released, .calibrating(cal.phase), "Calibration: \(cal.phase.rawValue).")
-            }
-            // Calibration finished: fall through and restore the user limit.
-        }
-
-        // One-shot discharge down to the target.
-        if memory.discharge != nil {
-            if input.percentage > target {
-                return out(ChargeInhibitState(chargingInhibited: false, adapterInhibited: true), .discharging,
-                           "Discharging to \(target)%.")
+        // One-shot discharge down to the requested level (the target limit by default).
+        if let request = memory.discharge {
+            let floor = request.target.map(AdvancedChargeLimits.normalizedTarget) ?? target
+            if input.percentage > floor {
+                return out(cutAdapter, .discharging, "Discharging to \(floor)%.")
             }
             memory.discharge = nil
         }
 
         if heat {
-            return out(ChargeInhibitState(chargingInhibited: true, adapterInhibited: false), .heatPaused,
-                       "Charging paused: battery is warmer than \(Int(settings.heatPauseAbove)) °C.")
+            return out(pause, .heatPaused, adapterOnly
+                       ? "Adapter cut: battery is warmer than \(Int(settings.heatPauseAbove)) °C; running on battery until it cools."
+                       : "Charging paused: battery is warmer than \(Int(settings.heatPauseAbove)) °C.")
+        }
+
+        if adapterOnly && !adapterMode {
+            // Only on-demand discharge and calibration use the adapter here; macOS keeps its own limit.
+            memory.adapterLatched = false
+            return out(released, .idle, "Adapter mode is off; macOS keeps its own limit.")
         }
 
         if adapterMode {
@@ -236,7 +269,7 @@ enum AdvancedChargeEngine {
                 memory.adapterLatched = false
                 return out(released, .idle, "No limit set.")
             }
-            let resumeAt = adapterResumeAt(target: target, sailingDelta: settings.sailingDelta)
+            let resumeAt = adapterResumeAt(target: target, settings: settings)
             if input.percentage >= target { memory.adapterLatched = true }
             else if memory.adapterLatched && input.percentage <= resumeAt { memory.adapterLatched = false }
             if memory.adapterLatched {
@@ -271,13 +304,20 @@ enum AdvancedChargeEngine {
         target - max(AdvancedChargeLimits.adapterMinBand, AdvancedChargeLimits.clampedDelta(sailingDelta))
     }
 
-    /// Moves a calibration session through its phases; nil when the final recharge reached 100%.
-    static func advance(_ session: CalibrationSession, percentage: Int, now: Date) -> CalibrationSession? {
+    /// Adapter mode band: the minimum 5 points, or the sailing range when sailing is on.
+    static func adapterResumeAt(target: Int, settings: AdvancedChargeSettings) -> Int {
+        adapterResumeAt(target: target, sailingDelta: settings.sailingEnabled ? settings.sailingDelta : AdvancedChargeLimits.adapterMinBand)
+    }
+
+    /// Moves a calibration session through its phases; nil when the final recharge reached full.
+    /// `full` also accepts 99% once charging has stopped (macOS often ends a full charge there).
+    static func advance(_ session: CalibrationSession, percentage: Int, full: Bool? = nil, now: Date) -> CalibrationSession? {
+        let full = full ?? (percentage >= 100)
         var cal = session
         while true {
             switch cal.phase {
             case .chargeToFull:
-                guard percentage >= 100 else { return cal }
+                guard full else { return cal }
                 cal.phase = .hold; cal.holdStartedAt = now
             case .hold:
                 let start = cal.holdStartedAt ?? now
@@ -288,7 +328,7 @@ enum AdvancedChargeEngine {
                 guard percentage <= AdvancedChargeLimits.calibrationLow else { return cal }
                 cal.phase = .rechargeToFull
             case .rechargeToFull:
-                return percentage >= 100 ? nil : cal
+                return full ? nil : cal
             }
         }
     }

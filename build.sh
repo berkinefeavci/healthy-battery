@@ -29,10 +29,10 @@ if [[ "${1:-}" == "--local-preview-sdk" ]]; then
   executable=.build/local-preview/ChargeMate
   native_charge_helper=.build/local-preview/ChargeMateNativeChargeHelper
   xcrun clang -isysroot "$sdk_path" -mmacosx-version-min=13.0 -O2 \
-    Tools/MagSafeLEDProbe.c -framework IOKit -framework CoreFoundation \
+    Tools/MagSafeLEDProbe.c -framework IOKit -framework CoreFoundation -framework Security \
     -o .build/local-preview/ChargeMateLEDHelper
   xcrun clang -isysroot "$sdk_path" -mmacosx-version-min=13.0 -O2 \
-    Tools/PowerModeHelper.c -o .build/local-preview/ChargeMatePowerModeHelper
+    Tools/PowerModeHelper.c -framework CoreFoundation -framework Security -o .build/local-preview/ChargeMatePowerModeHelper
   xcrun clang -isysroot "$sdk_path" -mmacosx-version-min=13.0 -O2 \
     Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation -framework Security \
     -o .build/local-preview/ChargeMateChargeInhibitHelper
@@ -56,9 +56,9 @@ else
   extract_intents=true
   executable=.build/release/Cellkeep
   native_charge_helper=.build/release/CellkeepNativeChargeHelper
-  xcrun clang -O2 Tools/MagSafeLEDProbe.c -framework IOKit -framework CoreFoundation \
+  xcrun clang -O2 Tools/MagSafeLEDProbe.c -framework IOKit -framework CoreFoundation -framework Security \
     -o .build/release/CellkeepLEDHelper
-  xcrun clang -O2 Tools/PowerModeHelper.c -o .build/release/CellkeepPowerModeHelper
+  xcrun clang -O2 Tools/PowerModeHelper.c -framework CoreFoundation -framework Security -o .build/release/CellkeepPowerModeHelper
   xcrun clang -O2 Tools/ChargeInhibitHelper.c Tools/ChargeInhibitSafety.c -framework IOKit -framework CoreFoundation -framework Security \
     -o .build/release/CellkeepChargeInhibitHelper
   charge_inhibit_helper=.build/release/CellkeepChargeInhibitHelper

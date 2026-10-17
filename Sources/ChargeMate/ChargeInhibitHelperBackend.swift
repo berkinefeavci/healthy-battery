@@ -4,17 +4,23 @@ import Foundation
 enum ChargeInhibitWire {
     enum Failure: Error, Equatable, LocalizedError {
         case badRequest, refused, failed, unsupported, gated, malformed, helperMissing, helperNotTrusted, locked
+        /// The helper install did not complete (administrator prompt denied or the install command failed).
+        case installFailed
+        /// The user dismissed the administrator prompt; nothing was installed.
+        case cancelled
         var errorDescription: String? {
             switch self {
-            case .badRequest: return "Şarj durdurma yardımcısı isteği anlamadı."
-            case .refused: return "Şarj durdurma güvenlik kuralıyla reddedildi (pil düşük, adaptör yok veya uyku)."
-            case .failed: return "Şarj durdurma yazılamadı ya da doğrulanamadı; her şey serbest bırakıldı."
-            case .gated: return "macOS bu anahtarı özel yetkiye bağlamış (kIOReturnNotPrivileged); root olsa bile yazılamıyor."
-            case .unsupported: return "Bu Mac'te doğrulanmış şarj durdurma anahtarı yok."
-            case .malformed: return "Şarj durdurma yardımcısından geçersiz yanıt geldi."
-            case .helperMissing: return "Şarj durdurma yardımcısı kurulu değil."
-            case .helperNotTrusted: return "Şarj durdurma yardımcısı güvenli değil; işlem durduruldu."
-            case .locked: return "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor)."
+            case .badRequest: return String(localized: "Şarj durdurma yardımcısı isteği anlamadı.")
+            case .refused: return String(localized: "Şarj durdurma güvenlik kuralıyla reddedildi (pil düşük, adaptör yok veya uyku).")
+            case .failed: return String(localized: "Şarj durdurma yazılamadı ya da doğrulanamadı; her şey serbest bırakıldı.")
+            case .gated: return String(localized: "macOS bu anahtarı özel yetkiye bağlamış (kIOReturnNotPrivileged); root olsa bile yazılamıyor.")
+            case .unsupported: return String(localized: "Bu Mac'te doğrulanmış şarj durdurma anahtarı yok.")
+            case .malformed: return String(localized: "Şarj durdurma yardımcısından geçersiz yanıt geldi.")
+            case .helperMissing: return String(localized: "Şarj durdurma yardımcısı kurulu değil.")
+            case .helperNotTrusted: return String(localized: "Şarj durdurma yardımcısı güvenli değil; işlem durduruldu.")
+            case .locked: return String(localized: "Şarj durdurma henüz kilitli (deneysel, fiziksel test bekliyor).")
+            case .installFailed: return String(localized: "Şarj durdurma yardımcısı kurulamadı.")
+            case .cancelled: return String(localized: "Yönetici onayı iptal edildi; yardımcı kurulmadı.")
             }
         }
     }
@@ -135,69 +141,9 @@ struct ChargeInhibitHelperBackend: ChargeInhibitBackend {
     }
 }
 
-/// Owns the 20 s heartbeat while something is inhibited. It never starts on its own: `hold` is
-/// called only by a feature that wants to inhibit, and only while the backend reports a capability.
-/// If the heartbeat cannot be delivered, the helper's 60 s watchdog releases everything.
-final class ChargeInhibitHeartbeat {
-    private let backend: ChargeInhibitBackend
-    private let interval: TimeInterval
-    private var timer: DispatchSourceTimer?
-    private let queue = DispatchQueue(label: "io.github.berkinefeavci.cellkeep.chargeinhibit.heartbeat")
-    private let lock = NSLock() // guards `timer`; never queue.sync, the failure path stops from the queue itself
-    /// Called (on the heartbeat queue) when a heartbeat fails; the timer is stopped first.
-    var onFailure: ((Error) -> Void)?
-
-    init(backend: ChargeInhibitBackend, interval: TimeInterval = ChargeInhibitSafety.heartbeatInterval) {
-        self.backend = backend
-        self.interval = interval
-    }
-
-    var isRunning: Bool { lock.lock(); defer { lock.unlock() }; return timer != nil }
-
-    /// Applies `state`; keeps a heartbeat running while it is not the released state.
-    @discardableResult
-    func hold(_ state: ChargeInhibitState) throws -> ChargeInhibitState {
-        let wantsInhibit = state.chargingInhibited || state.adapterInhibited
-        if wantsInhibit {
-            let capabilities = backend.capabilities()
-            guard capabilities.canInhibitCharging || capabilities.canForceDischarge else {
-                throw ChargeInhibitWire.Failure.unsupported
-            }
-        }
-        let applied = try backend.apply(state)
-        if applied.chargingInhibited || applied.adapterInhibited { start() } else { stop() }
-        return applied
-    }
-
-    func release() { _ = try? hold(.released); stop() }
-
-    /// One heartbeat; returns false (and stops the timer) when it could not be delivered.
-    @discardableResult
-    func beat() -> Bool {
-        do { try backend.heartbeat(); return true }
-        catch { stop(); onFailure?(error); return false }
-    }
-
-    private func start() {
-        lock.lock(); defer { lock.unlock() }
-        guard timer == nil else { return }
-        let source = DispatchSource.makeTimerSource(queue: queue)
-        source.schedule(deadline: .now() + interval, repeating: interval)
-        source.setEventHandler { [weak self] in self?.beat() }
-        source.resume()
-        timer = source
-    }
-
-    func stop() {
-        lock.lock(); defer { lock.unlock() }
-        timer?.cancel()
-        timer = nil
-    }
-}
-
 /// Installs/queries the root helper. Mirrors `SystemPowerModeService` (one admin prompt, root-owned
-/// copy checked before it runs). Nothing calls `install()` automatically: it is exposed for the
-/// future, explicit "Şarj durdurmayı etkinleştir" action only. Removal is part of `UninstallPlan`.
+/// copy checked before it runs). Nothing calls `install()` automatically: only the "Yardımcıyı kur" button
+/// does, through `AdapterModeController`. Removal is part of `UninstallPlan`.
 enum ChargeInhibitHelperService {
     static let label = "io.github.berkinefeavci.cellkeep.chargeinhibit"
     static let helperPath = "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.chargeinhibit"
@@ -217,14 +163,8 @@ enum ChargeInhibitHelperService {
     /// The one admin shell command: copy → verify signature → write plist → authorize this user → (re)load.
     /// Pure and public so tests can inspect it; `install()` is the only caller that runs it.
     static func installCommand(bundledHelperPath: String, teamIdentifier: String?, uid: uid_t) -> String {
-        let quote = HelperInstallState.shellQuoted
-        return "/usr/bin/install -d -o root -g wheel -m 755 /Library/PrivilegedHelperTools && " +
-            "/usr/bin/install -o root -g wheel -m 755 \(quote(bundledHelperPath)) \(quote(helperPath)) && " +
-            HelperInstallState.signatureCheckCommand(installedPath: helperPath, teamIdentifier: teamIdentifier) + " && " +
-            HelperInstallState.writeLaunchDaemonPlistCommand(label: label, helperPath: helperPath) + " && " +
-            "\(quote(helperPath)) --authorize-uid \(uid) && " +
-            "(/bin/launchctl bootout system/\(label) 2>/dev/null || true) && " +
-            "/bin/launchctl bootstrap system /Library/LaunchDaemons/\(label).plist"
+        HelperInstallState.installCommand(label: label, helperPath: helperPath, bundledHelperPath: bundledHelperPath,
+                                          teamIdentifier: teamIdentifier, uid: uid)
     }
 
     static func install() throws {
@@ -275,29 +215,12 @@ enum ChargeInhibitHelperService {
     }
 
     private static func authorized(_ command: String) throws {
-        let escaped = command.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
-        process.arguments = ["-e", "do shell script \"\(escaped)\" with administrator privileges"]
-        let output = Pipe()
-        process.standardOutput = output
-        process.standardError = output
-        try process.run()
-        process.waitUntilExit()
-        guard process.terminationStatus == 0 else { throw ChargeInhibitWire.Failure.failed }
+        do { try AdminAuthorization.run(command) }
+        catch AdminAuthorization.Failure.cancelled { throw ChargeInhibitWire.Failure.cancelled }
+        catch { throw ChargeInhibitWire.Failure.installFailed }
     }
 
     private static func helperVersion() -> Int? {
-        let process = Process()
-        let pipe = Pipe()
-        process.executableURL = URL(fileURLWithPath: helperPath)
-        process.arguments = ["--version"]
-        process.standardOutput = pipe
-        process.standardError = pipe
-        guard (try? process.run()) != nil else { return nil }
-        process.waitUntilExit()
-        guard process.terminationStatus == 0,
-              let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) else { return nil }
-        return Int(output.trimmingCharacters(in: .whitespacesAndNewlines))
+        HelperInstallState.cachedVersion(atPath: helperPath) { HelperInstallState.readVersion(ofHelperAt: helperPath) }
     }
 }

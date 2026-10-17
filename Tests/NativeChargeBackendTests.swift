@@ -94,6 +94,26 @@ import Foundation
         let observedState = try observed.readState()
         check(observedState.manualLimit == 81, "read accepts a real observed non-writable limit")
 
+        // Every error the PowerUI bridge or the helper can print has a translation entry, so none reaches the
+        // UI as untranslated Turkish. (Reads the sources, so a new message cannot be added unnoticed.)
+        func messages(in path: String, pattern: String) throws -> [String] {
+            let text = try String(contentsOfFile: path, encoding: .utf8)
+            let regex = try NSRegularExpression(pattern: pattern)
+            return regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).compactMap {
+                Range($0.range(at: 1), in: text).map { String(text[$0]) }
+            }
+        }
+        let bridge = try messages(in: "Sources/PowerUIBridge/PowerUIBridge.m", pattern: #"failure\(@"([^"]+)"\)"#)
+            + (try messages(in: "Sources/PowerUIBridge/PowerUIBridge.m", pattern: #"\?: @"([^"]+)""#))
+        let helper = try messages(in: "Sources/NativeChargeHelper/main.swift", pattern: #"failure\("([^"]+)"\)"#)
+            .filter { $0 != "test" }
+        check(bridge.count >= 9 && helper.count == 2, "found the bridge and helper messages in the sources")
+        for message in bridge + helper {
+            check(NativeChargeBackend.isTranslated(helperMessage: message), "helper message has a translation: \(message)")
+        }
+        check(NativeChargeBackend.localized(helperMessage: "text from macOS itself") == "text from macOS itself",
+              "unknown helper text passes through")
+
         print("Native charge backend: \(count) assertions passed; fake process only.")
     }
 }

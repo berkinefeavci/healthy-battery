@@ -38,15 +38,19 @@ enum ScheduleTests {
 
         let now = date("2026-09-20T10:00:00Z")
         let fresh = ScheduleTask.new(now: now)
-        check(!fresh.enabled && fresh.action == .pauseCharging && fresh.recurrence == .daily, "new task safe defaults")
+        check(!fresh.enabled && fresh.action == .topUp && fresh.action.isRunnable && fresh.recurrence == .daily, "new task safe defaults to a runnable action")
         var enabledOriginal = fresh; enabledOriginal.enabled = true; enabledOriginal.activationStart = .distantPast; enabledOriginal.lastEvaluatedAt = .distantPast
         let copy = enabledOriginal.duplicated(now: now)
         check(copy.id != enabledOriginal.id && !copy.enabled && copy.name.hasSuffix(" kopyası"), "duplicate has safe identity and name")
         check(copy.createdAt == now && copy.activationStart == nil && copy.lastEvaluatedAt == nil, "duplicate resets runtime state")
-        for template in ScheduleTemplate.allCases { check(!template.task(now: now).enabled, "template disabled") }
+        for template in ScheduleTemplate.allCases {
+            check(!template.task(now: now).enabled, "template disabled")
+            check(template.task(now: now).action.isRunnable, "templates only use actions that can run")
+        }
+        check(ScheduleTemplate.allCases.count == 2, "calibration templates are gone until calibration can run")
         var target = fresh; target.action = .setChargeLimit; target.target = 85
         let capabilities = ScheduleCapabilities(chargeLimits: [80, 85, 90, 95, 100], topUpAvailable: true,
-                                                powerModes: [.automatic, .lowPower, .turbo])
+                                                powerModes: [.automatic, .lowPower, .turbo], adapterCut: true)
         check(target.validationError(capabilities: capabilities) == nil, "supported target validates")
         target.target = 83
         check(target.validationError(capabilities: capabilities) != nil, "unsupported target rejected")
@@ -60,17 +64,34 @@ enum ScheduleTests {
         check(ScheduleAction.topUp.availability(in: limited) != nil, "Top Up needs 100 capability")
         check(ScheduleAction.enableLowPower.availability(in: limited) != nil, "low power needs capability")
         check(ScheduleAction.enableHighPower.availability(in: limited) != nil, "high power needs capability")
-        for action in [ScheduleAction.pauseCharging, .startCalibration, .dischargeTo] {
-            check(action.availability(in: capabilities) != nil, "unverified action remains unavailable")
+        check(ScheduleAction.pauseCharging.availability(in: capabilities) != nil, "pause charging stays unavailable")
+        check(!ScheduleAction.pauseCharging.isRunnable && !ScheduleAction.offered().contains(.pauseCharging), "pause charging is not offered for new tasks")
+        check(ScheduleAction.offered(keeping: .pauseCharging).contains(.pauseCharging), "an old task keeps its action in the editor")
+        for action in [ScheduleAction.startCalibration, .dischargeTo] {
+            check(action.availability(in: capabilities) == nil, "adapter cut enables \(action.rawValue)")
+            check(action.availability(in: limited) != nil, "\(action.rawValue) needs the verified adapter cut")
+            check(action.isRunnable && ScheduleAction.offered().contains(action), "\(action.rawValue) is offered")
         }
+        check(Set(ScheduleAction.allCases.filter(\.isRunnable)) == Set(ScheduleAction.offered()), "runnable and offered agree")
+        var discharge = fresh; discharge.action = .dischargeTo; discharge.target = 50
+        check(discharge.validationError(capabilities: capabilities) == nil, "discharge target 50 validates")
+        discharge.target = nil
+        check(discharge.validationError(capabilities: capabilities) != nil, "discharge needs a target")
+        // A calibration task can be enabled only where the adapter cut is verified.
+        var calibration = fresh; calibration.action = .startCalibration; calibration.enabled = true
+        check(calibration.validationError(capabilities: capabilities) == nil, "calibration enables with the adapter cut")
+        check(calibration.validationError(capabilities: limited) != nil, "calibration cannot be enabled without it")
 
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("chargemate-schedule-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
         let store = ScheduleStore(url: root.appendingPathComponent("schedules.json"))
-        try store.save([fresh, target])
+        // A task saved with an action no Mac can run (pause charging) still loads as is.
+        var legacy = fresh; legacy.action = .pauseCharging; legacy.name = "Eski duraklatma"
+        try store.save([fresh, target, legacy])
         let loaded = store.load()
-        check(loaded.warning == nil && loaded.tasks == [fresh, target], "store round trip")
+        check(loaded.warning == nil && loaded.tasks == [fresh, target, legacy], "store round trip keeps tasks with now-unsupported actions")
+        try store.save([fresh, target])
         let raw = try JSONSerialization.jsonObject(with: Data(contentsOf: store.url)) as! [String: Any]
         var rows = raw["tasks"] as! [Any]; rows.append(["schemaVersion": 999, "name": "broken"])
         try JSONSerialization.data(withJSONObject: ["schemaVersion": 1, "tasks": rows]).write(to: store.url)

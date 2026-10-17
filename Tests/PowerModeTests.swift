@@ -23,8 +23,9 @@ import Foundation
         precondition(SystemPowerSource.battery.requestCode == "B")
         precondition(SystemPowerSource.adapter.requestCode == "C")
         precondition(SystemPowerSource.all.requestCode == "A")
-        precondition(!SystemPowerModeService.isCompatibleHelperVersion(1))
-        precondition(SystemPowerModeService.isCompatibleHelperVersion(2))
+        precondition(!SystemPowerModeService.isCompatibleHelperVersion(nil))
+        precondition(!SystemPowerModeService.isCompatibleHelperVersion(2)) // 2 still accepted any process of the user
+        precondition(SystemPowerModeService.isCompatibleHelperVersion(3))
         precondition(SystemPowerModeService.parseCapabilities("") == [.automatic])
         precondition(SystemPowerModeService.parseCapabilities("lowpowermode 1\n") == [.automatic, .lowPower])
         precondition(SystemPowerModeService.parseCapabilities(" highpowermode 1\nlowpowermode 1\n") == [.automatic, .lowPower, .turbo])

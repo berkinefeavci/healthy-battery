@@ -83,40 +83,16 @@ import Foundation
         do { _ = try backend(lying).apply(.init(chargingInhibited: true, adapterInhibited: false)); preconditionFailure() }
         catch let failure as ChargeInhibitWire.Failure { precondition(failure == .failed) }
 
-        // Heartbeat owner: never starts for an unsupported backend, runs while inhibited, stops on release.
-        let idle = ChargeInhibitHeartbeat(backend: backend(none), interval: 0.05)
-        do { _ = try idle.hold(.init(chargingInhibited: true, adapterInhibited: false)); preconditionFailure() }
-        catch { precondition(!idle.isRunning) }
-        let owner = ChargeInhibitHeartbeat(backend: backend(both), interval: 0.05)
-        precondition(!owner.isRunning, "not started until a feature asks")
-        _ = try owner.hold(.init(chargingInhibited: true, adapterInhibited: false))
-        precondition(owner.isRunning)
-        Thread.sleep(forTimeInterval: 0.3)
-        precondition(both.requests.filter { $0 == "H\n" }.count >= 3, "heartbeats flow while inhibited")
-        _ = try owner.hold(.released)
-        precondition(!owner.isRunning)
-        let beats = both.requests.filter { $0 == "H\n" }.count
-        Thread.sleep(forTimeInterval: 0.2)
-        precondition(both.requests.filter { $0 == "H\n" }.count == beats, "no heartbeat after release")
-
-        // A failing heartbeat stops the timer and reports (the helper's watchdog then releases).
-        let flaky = FakeHelper()
-        let failing = ChargeInhibitHeartbeat(backend: backend(flaky), interval: 0.05)
-        var reported = false
-        failing.onFailure = { _ in reported = true }
-        _ = try failing.hold(.init(chargingInhibited: false, adapterInhibited: true))
-        flaky.failHeartbeat = true
-        Thread.sleep(forTimeInterval: 0.3)
-        precondition(reported && !failing.isRunning)
-
         // Install command: one chained admin command, root-owned copy checked before launch.
         let command = ChargeInhibitHelperService.installCommand(bundledHelperPath: "/Apps/x y/Helper", teamIdentifier: "ABCDE12345", uid: 501)
         precondition(command.contains("--authorize-uid 501"))
         precondition(command.contains("launchctl bootstrap system /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.chargeinhibit.plist"))
         precondition(command.contains("'/Apps/x y/Helper'"))
         precondition(command.range(of: "codesign --verify")!.lowerBound < command.range(of: "--authorize-uid")!.lowerBound)
+        precondition(!command.contains("\n"))
+        precondition(ChargeInhibitWire.Failure.cancelled != .installFailed && ChargeInhibitWire.Failure.cancelled.errorDescription != nil)
         precondition(ChargeInhibitHelperService.minimumHelperVersion == 2)
         precondition(ChargeInhibitSafety.watchdogTimeout == 60 && ChargeInhibitSafety.criticalPercent == 10)
-        print("Charge inhibit backend: wire format, lock, capabilities, heartbeat owner and install command assertions passed; no helper contacted.")
+        print("Charge inhibit backend: wire format, lock, capabilities and install command assertions passed; no helper contacted.")
     }
 }

@@ -139,7 +139,7 @@ enum ChargePolicyEngine {
             return decision(.recoveryRequired(String(localized: "Top Up için adaptör bağlı olmalı.")), policy: input.policy)
         }
         guard native.availableLimits.contains(100) else {
-            return decision(.recoveryRequired("Bu Mac %100 yerel limitini desteklemiyor."), policy: input.policy)
+            return decision(.recoveryRequired(String(localized: "Bu Mac %100 yerel limitini desteklemiyor.")), policy: input.policy)
         }
         guard native.availableLimits.contains(native.manualLimit) else {
             return decision(.recoveryRequired(String(localized: "Mevcut %\(native.manualLimit) limiti Top Up sonrasında tam olarak geri yüklenemez.")),
@@ -243,7 +243,7 @@ enum ChargePolicyEngine {
         }
         if case .adoptNativeLimit = input.intent {
             guard native.availableLimits.contains(native.manualLimit) else {
-                return decision(.recoveryRequired("Okunan yerel limit desteklenmiyor."), policy: policy)
+                return decision(.recoveryRequired(String(localized: "Okunan yerel limit desteklenmiyor.")), policy: policy)
             }
             policy.desiredLimit = native.manualLimit
             return decision(.maintainingLimit(native.manualLimit), policy: policy)
@@ -287,12 +287,6 @@ enum ChargePolicyEngine {
     }
 }
 
-enum ChargePolicyPresentationAction: Equatable {
-    case reapplyChargeMateTarget
-    case adoptMacOSValue
-    case acknowledgeRecovery
-}
-
 extension ChargePolicyState {
     var title: String {
         switch self {
@@ -303,14 +297,6 @@ extension ChargePolicyState {
         case .topUpRestoring(let limit): return String(localized: "Önceki limite dönülüyor: %\(limit)")
         case .pausedByConflict(_, let observed): return String(localized: "macOS limiti dışarıdan %\(observed) yapıldı")
         case .recoveryRequired: return String(localized: "Kontrol gerekli; yeni işlem durduruldu")
-        }
-    }
-
-    var availableActions: [ChargePolicyPresentationAction] {
-        switch self {
-        case .pausedByConflict: return [.reapplyChargeMateTarget, .adoptMacOSValue]
-        case .recoveryRequired: return [.acknowledgeRecovery]
-        default: return []
         }
     }
 

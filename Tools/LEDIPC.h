@@ -3,11 +3,17 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <errno.h>
+#include "ClientSignature.h"
 #define LED_SOCKET "/var/run/io.github.berkinefeavci.cellkeep.led.sock"
 #define LED_HELPER "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.led"
 
 static int authorizeUID(uid_t uid) {
     if (geteuid() != 0) return 4;
+    // The state directory may not exist yet on a first install; it must be root-owned and not writable by others.
+    if (mkdir("/Library/Application Support", 0755) && errno != EEXIST) return 4;
+    if (mkdir(POLICY_DIR, 0755) && errno != EEXIST) return 4;
+    struct stat directory;
+    if (lstat(POLICY_DIR, &directory) || !S_ISDIR(directory.st_mode) || directory.st_uid != 0 || (directory.st_mode & 022)) return 4;
     int fd = open(POLICY_DIR "/client", O_CREAT | O_WRONLY | O_TRUNC | O_NOFOLLOW, 0600);
     if (fd < 0) return 4;
     int ok = write(fd, &uid, sizeof(uid)) == sizeof(uid) && !fsync(fd);
@@ -25,7 +31,7 @@ static int trustedClient(int socketFD) {
     int valid = !fstat(fd, &st) && S_ISREG(st.st_mode) && st.st_uid == 0 && !(st.st_mode & 022) &&
         st.st_size == (off_t)sizeof(expected) && read(fd, &expected, sizeof(expected)) == sizeof(expected) && expected == uid;
     close(fd);
-    return valid;
+    return valid && cs_client_ok(socketFD);
 }
 
 static int openServer(void) {
@@ -41,8 +47,8 @@ static int openServer(void) {
     return fd;
 }
 
-// Only processes running as the registered user (UID written by --authorize-uid) can call
-// this endpoint; the peer's code signature is not checked.
+// Only processes running as the registered user (UID written by --authorize-uid) can call this endpoint,
+// and a Developer ID helper also requires the caller to be the app signed by its own team (ClientSignature.h).
 // Commands map to fixed argv; neither shell strings nor arbitrary paths are accepted.
 static void serveIPC(int server) {
     fd_set ready; FD_ZERO(&ready); FD_SET(server, &ready);

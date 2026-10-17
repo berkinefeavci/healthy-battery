@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for considering a contribution to Cellkeep.
+Thanks for considering a contribution to Healthy Battery (previously Cellkeep; internal names such as `Cellkeep.app`, helper labels and data folders keep that identity on purpose).
 
 ## Build and test
 
@@ -15,7 +15,7 @@ Read `check.sh` and `build.sh` before running them — they're plain shell scrip
 
 ## Translations
 
-Cellkeep ships in English, Turkish, German, French and Spanish. Turkish is the source language: user-facing text in the code is Turkish (`Text("…")`, `String(localized: "…")`), and each `Localization/<lang>.lproj/Localizable.strings` maps that Turkish key to its translation.
+Healthy Battery ships in English, Turkish, German, French and Spanish. Turkish is the source language: user-facing text in the code is Turkish (`Text("…")`, `String(localized: "…")`), and each `Localization/<lang>.lproj/Localizable.strings` maps that Turkish key to its translation.
 
 When you add or change a user-facing string, `./build.sh` will fail and list it as `MISSING` for every language. Add the key to each `Localizable.strings` (Turkish maps the key to itself). Keep format specifiers such as `%@`, `%lld` and `%%` exactly as in the key. Identifiers — enum raw values, `UserDefaults` keys, process names, SF Symbol names — must stay unwrapped.
 

@@ -4,6 +4,8 @@ struct ScheduleCapabilities: Equatable {
     let chargeLimits: [Int]
     let topUpAvailable: Bool
     let powerModes: Set<SystemPowerMode>
+    /// The verified adapter cut (charge helper + passed adapter test): discharge and calibration can run.
+    var adapterCut = false
 
     static let unavailable = Self(chargeLimits: [], topUpAvailable: false, powerModes: [])
 }
@@ -25,6 +27,14 @@ enum ScheduleAction: String, Codable, CaseIterable, Identifiable {
         }
     }
     var needsTarget: Bool { self == .setChargeLimit || self == .dischargeTo }
+    /// True for the actions a task can really run. Pausing charging needs a charge-stop key that macOS 27
+    /// locks, so no Mac can; a task saved with it still loads and is shown as unsupported. Discharge and
+    /// calibration run through the adapter cut where it is verified (`availability` says when it is not).
+    var isRunnable: Bool { self != .pauseCharging }
+    /// The actions the editor offers: every runnable one, plus `keeping` so an old task can still be edited.
+    static func offered(keeping current: ScheduleAction? = nil) -> [ScheduleAction] {
+        allCases.filter { $0.isRunnable || $0 == current }
+    }
     func availability(in capabilities: ScheduleCapabilities) -> String? {
         switch self {
         case .topUp:
@@ -38,7 +48,10 @@ enum ScheduleAction: String, Codable, CaseIterable, Identifiable {
             return capabilities.powerModes.contains(.automatic) ? nil : String(localized: "Otomatik güç modu kullanılamıyor.")
         case .enableHighPower:
             return capabilities.powerModes.contains(.turbo) ? nil : String(localized: "Bu Mac Yüksek Güç Modunu sunmuyor.")
-        case .pauseCharging, .startCalibration, .dischargeTo:
+        case .startCalibration, .dischargeTo:
+            return capabilities.adapterCut ? nil
+                : String(localized: "Şarj yardımcısı kurulu olmalı ve adaptör testi geçmiş olmalı (Ayarlar → Şarj Kontrolü).")
+        case .pauseCharging:
             return String(localized: "Bu donanım eyleminin fiziksel etkisi henüz doğrulanmadı.")
         }
     }
@@ -80,7 +93,7 @@ struct ScheduleTask: Codable, Identifiable, Equatable {
     static func new(now: Date, calendar: Calendar = .current) -> Self {
         let nextHour = calendar.date(bySetting: .minute, value: 0,
             of: calendar.date(byAdding: .hour, value: 1, to: now)!)!
-        return Self(name: String(localized: "Yeni görev"), action: .pauseCharging, target: nil, recurrence: .daily,
+        return Self(name: String(localized: "Yeni görev"), action: .topUp, target: nil, recurrence: .daily,
                     startLocalComponents: localComponents(nextHour, calendar: calendar),
                     timezoneID: calendar.timeZone.identifier, createdAt: now, modifiedAt: now)
     }
@@ -230,38 +243,23 @@ struct ScheduleStore {
 }
 
 enum ScheduleTemplate: String, CaseIterable, Identifiable {
-    case monthlyCalibration, biweeklyCalibration, mondayTopUp, weekendFull
+    case mondayTopUp, weekendFull
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .monthlyCalibration: return String(localized: "Aylık kalibrasyon")
-        case .biweeklyCalibration: return String(localized: "İki haftalık kalibrasyon")
         case .mondayTopUp: return String(localized: "Pazartesi tam dolum")
         case .weekendFull: return String(localized: "Hafta sonu tam dolum")
         }
     }
-    func task(now: Date, calendar source: Calendar = .current) -> ScheduleTask {
-        let calendar = source
-        let action: ScheduleAction
-        let recurrence: ScheduleRecurrence
-        let targetWeekday: Int?
-        let hour: Int
+    func task(now: Date, calendar: Calendar = .current) -> ScheduleTask {
+        let weekday: Int, hour: Int
         switch self {
-        case .monthlyCalibration: action = .startCalibration; recurrence = .monthly; targetWeekday = nil; hour = 9
-        case .biweeklyCalibration: action = .startCalibration; recurrence = .biweekly; targetWeekday = 7; hour = 9
-        case .mondayTopUp: action = .topUp; recurrence = .weekly; targetWeekday = 2; hour = 7
-        case .weekendFull: action = .topUp; recurrence = .weekly; targetWeekday = 6; hour = 18
+        case .mondayTopUp: weekday = 2; hour = 7
+        case .weekendFull: weekday = 6; hour = 18
         }
-        var start: Date
-        if self == .monthlyCalibration {
-            let nextMonth = calendar.date(byAdding: .month, value: 1, to: now)!
-            var c = calendar.dateComponents([.year, .month], from: nextMonth); c.day = 1; c.hour = hour; c.minute = 0
-            start = calendar.date(from: c)!
-        } else {
-            var match = DateComponents(); match.weekday = targetWeekday; match.hour = hour; match.minute = 0
-            start = calendar.nextDate(after: now, matching: match, matchingPolicy: .nextTime, repeatedTimePolicy: .first)!
-        }
-        return ScheduleTask(name: title, action: action, target: nil, recurrence: recurrence,
+        var match = DateComponents(); match.weekday = weekday; match.hour = hour; match.minute = 0
+        let start = calendar.nextDate(after: now, matching: match, matchingPolicy: .nextTime, repeatedTimePolicy: .first)!
+        return ScheduleTask(name: title, action: .topUp, target: nil, recurrence: .weekly,
             startLocalComponents: ScheduleTask.localComponents(start, calendar: calendar),
             timezoneID: calendar.timeZone.identifier, createdAt: now, modifiedAt: now)
     }

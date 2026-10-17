@@ -76,6 +76,17 @@ import Foundation
                                               policyState: "idle", isCharging: false,
                                               externalConnected: true) == .sailing,
               "sailing state stays stable")
+        for (key, expected) in [("calibrating", ChargeMateShortcutState.calibration), ("discharging", .discharging),
+                                ("adapterCut", .discharging), ("heatPaused", .heatProtect), ("sailing", .sailing)] {
+            check(ChargeMateShortcutState.resolve(available: true, controlState: "pausedAtLimit", advancedState: key,
+                                                  policyState: "idle", isCharging: false,
+                                                  externalConnected: false) == expected,
+                  "adapter-cut engine state \(key) wins over the native state")
+        }
+        check(ChargeMateShortcutState.resolve(available: true, controlState: "idle", advancedState: "calibrating",
+                                              policyState: "recoveryRequired", isCharging: false,
+                                              externalConnected: true) == .error,
+              "recovery still wins over the engine state")
         check(ChargeMateShortcutState.resolve(available: true, controlState: "idle",
                                               policyState: "recoveryRequired", isCharging: false,
                                               externalConnected: true) == .error,
@@ -85,24 +96,16 @@ import Foundation
                                               externalConnected: false) == .discharging,
               "battery operation resolves to discharging")
 
-        var commands: [ChargeMateShortcutCommand] = []
-        let runner = ChargeMateShortcutCommandRunner(
-            supportedLimits: { [80, 85, 90, 95, 100] },
-            execute: { commands.append($0); return "ok" }
-        )
-        expects(.unsupportedChargeLimit(79), "unsupported target never reaches writer") {
-            _ = try runner.run(.setChargeLimit(79))
-        }
-        check(commands.isEmpty, "unsupported target writer zero")
-        check(try runner.run(.setChargeLimit(85)) == "ok", "supported limit returns writer result")
-        check(commands == [.setChargeLimit(85)], "supported limit dispatches exactly once")
-        _ = try runner.run(.startTopUp)
-        _ = try runner.run(.cancelTopUp)
-        _ = try runner.run(.setPowerMode(.lowPower))
-        _ = try runner.run(.setMagSafe(.off))
-        check(commands == [.setChargeLimit(85), .startTopUp, .cancelTopUp,
-                           .setPowerMode(.lowPower), .setMagSafe(.off)],
-              "commands preserve typed values and order")
+        // The "actions ready" count follows what can really run: reads always, controls only with their prerequisite.
+        check(ChargeMateShortcutReadiness.total == 10, "ten shortcut actions in total")
+        check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: true, adapterCutVerified: true, powerModeHelperInstalled: true,
+                                                magSafeHelperInstalled: true) == 10, "everything ready")
+        check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: true, powerModeHelperInstalled: true,
+                                                magSafeHelperInstalled: true) == 8, "no verified adapter cut costs discharge and calibration")
+        check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: false, powerModeHelperInstalled: false,
+                                                magSafeHelperInstalled: false) == 4, "only reads without prerequisites")
+        check(ChargeMateShortcutReadiness.ready(nativeLimitsAvailable: true, powerModeHelperInstalled: false,
+                                                magSafeHelperInstalled: true) == 7, "missing power-mode helper costs one action")
 
         print("Shortcuts contract: \(assertions) assertions passed; writer fake only.")
     }

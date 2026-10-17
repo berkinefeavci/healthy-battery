@@ -59,6 +59,16 @@ enum ShortcutTopUpAction: String, AppEnum {
     ]
 }
 
+enum ShortcutRunAction: String, AppEnum {
+    case start
+    case cancel
+
+    static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Eylem")
+    static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
+        .start: "Başlat", .cancel: "İptal et"
+    ]
+}
+
 enum ShortcutPowerMode: String, AppEnum {
     case automatic
     case lowPower
@@ -171,6 +181,35 @@ struct ControlTopUpIntent: AppIntent {
     }
 }
 
+struct ControlDischargeIntent: AppIntent {
+    static let title: LocalizedStringResource = "Deşarjı Denetle"
+    static let description = IntentDescription("Kablo takılıyken adaptörü keserek pili şarj sınırına (ya da verilen seviyeye) indirir veya süren deşarjı iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir.")
+    static let openAppWhenRun = false
+
+    @Parameter(title: "Eylem")
+    var action: ShortcutRunAction
+
+    @Parameter(title: "Hedef yüzde", inclusiveRange: (20, 100))
+    var level: Int?
+
+    func perform() async throws -> some IntentResult & ReturnsValue<String> {
+        .result(value: try await ChargeMateShortcutService.controlDischarge(start: action == .start, level: level))
+    }
+}
+
+struct ControlCalibrationIntent: AppIntent {
+    static let title: LocalizedStringResource = "Kalibrasyonu Denetle"
+    static let description = IntentDescription("Kalibrasyonu başlatır (%100, 1 saat bekleme, %15, yeniden %100) veya iptal eder. Şarj yardımcısı ve geçen adaptör testi gerekir.")
+    static let openAppWhenRun = false
+
+    @Parameter(title: "Eylem")
+    var action: ShortcutRunAction
+
+    func perform() async throws -> some IntentResult & ReturnsValue<String> {
+        .result(value: try await ChargeMateShortcutService.controlCalibration(start: action == .start))
+    }
+}
+
 struct SetPowerModeIntent: AppIntent {
     static let title: LocalizedStringResource = "Güç Modunu Ayarla"
     static let description = IntentDescription("Önceden etkinleştirilmiş Healthy Battery yardımcısıyla macOS güç modunu değiştirir.")
@@ -217,6 +256,12 @@ struct ChargeMateAppShortcuts: AppShortcutsProvider {
         AppShortcut(intent: ControlTopUpIntent(),
                     phrases: ["\(.applicationName) Top Up denetle"],
                     shortTitle: "Top Up", systemImageName: "plus.circle")
+        AppShortcut(intent: ControlDischargeIntent(),
+                    phrases: ["\(.applicationName) deşarjı denetle"],
+                    shortTitle: "Deşarj", systemImageName: "minus.circle")
+        AppShortcut(intent: ControlCalibrationIntent(),
+                    phrases: ["\(.applicationName) kalibrasyonu denetle"],
+                    shortTitle: "Kalibrasyon", systemImageName: "arrow.triangle.2.circlepath")
         AppShortcut(intent: SetPowerModeIntent(),
                     phrases: ["\(.applicationName) güç modunu ayarla"],
                     shortTitle: "Güç modu", systemImageName: "speedometer")
@@ -260,6 +305,7 @@ private enum ChargeMateShortcutService {
                 state: ChargeMateShortcutState.resolve(
                     available: battery.available,
                     controlState: monitor.controlState.rawValue,
+                    advancedState: AdvancedChargeRunner.shared.shortcutKey,
                     policyState: monitor.policyState.shortcutKey,
                     isCharging: battery.isCharging,
                     externalConnected: battery.externalConnected
@@ -337,9 +383,38 @@ private enum ChargeMateShortcutService {
         return try requireSuccess(result)
     }
 
+    /// Discharge and calibration go through the adapter wiring, the only owner of the adapter cut.
+    static func controlDischarge(start: Bool, level: Int?) async throws -> String {
+        let result: Result<String, ScheduleAdapterRefusal> = await MainActor.run {
+            let adapter = AdapterModeController.shared
+            if start { return adapter.startDischarge(to: level) }
+            guard adapter.dischargeRunning else { return .failure(.init(message: String(localized: "Süren bir deşarj yok."))) }
+            AdvancedChargeRunner.shared.cancelDischarge()
+            return .success(String(localized: "Deşarj iptal edildi; adaptör geri açıldı."))
+        }
+        switch result {
+        case .success(let text): return text
+        case .failure(let refusal): throw ChargeMateShortcutError.commandFailed(refusal.message)
+        }
+    }
+
+    static func controlCalibration(start: Bool) async throws -> String {
+        let result: Result<String, ScheduleAdapterRefusal> = await MainActor.run {
+            let adapter = AdapterModeController.shared
+            if start { return adapter.beginCalibration() }
+            guard adapter.calibrationRunning else { return .failure(.init(message: String(localized: "Süren bir kalibrasyon yok."))) }
+            adapter.cancelCalibration()
+            return .success(String(localized: "Kalibrasyon iptal edildi; sınır geri yükleniyor."))
+        }
+        switch result {
+        case .success(let text): return text
+        case .failure(let refusal): throw ChargeMateShortcutError.commandFailed(refusal.message)
+        }
+    }
+
     static func setPowerMode(_ mode: SystemPowerMode) async throws -> String {
         guard SystemPowerModeService.availableModes().contains(mode) else {
-            throw ChargeMateShortcutError.commandFailed("\(mode.title) bu Mac'te desteklenmiyor.")
+            throw ChargeMateShortcutError.commandFailed(String(localized: "\(mode.title) bu Mac'te desteklenmiyor."))
         }
         switch SystemPowerModeService.applyInstalled(mode) {
         case .success(let confirmed): return String(localized: "\(confirmed.title) seçildi.")

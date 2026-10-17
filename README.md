@@ -31,6 +31,7 @@
 
 - **Charge limit, 80–100%.** Healthy Battery drives macOS's own native charge-limit control (the same mechanism macOS itself uses) to hold your battery at a target between 80% and 100% in 5% steps. Applying a limit is a real read/write round trip with an independent read-back check — see [Limitations](#how-it-works-and-limitations) for what that does and does not prove.
 - **Top Up.** Temporarily charge to 100% for a trip, then Healthy Battery restores your usual limit afterward.
+- **Heat protection (off by default).** While the battery charges on the adapter above 35 °C, the charge limit drops to 80% and Turbo is turned off; below 32 °C, or when the adapter is unplugged, your usual limit and power mode come back. It cannot stop charging if the battery is already below 80%. Settings → Charge Control.
 - **Live power flow.** A diagram of adapter, battery, CPU, display, and "other" power, in watts. CPU and display watts are read from Apple's SMC sensors; the total system draw comes from the battery controller. Nothing here is estimated or invented — if a value can't be measured, it shows as "—" instead of a guess.
 - **Connected device power.** When exactly one USB device is drawing power on exactly one active port, Healthy Battery shows its wattage (read-only, from the battery controller's port telemetry). With more than one device or port, it shows "—" rather than a guess.
 - **History charts.** 1 hour / 6 hour / 24 hour views of charge level, power draw, and battery health. The recorded readings can be exported as CSV from Settings → About.
@@ -39,8 +40,8 @@
 - **Power modes per source.** Automatic / High Power (Turbo) / Low Power (Battery Saver), tracked separately for "on battery" and "on adapter," backed by macOS's own `pmset` power profiles through a narrowly scoped, allowlisted helper.
 - **Sleep behavior.** Optional: while charging below your target with the adapter connected, Healthy Battery holds a public macOS idle-sleep assertion so your Mac keeps charging instead of going to sleep. It has an 8-hour safety cutoff and never touches lid-close or screen sleep. It does not pause charging by itself during sleep — see Limitations.
 - **MagSafe LED control.** Manual System / Green / Orange / Off control, plus an always-off or scheduled-hours policy, via a signed, narrowly scoped privileged helper that only writes one known SMC key.
-- **Schedules.** Recurring or one-off actions (apply a limit, switch power mode, and more) with a filterable execution history.
-- **Apple Shortcuts actions.** Eight App Intents to read battery percentage, temperature, and status, and to apply a limit, start/cancel Top Up, switch power mode, or set the MagSafe LED.
+- **Schedules.** Recurring or one-off actions (apply a limit, start Top Up, switch power mode, discharge to a level, start a calibration) with a filterable execution history and a retry that really re-runs the action.
+- **Apple Shortcuts actions.** Ten App Intents to read battery percentage, temperature, and status, and to apply a limit, start/cancel Top Up, start/cancel a discharge or calibration, switch power mode, or set the MagSafe LED.
 - **High-energy apps, with Quit.** The energy list groups helper processes under their owning app, shows a real icon, and lets you quit an app straight from the list.
 - **Updates from inside the app.** Healthy Battery asks GitHub for the latest release number at most once a day and shows one notification when a new version is out; both can be turned off in Settings → About. Press **Update** and it downloads that release, checks its checksum, Developer ID signature and Apple notarization, then replaces itself and relaunches. Nothing is sent; see [PRIVACY.md](PRIVACY.md).
 - **Conflict guard.** When another charge-limit tool is running or installed (AlDente, Battery Toolkit, BatFi, batt, battery, bclm), Healthy Battery keeps monitoring but locks its own limit writes, so two apps never fight over the same setting.
@@ -48,14 +49,17 @@
 - **Languages.** English, Türkçe, Deutsch, Français and Español; Healthy Battery follows your macOS language and falls back to English.
 - **Customizable panel.** Long-press a card (or right-click → Edit cards) to reorder, add or remove cards, switch square/wide, and choose which rows the battery-info card shows.
 
-### Planned; needs hardware verification
+### Through the adapter cut (experimental)
 
-These are shown in the UI as locked and marked **"Yakında"** (Coming soon). They are **not working features** — do not expect them to do anything yet:
+macOS 27 does not let any app pause charging while plugged in. What still works is cutting the adapter in software, so the Mac runs from the battery with the cable in. These features use that, through a separate charge helper (one administrator prompt) that only answers Healthy Battery and restores the adapter on unplug, sleep, quit or a missed heartbeat. They unlock after an automatic adapter test passes on your Mac:
 
-- **Discharge / auto-discharge** — no verified way to force the battery to discharge on this hardware.
-- **Sailing** (oscillate within a range) — needs a working pause/resume primitive that hasn't been found.
-- **Heat protection** — needs the same pause/resume primitive plus fresh temperature data.
-- **Calibration** — a long-running, restorable discharge/recharge cycle; not implemented.
+- **Discharge.** The minus button in the panel (or a schedule / Shortcut) runs the Mac from the battery down to the limit or a level you pick, then brings the adapter back.
+- **Calibration.** Charge to 100% (the macOS limit is lifted with Top Up), hold an hour, discharge to 15%, charge to 100% again, then restore the limit; 24 hours at most.
+- **Adapter mode.** Keeps a target from 20% to 100%: the adapter is cut at the target and restored 5 points lower.
+- **Sailing.** In adapter mode, widens that band to 5–15 points so the battery charges less often.
+- **Heat protection in adapter mode.** Above 35 °C while charging the adapter is cut until the battery is below 32 °C (never at or below 30%).
+
+All of them work only while the Mac is awake: the adapter is restored before sleep, and Discharge and Calibration keep the Mac from idle-sleeping while they run.
 
 ## Requirements
 
@@ -67,7 +71,7 @@ These are shown in the UI as locked and marked **"Yakında"** (Coming soon). The
 1. Download the latest `.dmg` from [Releases](../../releases). Release builds are signed with Developer ID and notarized by Apple.
 2. Open it and drag `Healthy Battery.app` to Applications.
 3. A build you made yourself with `./build.sh` is only ad-hoc signed; macOS will warn about it on first launch — open System Settings → Privacy & Security and allow it.
-4. The first time you use a feature that needs a privileged helper (power-mode switching or MagSafe LED control), macOS will ask for administrator approval once for that helper. No password is stored by Healthy Battery.
+4. The first time you use a feature that needs a privileged helper (power-mode switching, MagSafe LED control or adapter mode), macOS will ask for administrator approval once for that helper. No password is stored by Healthy Battery.
 
 ### With Homebrew
 
@@ -100,10 +104,13 @@ Manual alternative:
    ```sh
    sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.powermode 2>/dev/null
    sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.led 2>/dev/null
+   sudo launchctl bootout system/io.github.berkinefeavci.cellkeep.chargeinhibit 2>/dev/null
    sudo rm -f /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.powermode.plist
    sudo rm -f /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.led.plist
+   sudo rm -f /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.chargeinhibit.plist
    sudo rm -f /Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.powermode
    sudo rm -f /Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.led
+   sudo rm -f /Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.chargeinhibit
    ```
 4. If you uninstall manually, your macOS charge limit stays as it was: it is a macOS setting. Change it in System Settings → Battery if you want to.
 

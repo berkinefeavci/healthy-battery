@@ -27,6 +27,7 @@ cask "cellkeep" do
         "io.github.berkinefeavci.cellkeep.powermode",
       ],
       delete:    [
+        "/Library/Application Support/CellkeepChargeInhibit",
         "/Library/Application Support/CellkeepLED",
         "/Library/Application Support/CellkeepPowerMode",
         "/Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.chargeinhibit.plist",

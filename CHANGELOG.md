@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.5.0
+
+- The power-mode and MagSafe light helpers (version 3) answer only Healthy Battery signed by the same developer, like the charge helper since 1.4.2. Before, any program running as your user could change the power mode or the light. Both ask for the administrator password once more, the next time you change the power mode or set up the light.
+- A dismissed administrator prompt is no longer shown as a failure. Uninstall says which steps did not finish instead of always reporting success, and keeps the app open when something is left.
+- The in-app updater checks the downloaded app against an explicit Developer ID requirement (your installed app's team and bundle id) and follows download redirects only to GitHub's own hosts.
+- Schedule: "Run as new execution" in the history now really runs the action again (limit, Top Up or power mode) and shows the real result. Pause charging cannot run on any Mac, so it is no longer offered; "Add task" starts from Top Up and the two calibration templates are gone. Tasks saved earlier with it still load and show as unsupported. The page text now says what runs.
+- Failures are no longer swallowed: a Top Up that did not start, a limit that macOS refused (also with the limit editor closed) and a long-term history file that could not be saved show their reason. Helper and policy error messages follow the app language.
+- Heat protection is one switch (Settings → Charge Control → Automatic protection); the locked "Soon" row, the unused heat/sailing/maximum-temperature preferences and the unused "sleep behaviour" advanced setting are gone. Discharge and calibration buttons appear only on Macs that can use them. The MagSafe "by state" policy, which could not be selected, is removed.
+- The history range (1 / 6 / 24 h) now applies to the charts at rest, on square cards too; hovering only adds the axes.
+- An Edit menu makes ⌘C, ⌘V, ⌘X, ⌘Z and ⌘A work in text fields. The onboarding button opens the Dashboard, the Shortcuts page counts the actions that can really run, and the Dashboard status dot follows the real state.
+- Lower background cost: the 24-hour history is saved at most every 2 minutes (and when you quit or the Mac sleeps) instead of every 30 seconds, without re-reading and re-encoding the whole file each time; unchanged values no longer wake the interface. A crash can lose up to two minutes of chart points.
+- Docs: SECURITY.md lists all three helpers, the manual uninstall removes the charge helper too, and the Homebrew instructions agree.
+- Adapter mode no longer lets go of its own cut. While Healthy Battery cuts the adapter, macOS reports "no external power", and the app took that as the cable being pulled out: it brought the adapter back at the next battery reading and cut it again a moment later. It now asks the charge helper, which checks the cable itself, so the adapter stays cut until the battery reaches the resume level, and a real unplug still ends it at once.
+- The panel's status card no longer says "The adapter is not connected" and "Holding the limit: 80%" while adapter mode has cut the adapter. It says the cable is in, the Mac runs on battery and the adapter comes back on its own, and shows the adapter target.
+- Discharge works on Macs that only allow cutting the adapter (macOS 27): the minus button in the panel runs the Mac from the battery with the cable plugged in, down to the limit, then brings the adapter back. It needs the charge helper and a passed adapter test; adapter mode itself can stay off. Click again to cancel.
+- Calibration works the same way: charge to 100% (Healthy Battery lifts the macOS limit with Top Up), hold for an hour, discharge to 15%, charge to 100% again, then the limit comes back. 24 hours at most.
+- During a discharge or calibration the Mac does not idle-sleep. If the lid closes or the Mac sleeps anyway, the adapter comes back first and the work continues after waking.
+- Sailing in adapter mode: with Sailing on, the adapter comes back only after the battery drops by the sailing range (5–15 points) instead of 5, so the battery charges less often.
+- Heat protection in adapter mode: with Automatic protection on, the adapter is cut when the battery goes above 35 °C while charging, and charging continues below 32 °C. Never below 30% charge.
+- Schedules can run "Discharge to target" and "Start calibration" on Macs where the adapter cut is verified; elsewhere the editor says what is missing. "Pause charging" stays unavailable.
+- Two new Shortcuts actions: Control Discharge (start to the limit or a given percentage, or cancel) and Control Calibration (start or cancel). The status action now also reports calibration, discharge and heat protection driven by the adapter cut.
+- Menu bar: Calibration, Heat protection and Sailing can be shown and display their live state ("Cal. 3/4", "Sailing 70–80%").
+- Cancelling a calibration also ends the Top Up it started, even after the app was restarted in between.
+- The README describes discharge, calibration, adapter mode, sailing and heat protection as experimental features instead of "coming soon".
+
 ## 1.4.2
 
 - Adapter mode tests itself. Right after the charge helper is installed (or the next time the adapter is plugged in), Healthy Battery cuts the adapter, waits for the battery gauge to report that the battery really powers the Mac (it reports only about once a minute), brings the adapter back, then cuts it once more without heartbeats and checks that the helper's 60-second safety timer restores it. It takes a few minutes and always ends with the adapter on. Adapter mode can be turned on only after this test passes; the result is shown in Settings → Charge Control.

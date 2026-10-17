@@ -71,7 +71,7 @@ struct ScheduleView: View {
                         .chargeMateButtonStyle()
                 }
             }
-            Label("Zamanlayıcı hazır; görev yürütme güvenlik kapısı kapalı. Doğrulanmış sistem yazıcısı olmadan hiçbir görev macOS ayarını değiştirmez.", systemImage: "lock.shield")
+            Label("Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma, güç modu, hedefe kadar boşaltma ve kalibrasyon görevleri zamanı gelince gerçekten çalışır; sonuçlar Görev geçmişinde görünür. Boşaltma ve kalibrasyon şarj yardımcısı ile geçen adaptör testi ister. Şarjı duraklatmaya macOS izin vermiyor.", systemImage: "lock.shield")
                 .font(.caption).foregroundStyle(.secondary).chargeCard()
             ScheduleHistoryView(records: records,
                 taskNames: Dictionary(uniqueKeysWithValues: tasks.map { ($0.id, $0.name) }),
@@ -95,7 +95,7 @@ struct ScheduleView: View {
             case .execution(let record):
                 ScheduleExecutionDetailView(record: record,
                     taskName: tasks.first(where: { $0.id == record.taskID })?.name ?? String(localized: "Silinmiş görev"),
-                    onRetry: retry)
+                    retryAllowed: retryAllowed(record), onRetry: retry)
             }
         }
     }
@@ -156,22 +156,52 @@ struct ScheduleView: View {
         }
         catch { warning = String(localized: "Programlar kaydedilemedi: \(error.localizedDescription)") }
     }
+    /// A finished run can be tried again when the task still exists, the action can run on this Mac right
+    /// now (its capability is there) and the scheduler is running.
+    private func retryAllowed(_ record: ScheduleExecutionRecord) -> Bool {
+        record.status.isTerminal && ![.configurationVerified, .completed].contains(record.status)
+            && ScheduleRuntime.shared != nil
+            && tasks.contains { $0.id == record.taskID }
+            && record.actionSnapshot.availability(in: battery.scheduleCapabilities) == nil
+    }
+
+    /// Runs the action again through the scheduler (same admission rules and writers as a scheduled run) and
+    /// says what really happened.
     private func retry(_ record: ScheduleExecutionRecord) -> String {
-        do {
-            let retry = try executionStore.appendUnsupportedRetry(of: record, now: Date())
+        guard let runtime = ScheduleRuntime.shared, let retried = runtime.retry(record) else {
             load()
-            return String(localized: "Yeni çalışma \(retry.executionID.uuidString.prefix(8)) kimliğiyle kaydedildi. Doğrulanmış writer olmadığı için sistem ayarı değiştirilmedi.")
-        } catch {
-            return String(localized: "Yeni çalışma kaydedilemedi: \(error.localizedDescription)")
+            return String(localized: "Yeni çalışma başlatılamadı: görev silinmiş ya da kayıt yazılamadı.")
+        }
+        load()
+        let id = String(retried.executionID.uuidString.prefix(8))
+        switch retried.status {
+        case .configurationVerified, .completed:
+            return String(localized: "Yeni çalışma \(id) tamamlandı; ayar okunarak doğrulandı.")
+        case .running:
+            return String(localized: "Yeni çalışma \(id) başladı; sonuç Görev geçmişinde güncellenir.")
+        default:
+            return String(localized: "Yeni çalışma \(id) tamamlanamadı: \(retried.failureReason ?? retried.status.title)")
         }
     }
 }
 
 private struct ScheduleEditor: View {
     @State var task: ScheduleTask
+    /// The action the task had when the editor opened: an old task saved with an action that cannot run any
+    /// more stays selectable (and visibly unsupported) until the user picks another one.
+    private let initialAction: ScheduleAction
     let capabilities: ScheduleCapabilities
     let onSave: (ScheduleTask) -> Void
     let onCancel: () -> Void
+
+    init(task: ScheduleTask, capabilities: ScheduleCapabilities,
+         onSave: @escaping (ScheduleTask) -> Void, onCancel: @escaping () -> Void) {
+        _task = State(initialValue: task)
+        initialAction = task.action
+        self.capabilities = capabilities
+        self.onSave = onSave
+        self.onCancel = onCancel
+    }
 
     private var timezone: TimeZone { TimeZone(identifier: task.timezoneID) ?? .current }
     private var calendar: Calendar { var c = Calendar(identifier: .gregorian); c.timeZone = timezone; return c }
@@ -188,7 +218,7 @@ private struct ScheduleEditor: View {
             Form {
                 TextField("Ad", text: $task.name)
                 Picker("Eylem", selection: $task.action) {
-                    ForEach(ScheduleAction.allCases) { Text($0.title).tag($0) }
+                    ForEach(ScheduleAction.offered(keeping: initialAction)) { Text($0.title).tag($0) }
                 }.onChange(of: task.action) { action in task.target = action.needsTarget ? (task.target ?? capabilities.chargeLimits.first ?? 80) : nil }
                 if task.action.needsTarget {
                     Stepper("Hedef: %\(task.target ?? 80)", value: Binding(get: { task.target ?? 80 }, set: { task.target = $0 }), in: 20...100, step: 5)

@@ -45,11 +45,12 @@ grep -Fq '.focusable().focused($focused).quietVisualizationFocus()' Sources/Char
 grep -Fq '.allowsHitTesting(!battery.applyingPowerMode)' Sources/ChargeMate/PowerModeView.swift
 grep -Fq 'if let message = battery.powerModeMessage' Sources/ChargeMate/PowerModeView.swift
 ! grep -Eq 'Top Up.*disabled\(true\)|disabled\(true\).*Top Up' Sources/ChargeMate/Views.swift
-# Popover quick actions stay explicit: Top Up is shown as Doldur; unsupported
-# force-battery control is visible but cannot pretend to work.
-grep -Fq '.accessibilityLabel("Deşarj yakında; henüz kullanılamıyor")' Sources/ChargeMate/Views.swift
+# Popover quick actions stay explicit: Top Up is shown as Doldur; Discharge only acts through the
+# verified adapter cut and is disabled (with its reason) otherwise.
+grep -Fq 'Button { adapter.toggleDischarge() }' Sources/ChargeMate/Views.swift
+grep -Fq '.disabled(!adapter.dischargeRunning && adapter.dischargeBlockReason != nil)' Sources/ChargeMate/Views.swift
+grep -Fq 'var adapterCutAvailable: Bool { kind == .adapter && runner.capabilities.canForceDischarge }' Sources/ChargeMate/AdapterModeController.swift
 grep -Fq 'Text("Doldur")' Sources/ChargeMate/Views.swift
-grep -Fq '.popoverToolbarButtonStyle(iconOnly: true).disabled(true)' Sources/ChargeMate/Views.swift
 grep -Fq 'Text("Sınır: %\(shownLimit)")' Sources/ChargeMate/Views.swift
 # Panel must show the limit macOS really enforces, never only the saved preference.
 grep -Fq 'ChargeLimitDisplay.shown(native: battery.nativeLimit' Sources/ChargeMate/Views.swift
@@ -138,9 +139,14 @@ xcrun swiftc Sources/ChargeMate/IdentityMigration.swift Tests/IdentityMigrationT
 
 xcrun swiftc Sources/ChargeMate/UninstallPlan.swift Tests/UninstallPlanTests.swift -o .build/checks/uninstall-plan-tests
 .build/checks/uninstall-plan-tests
-xcrun clang -Wall -Wextra -Werror Tools/PowerModeHelper.c -o .build/checks/power-mode-helper-tests
+xcrun clang -Wall -Wextra -Werror Tools/PowerModeHelper.c -framework CoreFoundation -framework Security -o .build/checks/power-mode-helper-tests
 .build/checks/power-mode-helper-tests --self-test
-test "$(.build/checks/power-mode-helper-tests --version)" = "2"
+test "$(.build/checks/power-mode-helper-tests --version)" = "3"
+# MagSafe LED helper: build + caller-requirement self-test (no SMC access in --self-test).
+xcrun clang -Wall -Wextra -Werror Tools/MagSafeLEDProbe.c -framework IOKit -framework CoreFoundation -framework Security \
+  -o .build/checks/led-helper
+.build/checks/led-helper --self-test
+test "$(.build/checks/led-helper --version)" = "3"
 
 # Faz 3 charge-inhibit helper: pure safety logic (allowlist, verify, watchdog, battery floor, unplug,
 # sleep, shutdown) runs against a fake SMC. The helper itself is only built and --self-tested here;
@@ -226,7 +232,7 @@ xcrun swiftc Sources/ChargeMate/SettingsLayout.swift Tests/SettingsLayoutTests.s
 xcrun swiftc -I .build/checks Sources/ChargeMate/SMCReader.swift Sources/ChargeMate/NativeChargeBackend.swift Sources/ChargeMate/ChargePolicy.swift Sources/ChargeMate/ExternalChangePolicy.swift Sources/ChargeMate/ChargePolicyController.swift Sources/ChargeMate/Schedule.swift \
   Sources/ChargeMate/ChargeControlCoordinator.swift Sources/ChargeMate/PowerMode.swift Sources/ChargeMate/HelperInstallState.swift Sources/ChargeMate/ConnectedDevice.swift Sources/ChargeMate/EnergyPresentation.swift Sources/ChargeMate/ChargeControllerDetector.swift Sources/ChargeMate/LongTermHistory.swift Sources/ChargeMate/BatteryMonitor.swift Sources/ChargeMate/EnergyLedger.swift \
   Sources/ChargeMate/MenubarPreferences.swift Sources/ChargeMate/MenubarPresentation.swift \
-  Tests/MenubarTests.swift .build/checks/PowerUIBridge.o -o .build/checks/menubar-tests
+  Sources/ChargeMate/MacOSBatteryCondition.swift Tests/MenubarTests.swift .build/checks/PowerUIBridge.o -o .build/checks/menubar-tests
 .build/checks/menubar-tests "$PWD/.build/ChargeMate.app" "$PWD/.build/checks/menubar-preview.png"
 
 # Yardım/tanılama: geçici defaults ve dosyalar, sahte donanım; NSSavePanel açılmaz.

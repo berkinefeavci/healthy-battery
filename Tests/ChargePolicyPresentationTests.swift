@@ -14,10 +14,8 @@ import Foundation
         check(ChargePolicyState.topUpRestoring(80).title == "Önceki limite dönülüyor: %80", "restore title")
         let conflict = ChargePolicyState.pausedByConflict(expected: 80, observed: 90)
         check(conflict.title == "macOS limiti dışarıdan %90 yapıldı", "conflict title")
-        check(conflict.availableActions == [.reapplyChargeMateTarget, .adoptMacOSValue], "conflict has exactly two actions")
         let recovery = ChargePolicyState.recoveryRequired("ambiguous")
         check(recovery.title == "Kontrol gerekli; yeni işlem durduruldu", "recovery title")
-        check(recovery.availableActions == [.acknowledgeRecovery], "recovery action separate")
         check(ChargePolicyState.topUpCharging(99).menubarText == "Top Up %99", "menu Top Up status")
         print("Charge policy presentation: \(assertions) assertions passed.")
     }

@@ -13,8 +13,10 @@ struct MenubarPresentation {
     let lowPower: Bool
     let values: [MenubarValue]
 
+    /// `controlStates`: short live texts for metrics outside the battery snapshot (calibration, heat
+    /// protection, sailing, macOS condition); a missing entry shows "—".
     init(preferences: MenubarPreferences, snapshot: BatterySnapshot, lowPower: Bool,
-         policyState: ChargePolicyState = .idle, now: Date = Date()) {
+         policyState: ChargePolicyState = .idle, controlStates: [MenubarMetric: String] = [:], now: Date = Date()) {
         self.preferences = preferences.normalized()
         self.mode = PowerFlowPresentation(snapshot: snapshot, now: now).mode
         self.percentage = snapshot.reading(.percentage, now: now).validValue
@@ -36,7 +38,8 @@ struct MenubarPresentation {
             case .adapterVoltageV: field = .adapterVoltage
             case .adapterWatts: field = .adapterPower
             case .topUp: return MenubarValue(metric: metric, text: policyState.menubarText)
-            default: return MenubarValue(metric: metric, text: "—")
+            case .calibration, .heatProtection, .sailing, .macOSCondition:
+                return MenubarValue(metric: metric, text: controlStates[metric] ?? "—")
             }
             let reading = snapshot.reading(field, now: now)
             var text = reading.text(digits: [.percentage, .hardwarePercentage, .cycles, .current, .timeRemaining].contains(field) ? 0 : 1)

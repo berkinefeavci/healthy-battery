@@ -62,8 +62,6 @@ struct ScheduleExecutionRecord: Codable, Identifiable, Equatable {
     var status: ScheduleExecutionStatus
     var failureReason: String?
     var operationID: UUID?
-
-    var idempotencyKey: String { "\(taskID.uuidString)|\(plannedAt.timeIntervalSince1970)" }
 }
 
 struct ScheduleExecutionLoadResult {
@@ -106,21 +104,6 @@ struct ScheduleExecutionStore {
         let rows = try retained.map { try JSONSerialization.jsonObject(with: encoder.encode($0)) }
         let data = try JSONSerialization.data(withJSONObject: ["schemaVersion": 1, "records": rows], options: [.prettyPrinted, .sortedKeys])
         try data.write(to: url, options: .atomic)
-    }
-
-    /// A retry is an explicit new attempt. Until a coordinator-backed scheduled
-    /// writer is verified it terminates as unsupported and cannot touch hardware.
-    func appendUnsupportedRetry(of original: ScheduleExecutionRecord, now: Date) throws -> ScheduleExecutionRecord {
-        var records = load().records
-        let retry = ScheduleExecutionRecord(executionID: UUID(), taskID: original.taskID,
-            plannedAt: now, startedAt: now, finishedAt: now,
-            actionSnapshot: original.actionSnapshot, requestedValue: original.requestedValue,
-            timezoneIDSnapshot: original.timezoneIDSnapshot, observedResult: nil,
-            status: .unsupported, failureReason: original.actionSnapshot.unavailableReason,
-            operationID: nil)
-        records.append(retry)
-        try save(records, now: now)
-        return retry
     }
 
     static func pruned(_ records: [ScheduleExecutionRecord], now: Date) -> [ScheduleExecutionRecord] {
@@ -261,28 +244,62 @@ final class ScheduleEngine {
                 continue
             }
 
-            let record = makeRecord(task: task, plannedAt: candidate.plannedAt, status: .planned)
-            records.append(record)
-            do { try executionStore.save(records, now: now) }
-            catch { warning = String(localized: "Çalışma kimliği kaydedilemedi; görev gönderilmedi: \(error.localizedDescription)"); continue }
-            guard let row = records.firstIndex(where: { $0.executionID == record.executionID }) else { continue }
-            records[row].status = .dispatched
-            records[row].startedAt = now
-            do { try executionStore.save(records, now: now) }
-            catch { warning = String(localized: "Dispatch kaydı doğrulanamadı; görev gönderilmedi: \(error.localizedDescription)"); continue }
-
+            guard let finished = dispatchPersisted(task, plannedAt: candidate.plannedAt, records: &records, now: now,
+                                                   warning: &warning) else { continue }
             admittedTimes.insert(candidate.plannedAt)
-            let outcome = dispatcher(task, candidate.plannedAt, record.executionID)
-            records[row].status = outcome.status
-            records[row].observedResult = outcome.observedResult
-            records[row].failureReason = outcome.failureReason
-            records[row].operationID = outcome.operationID
-            if outcome.status.isTerminal { records[row].finishedAt = now }
-            if task.recurrence == .once && outcome.status.isTerminal { tasks[candidate.index].enabled = false }
+            if task.recurrence == .once && finished.status.isTerminal { tasks[candidate.index].enabled = false }
         }
         do { try executionStore.save(records, now: now) }
         catch { warning = warning ?? String(localized: "Görev sonucu kaydedilemedi: \(error.localizedDescription)") }
         return .init(tasks: tasks, records: records, nextFireDate: Self.nextFireDate(tasks: tasks, after: now), warning: warning)
+    }
+
+    /// The idempotency barrier shared by scheduled runs and explicit retries: a `planned` row, then a
+    /// `dispatched` row are persisted BEFORE the dispatcher is entered, so a crash can never replay the run.
+    /// Returns the finished record, or nil (with `warning`) when the barrier could not be persisted and nothing
+    /// was dispatched.
+    private func dispatchPersisted(_ task: ScheduleTask, plannedAt: Date, records: inout [ScheduleExecutionRecord],
+                                   now: Date, warning: inout String?) -> ScheduleExecutionRecord? {
+        let record = makeRecord(task: task, plannedAt: plannedAt, status: .planned)
+        records.append(record)
+        do { try executionStore.save(records, now: now) }
+        catch { warning = String(localized: "Çalışma kimliği kaydedilemedi; görev gönderilmedi: \(error.localizedDescription)"); return nil }
+        guard let row = records.firstIndex(where: { $0.executionID == record.executionID }) else { return nil }
+        records[row].status = .dispatched
+        records[row].startedAt = now
+        do { try executionStore.save(records, now: now) }
+        catch { warning = String(localized: "Dispatch kaydı doğrulanamadı; görev gönderilmedi: \(error.localizedDescription)"); return nil }
+
+        let outcome = dispatcher(task, plannedAt, record.executionID)
+        records[row].status = outcome.status
+        records[row].observedResult = outcome.observedResult
+        records[row].failureReason = outcome.failureReason
+        records[row].operationID = outcome.operationID
+        if outcome.status.isTerminal { records[row].finishedAt = now }
+        return records[row]
+    }
+
+    /// An explicit new attempt of a finished run ("Yeni çalışma olarak dene"). It takes the original action and
+    /// value, runs through the same admission rule (a manual operation wins), the same barrier and the same
+    /// dispatcher as a scheduled run, and records a NEW execution; the old record is never rewritten.
+    /// Returns the new record, or nil when it could not be saved (nothing was dispatched then).
+    func retry(of original: ScheduleExecutionRecord, task: ScheduleTask, now: Date) -> ScheduleExecutionRecord? {
+        var records = executionStore.load().records
+        var retried = task
+        retried.action = original.actionSnapshot
+        retried.target = original.requestedValue
+        var warning: String?
+        if manualOperationActive() {
+            var record = makeRecord(task: retried, plannedAt: now, status: .skippedConflict)
+            record.finishedAt = now
+            record.failureReason = String(localized: "Elle başlatılan işlem öncelikli olduğu için görev atlandı.")
+            records.append(record)
+            guard (try? executionStore.save(records, now: now)) != nil else { return nil }
+            return record
+        }
+        guard let finished = dispatchPersisted(retried, plannedAt: now, records: &records, now: now, warning: &warning),
+              (try? executionStore.save(records, now: now)) != nil else { return nil }
+        return finished
     }
 
     static func nextFireDate(tasks: [ScheduleTask], after now: Date) -> Date? {
@@ -304,14 +321,26 @@ extension Notification.Name {
     static let chargeMateScheduleRuntimeUpdated = Notification.Name("ChargeMateScheduleRuntimeUpdated")
 }
 
+/// Why a scheduled discharge or calibration did not start. `conflict`: the situation (no adapter, battery
+/// already low, another run active) rather than a fault.
+struct ScheduleAdapterRefusal: Error, Equatable {
+    var message: String
+    var conflict = true
+}
+
 #if canImport(AppKit)
-/// Main-run-loop host. Production currently exposes no scheduled writer: every
-/// action is recorded as unsupported until its coordinator-backed capability is
-/// separately verified and explicitly enabled by the user.
+/// Main-run-loop host. Charge-limit, Top Up and power-mode tasks run through the injected dispatchers, which are
+/// the same coordinator-backed paths the manual buttons use. Every other action (pause charging, calibration,
+/// discharge to a target) has no verified writer and is recorded as unsupported.
 final class ScheduleRuntime {
+    /// The running host, for the history sheet's explicit retry. Set by `start()`, cleared by `stop()`.
+    private(set) static weak var shared: ScheduleRuntime?
+
     typealias ChargeLimitDispatcher = (Int) -> ChargeControlCoordinator.Result
     typealias TopUpDispatcher = (UUID) -> ChargeControlCoordinator.Result
     typealias PowerDispatcher = (SystemPowerMode) -> Result<SystemPowerMode, SystemPowerModeService.WriteError>
+    /// Starts a discharge to the given level / a calibration; returns the started text or the reason it could not.
+    typealias AdapterDispatcher = (Int?) -> Result<String, ScheduleAdapterRefusal>
     private let scheduleStore: ScheduleStore
     private let engine: ScheduleEngine
     private let capabilities: () -> ScheduleCapabilities
@@ -328,7 +357,9 @@ final class ScheduleRuntime {
          topUp: @escaping TopUpDispatcher = { _ in
              .init(operationID: UUID(), status: .rejected, state: nil, message: String(localized: "Top Up kullanılamıyor."))
          },
-         powerMode: @escaping PowerDispatcher = SystemPowerModeService.applyInstalled) {
+         powerMode: @escaping PowerDispatcher = SystemPowerModeService.applyInstalled,
+         discharge: @escaping AdapterDispatcher = { _ in .failure(.init(message: String(localized: "Deşarj kullanılamıyor."))) },
+         calibration: @escaping AdapterDispatcher = { _ in .failure(.init(message: String(localized: "Kalibrasyon kullanılamıyor."))) }) {
         scheduleStore = ScheduleStore(url: directory.appendingPathComponent("schedules.json"))
         let executions = ScheduleExecutionStore(url: directory.appendingPathComponent("schedule-executions.json"))
         self.capabilities = capabilities
@@ -346,14 +377,20 @@ final class ScheduleRuntime {
                 return Self.outcome(powerMode(.automatic))
             case .enableHighPower:
                 return Self.outcome(powerMode(.turbo))
-            case .pauseCharging, .startCalibration, .dischargeTo:
-                return .unsupported(task.action.availability(in: capabilities()) ?? "Desteklenmiyor.")
+            case .dischargeTo:
+                guard let target = task.target else { return .unsupported(String(localized: "Deşarj hedefi eksik.")) }
+                return Self.outcome(discharge(target))
+            case .startCalibration:
+                return Self.outcome(calibration(nil))
+            case .pauseCharging:
+                return .unsupported(task.action.unavailableReason)
             }
         }
     }
 
     func start() {
         guard !started else { return }; started = true
+        Self.shared = self
         _ = engine.recoverInterrupted(now: Date())
         let center = NotificationCenter.default
         observers.append(center.addObserver(forName: .chargeMateScheduleChanged, object: nil, queue: .main) { [weak self] _ in self?.evaluate(.listChange) })
@@ -378,6 +415,17 @@ final class ScheduleRuntime {
         timer?.invalidate(); timer = nil
         observers.forEach { NotificationCenter.default.removeObserver($0); NSWorkspace.shared.notificationCenter.removeObserver($0) }
         observers.removeAll(); started = false
+        if Self.shared === self { Self.shared = nil }
+    }
+
+    /// Re-runs a finished execution on explicit request (history sheet). Same engine, admission rules and
+    /// dispatchers as a scheduled run. Returns the new record, or nil when the task no longer exists or
+    /// the record could not be saved.
+    func retry(_ record: ScheduleExecutionRecord) -> ScheduleExecutionRecord? {
+        guard let task = scheduleStore.load().tasks.first(where: { $0.id == record.taskID }) else { return nil }
+        let result = engine.retry(of: record, task: task, now: Date())
+        NotificationCenter.default.post(name: .chargeMateScheduleRuntimeUpdated, object: nil)
+        return result
     }
 
     private func evaluate(_ trigger: ScheduleEvaluationTrigger) {
@@ -411,6 +459,18 @@ final class ScheduleRuntime {
         case .pending, .reconciled:
             return .init(status: .failed, observedResult: nil,
                          failureReason: result.message, operationID: result.operationID)
+        }
+    }
+
+    /// Discharge and calibration hand over to the advanced charge engine and finish there (they can take
+    /// hours and survive restarts), so a started request is the scheduled run's verified result.
+    static func outcome(_ result: Result<String, ScheduleAdapterRefusal>) -> ScheduleDispatchOutcome {
+        switch result {
+        case .success(let started):
+            return .init(status: .configurationVerified, observedResult: started, failureReason: nil, operationID: nil)
+        case .failure(let refusal):
+            return .init(status: refusal.conflict ? .skippedConflict : .failed, observedResult: nil,
+                         failureReason: refusal.message, operationID: nil)
         }
     }
 

@@ -11,19 +11,18 @@ enum MagSafeLEDRawCodec {
         }
     }
 
-    static func encode(_ output: MagSafeLEDOutput) -> UInt8? {
+    static func encode(_ output: MagSafeLEDOutput) -> UInt8 {
         switch output {
         case .system: return 0
         case .off: return 1
         case .green: return 3
         case .orange: return 4
-        case .blinkingOrange: return nil
         }
     }
 }
 
-/// Crash-aware ownership for a future privileged LED backend. Production deliberately does
-/// not construct this coordinator until the physical protocol and helper are approved.
+/// Crash-aware ownership of a manual LED test: remembers the colour from before the test in a journal, so the
+/// original policy is restored after a crash or a forgotten "Testi bitir". Built by `MagSafeLEDHardwareService`.
 final class MagSafeLEDControlCoordinator {
     struct Backend {
         let supportedOutputs: Set<MagSafeLEDOutput>
@@ -66,7 +65,7 @@ final class MagSafeLEDControlCoordinator {
 
     func apply(_ output: MagSafeLEDOutput) -> Outcome {
         guard !journalCorrupt else { return .blocked(String(localized: "Önceki LED oturumu okunamıyor.")) }
-        guard output != .blinkingOrange, backend.supportedOutputs.contains(output) else {
+        guard backend.supportedOutputs.contains(output) else {
             return .blocked(String(localized: "Bu LED çıktısı backend tarafından desteklenmiyor."))
         }
         if let current = session {

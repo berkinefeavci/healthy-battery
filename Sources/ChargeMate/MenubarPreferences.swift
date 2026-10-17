@@ -52,28 +52,24 @@ enum MenubarMetric: String, Codable, CaseIterable, Identifiable {
         default: return "Batarya"
         }
     }
-    var unavailableReason: String? {
-        switch self {
-        case .macOSCondition: return String(localized: "macOS pil durumu için doğrulanmış veri kaynağı bulunmuyor.")
-        case .calibration, .heatProtection, .sailing:
-            return String(localized: "Bu kontrol henüz etkin değil; doğrulanmış işlem durumu bekleniyor.")
-        case .topUp: return nil
-        default: return nil
-        }
-    }
+    /// Every metric has a live source now; kept so a future metric without one can say why.
+    var unavailableReason: String? { nil }
 }
 
 enum MenubarRightClick: String, Codable, CaseIterable, Identifiable {
     case none, likeLeftClick, openDashboard, toggleCharging, toggleLowPower
     var id: String { rawValue }
-    var supported: Bool { self != .toggleCharging && self != .toggleLowPower }
+    /// Every action runs; Discharge explains itself (tooltip) when this Mac cannot cut the adapter.
+    var supported: Bool { true }
     var title: String {
         switch self {
         case .none: return String(localized: "Hiçbir şey yapma")
         case .likeLeftClick: return String(localized: "Paneli aç / kapat")
         case .openDashboard: return String(localized: "Gösterge Tablosu’nu aç")
-        case .toggleCharging: return String(localized: "Şarjı başlat / durdur — henüz kullanılamıyor")
-        case .toggleLowPower: return String(localized: "Düşük Güç Modunu değiştir — henüz kullanılamıyor")
+        // Raw value kept for saved preferences: charging cannot be paused on macOS 27, so this
+        // starts or cancels a discharge through the adapter cut.
+        case .toggleCharging: return String(localized: "Deşarjı başlat / durdur")
+        case .toggleLowPower: return String(localized: "Düşük Güç Modunu aç / kapat")
         }
     }
 }

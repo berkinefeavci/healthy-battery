@@ -92,6 +92,11 @@ static int readLED(uint8_t *value) {
 
 int main(int argc, char **argv) {
     if (argc == 2 && !strcmp(argv[1], "--version")) { printf("%d\n", LED_HELPER_VERSION); return 0; }
+    if (argc == 2 && !strcmp(argv[1], "--self-test")) {
+        if (cs_self_test()) return 1;
+        puts("LED helper: caller-requirement assertions passed; no SMC access.");
+        return 0;
+    }
     if (argc == 3 && !strcmp(argv[1], "--authorize-uid")) {
         char *tail; long uid = strtol(argv[2], &tail, 10);
         return *argv[2] && !*tail && uid >= 0 && uid <= INT_MAX ? authorizeUID((uid_t)uid) : 2;
@@ -149,6 +154,7 @@ int main(int argc, char **argv) {
         goto done;
     }
     if (daemon) {
+        cs_load_requirement("led");
         int server = openServer();
         if (server < 0) return 4;
         int previousDesired = -1;

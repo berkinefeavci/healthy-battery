@@ -180,6 +180,7 @@ enum ScheduleSchedulerTests {
         }
 
         do {
+            // Retry: a real new run through the dispatcher, never a rewrite of the old record.
             let url = root.appendingPathComponent("retry.json")
             let store = ScheduleExecutionStore(url: url)
             let original = ScheduleExecutionRecord(executionID: UUID(), taskID: UUID(),
@@ -188,17 +189,49 @@ enum ScheduleSchedulerTests {
                 requestedValue: 85, timezoneIDSnapshot: "Europe/Istanbul", observedResult: nil,
                 status: .failed, failureReason: "fake failure", operationID: nil)
             try store.save([original], now: now)
-            let retry = try store.appendUnsupportedRetry(of: original, now: now)
+            var task = enabledTask(id: original.taskID, catchUp: true, last: prior)
+            task.action = .topUp; task.target = nil // edited since: the retry still repeats the original run
+            var dispatched: [(ScheduleAction, Int?)] = []
+            var persistedBeforeDispatch: [ScheduleExecutionStatus] = []
+            let engine = ScheduleEngine(executionStore: store) { retried, _, executionID in
+                dispatched.append((retried.action, retried.target))
+                persistedBeforeDispatch = store.load().records.filter { $0.executionID == executionID }.map(\.status)
+                return .init(status: .configurationVerified, observedResult: "fake readback", failureReason: nil, operationID: executionID)
+            }
+            let retry = engine.retry(of: original, task: task, now: now)
             let loaded = store.load().records
-            check(retry.executionID != original.executionID && loaded.count == 2, "retry creates a new execution identity")
+            check(dispatched.count == 1 && dispatched[0].0 == .setChargeLimit && dispatched[0].1 == 85, "retry repeats the original action and value")
+            check(persistedBeforeDispatch == [.dispatched], "retry persists its idempotency row before the dispatcher runs")
+            check(retry?.status == .configurationVerified && retry?.observedResult == "fake readback", "retry reports the real outcome")
+            check(retry?.executionID != original.executionID && loaded.count == 2, "retry creates a new execution identity")
             check(loaded.first(where: { $0.executionID == original.executionID })?.status == .failed, "retry never rewrites old failure")
-            check(retry.actionSnapshot == .setChargeLimit && retry.requestedValue == 85 && retry.timezoneIDSnapshot == "Europe/Istanbul", "retry preserves immutable snapshots")
-            check(retry.status == .unsupported && retry.finishedAt == now, "unverified retry terminates safely without writer")
+            check(retry?.actionSnapshot == .setChargeLimit && retry?.requestedValue == 85 && retry?.timezoneIDSnapshot == "Europe/Istanbul", "retry preserves immutable snapshots")
+            check(retry?.finishedAt == now && retry?.status != .unsupported, "retry is no longer a placeholder row")
+
+            // A manual operation has priority: nothing is dispatched.
+            var busyCalls = 0
+            let busyEngine = ScheduleEngine(executionStore: store, manualOperationActive: { true }) { _, _, _ in
+                busyCalls += 1; return .unsupported("unexpected")
+            }
+            let blocked = busyEngine.retry(of: original, task: task, now: now.addingTimeInterval(60))
+            check(busyCalls == 0 && blocked?.status == .skippedConflict && blocked?.failureReason != nil, "retry yields to a manual operation")
+
+            // A failing writer is recorded as failed, not completed.
+            let failing = ScheduleEngine(executionStore: store) { _, _, _ in
+                .init(status: .failed, observedResult: nil, failureReason: "fake write failure", operationID: nil)
+            }
+            let failed = failing.retry(of: original, task: task, now: now.addingTimeInterval(120))
+            check(failed?.status == .failed && failed?.failureReason == "fake write failure", "retry surfaces the writer failure")
+
+            // An unwritable store cannot dispatch (the barrier row could not be saved).
+            let blockedStore = ScheduleExecutionStore(url: URL(fileURLWithPath: "/dev/null/executions.json"))
+            var neverCalled = 0
+            let barrier = ScheduleEngine(executionStore: blockedStore) { _, _, _ in neverCalled += 1; return .unsupported("x") }
+            check(barrier.retry(of: original, task: task, now: now) == nil && neverCalled == 0, "nothing runs when the idempotency row cannot be saved")
 
             let scheduleStore = ScheduleStore(url: root.appendingPathComponent("delete-history-schedules.json"))
-            let task = enabledTask(id: original.taskID, catchUp: true, last: prior)
             try scheduleStore.save([task]); try scheduleStore.save([])
-            check(store.load().records.count == 2, "deleting task does not delete execution history")
+            check(store.load().records.count == 4, "deleting task does not delete execution history")
         }
 
         do {

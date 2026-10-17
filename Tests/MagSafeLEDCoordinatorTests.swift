@@ -14,7 +14,7 @@ import Foundation
         expect(MagSafeLEDRawCodec.decode(3) == .green)
         expect(MagSafeLEDRawCodec.decode(4) == .orange)
         expect(MagSafeLEDRawCodec.decode(2) == nil)
-        expect(MagSafeLEDRawCodec.encode(.blinkingOrange) == nil)
+        for output in MagSafeLEDOutput.allCases { expect(MagSafeLEDRawCodec.decode(MagSafeLEDRawCodec.encode(output)) == output) }
 
         var value = MagSafeLEDOutput.green
         var writes: [MagSafeLEDOutput] = []
@@ -41,9 +41,9 @@ import Foundation
 
         var unsupportedWrites = 0
         let unsupported = MagSafeLEDControlCoordinator(journal: path(), backend: .init(
-            supportedOutputs: supported, read: { .green }, write: { _ in unsupportedWrites += 1 }
+            supportedOutputs: [.system, .green], read: { .green }, write: { _ in unsupportedWrites += 1 }
         ))
-        expect(unsupported.apply(.blinkingOrange) == .blocked("Bu LED çıktısı backend tarafından desteklenmiyor."))
+        expect(unsupported.apply(.orange) == .blocked("Bu LED çıktısı backend tarafından desteklenmiyor."))
         expect(unsupportedWrites == 0)
 
         let mismatch = MagSafeLEDOutput.green

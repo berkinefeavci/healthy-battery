@@ -76,7 +76,8 @@ struct SystemPowerModeProfiles: Equatable {
 enum SystemPowerModeService {
     static let helperPath = "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.powermode"
     private static let socketPath = "/var/run/io.github.berkinefeavci.cellkeep.powermode.sock"
-    private static let minimumHelperVersion = 2
+    /// Matches POWER_MODE_HELPER_VERSION in Tools/PowerModeHelper.c. 3: callers must be the signed app.
+    private static let minimumHelperVersion = 3
     /// Root helper/daemon identity installed by versions of this app published as "ChargeMate".
     static let legacyHelperPath = "/Library/PrivilegedHelperTools/com.chargemate.powermode"
     static let legacyLaunchDaemonLabel = "local.chargemate.powermode"
@@ -141,9 +142,12 @@ enum SystemPowerModeService {
         case helperMissing
         case helperNotTrusted
         case commandFailed
+        /// The user dismissed the administrator prompt; nothing was installed or changed.
+        case cancelled
         case message(String)
         var errorDescription: String? {
             switch self {
+            case .cancelled: return String(localized: "Yönetici onayı iptal edildi; yardımcı kurulmadı.")
             case .helperMissing: return String(localized: "Güç modu yardımcısı kurulamadı.")
             case .helperNotTrusted: return String(localized: "Güç modu yardımcısı güvenli değil; işlem durduruldu.")
             case .commandFailed: return String(localized: "macOS güç modu değiştirilemedi.")
@@ -184,20 +188,12 @@ enum SystemPowerModeService {
         let resources = executable.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Resources")
         let bundled = resources.appendingPathComponent("CellkeepPowerModeHelper")
         guard FileManager.default.fileExists(atPath: bundled.path) else { throw WriteError.helperMissing }
-        let label = "io.github.berkinefeavci.cellkeep.powermode"
-        let legacyCleanup = legacyInstalled()
-            ? "(/bin/launchctl bootout system/\(legacyLaunchDaemonLabel) 2>/dev/null || true) && " +
-              "/bin/rm -f \(shellQuote(legacyHelperPath)) /Library/LaunchDaemons/\(legacyLaunchDaemonLabel).plist && "
-            : ""
-        let command = legacyCleanup +
-            "/usr/bin/install -d -o root -g wheel -m 755 /Library/PrivilegedHelperTools && " +
-            "/usr/bin/install -o root -g wheel -m 755 \(shellQuote(bundled.path)) \(shellQuote(helperPath)) && " +
-            HelperInstallState.signatureCheckCommand(installedPath: helperPath,
-                                                     teamIdentifier: HelperInstallState.currentTeamIdentifier()) + " && " +
-            HelperInstallState.writeLaunchDaemonPlistCommand(label: label, helperPath: helperPath) + " && " +
-            "\(shellQuote(helperPath)) --authorize-uid \(getuid()) && " +
-            "(/bin/launchctl bootout system/io.github.berkinefeavci.cellkeep.powermode 2>/dev/null || true) && " +
-            "/bin/launchctl bootstrap system /Library/LaunchDaemons/io.github.berkinefeavci.cellkeep.powermode.plist"
+        let command = HelperInstallState.installCommand(
+            label: "io.github.berkinefeavci.cellkeep.powermode", helperPath: helperPath,
+            bundledHelperPath: bundled.path, teamIdentifier: HelperInstallState.currentTeamIdentifier(), uid: getuid(),
+            legacyCleanup: legacyInstalled()
+                ? HelperInstallState.legacyCleanupCommand(daemonLabel: legacyLaunchDaemonLabel, binaryPath: legacyHelperPath)
+                : "")
         try authorized(command)
         guard installed() else { throw WriteError.helperNotTrusted }
     }
@@ -275,37 +271,14 @@ enum SystemPowerModeService {
     }
 
     private static func authorized(_ command: String) throws {
-        let escaped = command.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
-        process.arguments = ["-e", "do shell script \"\(escaped)\" with administrator privileges"]
-        let output = Pipe()
-        process.standardOutput = output
-        process.standardError = output
-        try process.run()
-        process.waitUntilExit()
-        guard process.terminationStatus == 0 else {
-            let message = String(data: output.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
-                .trimmingCharacters(in: .whitespacesAndNewlines) ?? String(localized: "macOS yönetici izni vermedi.")
-            throw WriteError.message(message)
+        do { try AdminAuthorization.run(command) }
+        catch AdminAuthorization.Failure.cancelled { throw WriteError.cancelled }
+        catch AdminAuthorization.Failure.failed(let detail) {
+            throw WriteError.message(detail.isEmpty ? String(localized: "macOS yönetici izni vermedi.") : detail)
         }
     }
 
     private static func helperVersion() -> Int? {
-        let process = Process()
-        let pipe = Pipe()
-        process.executableURL = URL(fileURLWithPath: helperPath)
-        process.arguments = ["--version"]
-        process.standardOutput = pipe
-        process.standardError = pipe
-        guard (try? process.run()) != nil else { return nil }
-        process.waitUntilExit()
-        guard process.terminationStatus == 0,
-              let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) else { return nil }
-        return Int(output.trimmingCharacters(in: .whitespacesAndNewlines))
-    }
-
-    private static func shellQuote(_ value: String) -> String {
-        "'" + value.replacingOccurrences(of: "'", with: "'\\''") + "'"
+        HelperInstallState.cachedVersion(atPath: helperPath) { HelperInstallState.readVersion(ofHelperAt: helperPath) }
     }
 }
