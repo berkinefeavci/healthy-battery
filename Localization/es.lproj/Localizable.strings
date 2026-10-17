@@ -384,7 +384,6 @@
 "Her zaman kapalı" = "Siempre apagada";
 "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir." = "«Siempre apagada» y el rango horario también funcionan con la app cerrada. Las horas usan la hora local de este Mac.";
 "Hiçbir şey yapma" = "No hacer nada";
-"Isı koruması" = "Protección térmica";
 "Isı koruması bekletiyor" = "Detenido por la protección térmica";
 "Işık" = "Luz";
 "Işık denetimi hazır" = "Control de la luz listo";
@@ -676,7 +675,6 @@
 "Yüksek Enerji Kullanımı:" = "Alto consumo de energía:";
 "Yüksek Güç Modunu aç" = "Activar el modo de alto rendimiento";
 "Yüksek etki" = "Impacto alto";
-"Yüksek sıcaklıkta şarjı geçici olarak durdurur." = "Pausa temporalmente la carga a temperatura alta.";
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Cargar al 100 % y restaurar el límite anterior";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Carga al 100 % y luego vuelve al límite anterior.";
 "Yüzdeyi göster" = "Mostrar porcentaje";
@@ -871,7 +869,6 @@
 "Gelişmiş şarj (deneysel)" = "Carga avanzada (experimental)";
 "Hedef sınır: %%%lld" = "Límite objetivo: %lld %%";
 "Hedefe kadar deşarj et" = "Descargar hasta el objetivo";
-"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Protección térmica: pausar la carga por encima de 35 °C y reanudar por debajo de 32 °C";
 "Isı nedeniyle duraklatıldı" = "En pausa por calor";
 "Kalibrasyon sürüyor" = "Calibración en curso";
 "Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat)." = "Calibración: cargar al máximo, mantener 1 hora, descargar hasta 15, volver a cargar al máximo y restaurar el límite (24 horas como máximo).";

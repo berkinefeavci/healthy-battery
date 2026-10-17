@@ -234,6 +234,10 @@ private final class FakeBackend: ChargeInhibitBackend {
         // old persisted data decodes
         let oldSettings = try! JSONDecoder().decode(AdvancedChargeSettings.self, from: Data("{\"targetLimit\":70}".utf8))
         check(oldSettings.targetLimit == 70 && !oldSettings.adapterModeEnabled, "old settings decode")
+        // The advanced card no longer has its own heat switch (Settings > Charge control has the one real
+        // switch); a value saved by an older build must not keep acting invisibly.
+        let legacyHeat = try! JSONDecoder().decode(AdvancedChargeSettings.self, from: Data("{\"heatProtectionEnabled\":true}".utf8))
+        check(!legacyHeat.heatProtectionEnabled, "legacy advanced heat switch is ignored")
         let oldMem = try! JSONDecoder().decode(AdvancedChargeMemory.self, from: Data("{\"limitLatched\":true,\"heatLatched\":false}".utf8))
         check(oldMem.limitLatched && !oldMem.adapterLatched, "old memory decodes")
 

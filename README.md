@@ -38,6 +38,7 @@
 - **Battery health.** A maximum-capacity chart, smoothed to hourly medians so day-to-day sensor noise doesn't look like a real health swing.
 - **Power modes per source.** Automatic / High Power (Turbo) / Low Power (Battery Saver), tracked separately for "on battery" and "on adapter," backed by macOS's own `pmset` power profiles through a narrowly scoped, allowlisted helper.
 - **Sleep behavior.** Optional: while charging below your target with the adapter connected, Healthy Battery holds a public macOS idle-sleep assertion so your Mac keeps charging instead of going to sleep. It has an 8-hour safety cutoff and never touches lid-close or screen sleep. It does not pause charging by itself during sleep — see Limitations.
+- **Heat protection.** Optional, off by default. While charging on the adapter above 35 °C, the limit drops to 80% and Turbo turns off; below 32 °C (or when the adapter is unplugged) everything goes back. It cannot stop charging if the battery is already below 80%.
 - **MagSafe LED control.** Manual System / Green / Orange / Off control, plus an always-off or scheduled-hours policy, via a signed, narrowly scoped privileged helper that only writes one known SMC key.
 - **Schedules.** Recurring or one-off actions (apply a limit, switch power mode, and more) with a filterable execution history.
 - **Apple Shortcuts actions.** Eight App Intents to read battery percentage, temperature, and status, and to apply a limit, start/cancel Top Up, switch power mode, or set the MagSafe LED.
@@ -54,7 +55,6 @@ These are shown in the UI as locked and marked **"Yakında"** (Coming soon). The
 
 - **Discharge / auto-discharge** — no verified way to force the battery to discharge on this hardware.
 - **Sailing** (oscillate within a range) — needs a working pause/resume primitive that hasn't been found.
-- **Heat protection** — needs the same pause/resume primitive plus fresh temperature data.
 - **Calibration** — a long-running, restorable discharge/recharge cycle; not implemented.
 
 ## Requirements

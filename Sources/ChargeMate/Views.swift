@@ -976,8 +976,6 @@ struct SettingsView: View {
             Divider()
             lockedRow(String(localized: "Yelken modu"), icon: "sailboat", detail: String(localized: "Şarj ve boşalmayı hedef bandında dengeler."))
             Divider()
-            lockedRow(String(localized: "Isı koruması"), icon: "thermometer.snowflake", detail: String(localized: "Yüksek sıcaklıkta şarjı geçici olarak durdurur."))
-            Divider()
             lockedRow(String(localized: "Kalibrasyon"), icon: "arrow.triangle.2.circlepath", detail: String(localized: "Beş aşamalı tam şarj/deşarj döngüsünü otomatik yönetir."))
             Text("Fiziksel durdurma desteği doğrulanınca eklenecek. Etkisiz anahtar gösterilmez.")
                 .font(.caption).foregroundStyle(.secondary)

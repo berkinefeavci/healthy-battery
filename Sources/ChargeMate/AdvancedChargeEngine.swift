@@ -52,7 +52,7 @@ extension AdvancedChargeSettings {
         d.targetLimit = try c.decodeIfPresent(Int.self, forKey: .targetLimit) ?? d.targetLimit
         d.sailingEnabled = try c.decodeIfPresent(Bool.self, forKey: .sailingEnabled) ?? d.sailingEnabled
         d.sailingDelta = try c.decodeIfPresent(Int.self, forKey: .sailingDelta) ?? d.sailingDelta
-        d.heatProtectionEnabled = try c.decodeIfPresent(Bool.self, forKey: .heatProtectionEnabled) ?? d.heatProtectionEnabled
+        // heatProtectionEnabled is deliberately not read: Settings > Charge control has the one heat switch.
         d.heatPauseAbove = try c.decodeIfPresent(Double.self, forKey: .heatPauseAbove) ?? d.heatPauseAbove
         d.heatResumeBelow = try c.decodeIfPresent(Double.self, forKey: .heatResumeBelow) ?? d.heatResumeBelow
         d.sleepBehaviorEnabled = try c.decodeIfPresent(Bool.self, forKey: .sleepBehaviorEnabled) ?? d.sleepBehaviorEnabled

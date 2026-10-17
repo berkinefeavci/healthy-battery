@@ -384,7 +384,6 @@
 "Her zaman kapalı" = "Her zaman kapalı";
 "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir." = "Her zaman kapalı ve saat aralığı uygulama kapalıyken de çalışır. Saatler bu Mac’in yerel saatidir.";
 "Hiçbir şey yapma" = "Hiçbir şey yapma";
-"Isı koruması" = "Isı koruması";
 "Isı koruması bekletiyor" = "Isı koruması bekletiyor";
 "Işık" = "Işık";
 "Işık denetimi hazır" = "Işık denetimi hazır";
@@ -676,7 +675,6 @@
 "Yüksek Enerji Kullanımı:" = "Yüksek Enerji Kullanımı:";
 "Yüksek Güç Modunu aç" = "Yüksek Güç Modunu aç";
 "Yüksek etki" = "Yüksek etki";
-"Yüksek sıcaklıkta şarjı geçici olarak durdurur." = "Yüksek sıcaklıkta şarjı geçici olarak durdurur.";
 "Yüzde 100'e şarj et ve önceki limiti geri yükle" = "Yüzde 100'e şarj et ve önceki limiti geri yükle";
 "Yüzde 100’e şarj eder, sonra önceki limite döner." = "Yüzde 100’e şarj eder, sonra önceki limite döner.";
 "Yüzdeyi göster" = "Yüzdeyi göster";
@@ -871,7 +869,6 @@
 "Gelişmiş şarj (deneysel)" = "Gelişmiş şarj (deneysel)";
 "Hedef sınır: %%%lld" = "Hedef sınır: %%%lld";
 "Hedefe kadar deşarj et" = "Hedefe kadar deşarj et";
-"Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür" = "Isı koruması: 35 °C üstünde şarjı duraklat, 32 °C altında sürdür";
 "Isı nedeniyle duraklatıldı" = "Isı nedeniyle duraklatıldı";
 "Kalibrasyon sürüyor" = "Kalibrasyon sürüyor";
 "Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat)." = "Kalibrasyon: tam şarj, 1 saat bekleme, 15 seviyesine deşarj, tekrar tam şarj, ardından sınır geri yüklenir (en fazla 24 saat).";

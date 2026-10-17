@@ -277,3 +277,6 @@ grep -Fq 'static func availableModes() -> Set<SystemPowerMode> { cachedModes }' 
 ! grep -rFq 'appendUnsupportedRetry' Sources Tests
 ! grep -Fq 'Yeni çalışma olarak dene' Sources/ChargeMate/ScheduleHistoryView.swift
 ! grep -Fq "hiçbir görev macOS ayarını değiştirmez" Sources/ChargeMate/ScheduleView.swift
+# Isı koruması tek anahtardır (Şarj kontrolü > Otomatik koruma); "Yakında" kilitli satırı ve gelişmiş karttaki ikinci anahtar olmamalı.
+! grep -Fq 'lockedRow(String(localized: "Isı koruması")' Sources/ChargeMate/Views.swift
+! grep -Fq 'heatProtectionEnabled' Sources/ChargeMate/AdvancedChargeSettingsView.swift
