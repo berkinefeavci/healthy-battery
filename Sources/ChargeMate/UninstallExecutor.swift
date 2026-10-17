@@ -14,30 +14,43 @@ enum UninstallExecutor {
         }
     }
 
-    static func run(options: UninstallPlan.Options, battery: BatteryMonitor) async -> Result<Void, ExecutionError> {
+    /// `.success` carries the steps that did not work (empty = everything done), already worded for the user.
+    static func run(options: UninstallPlan.Options, battery: BatteryMonitor) async -> Result<[String], ExecutionError> {
         let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Cellkeep").path
         let steps = UninstallPlan.build(options: options, applicationSupportDirectory: supportDirectory)
+        var problems: [String] = []
 
         if let command = UninstallPlan.adminShellCommand(for: steps) {
             do { try authorized(command) }
             catch let error as ExecutionError { return .failure(error) }
             catch { return .failure(.adminDenied(error.localizedDescription)) }
-        }
-
-        _ = try? StartupPreferences.setLoginItemEnabled(false)
-
-        if steps.contains(.resetNativeChargeLimitTo100) {
-            _ = await battery.applyShortcutLimit(100)
-        }
-
-        for step in steps {
-            if case .removeApplicationSupportData(let path) = step {
-                try? FileManager.default.removeItem(atPath: path)
+            let left = UninstallPlan.remainingHelperFiles(in: steps)
+            if !left.isEmpty {
+                problems.append(String(localized: "Şu yardımcı dosyalar silinemedi: \(left.joined(separator: ", "))"))
             }
         }
 
-        return .success(())
+        if StartupPreferences.loginItemState().requested {
+            do { _ = try StartupPreferences.setLoginItemEnabled(false) }
+            catch { problems.append(String(localized: "Giriş öğesi kayıttan silinemedi: \(error.localizedDescription)")) }
+        }
+
+        if steps.contains(.resetNativeChargeLimitTo100) {
+            let reset = await battery.applyShortcutLimit(100)
+            if reset.status != .configurationVerified {
+                problems.append(String(localized: "Şarj limiti sıfırlanamadı: \(reset.message)"))
+            }
+        }
+
+        for step in steps {
+            guard case .removeApplicationSupportData(let path) = step,
+                  FileManager.default.fileExists(atPath: path) else { continue }
+            do { try FileManager.default.removeItem(atPath: path) }
+            catch { problems.append(String(localized: "Uygulama verileri silinemedi: \(error.localizedDescription)")) }
+        }
+
+        return .success(problems)
     }
 
     private static func authorized(_ command: String) throws {

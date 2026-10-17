@@ -148,12 +148,20 @@ struct GeneralSettingsView: View {
             await MainActor.run {
                 uninstalling = false
                 switch result {
-                case .success:
+                case .success(let problems) where problems.isEmpty:
                     let alert = NSAlert()
                     alert.messageText = String(localized: "Healthy Battery kaldırıldı")
                     alert.informativeText = String(localized: "Yardımcı süreçler ve servisler kaldırıldı. Şimdi uygulamayı Çöp Sepeti'ne sürükleyin.")
                     alert.runModal()
                     NSApplication.shared.terminate(nil)
+                case .success(let problems):
+                    // Not everything worked: say so and stay open, so nothing claims "removed" and the user can retry.
+                    let list = problems.joined(separator: "\n")
+                    uninstallError = list
+                    let alert = NSAlert()
+                    alert.messageText = String(localized: "Healthy Battery tam olarak kaldırılamadı")
+                    alert.informativeText = String(localized: "Bazı adımlar tamamlanamadı:") + "\n" + list
+                    alert.runModal()
                 case .failure(let error):
                     uninstallError = error.localizedDescription
                 }

@@ -973,3 +973,9 @@
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Part de l’impact énergétique total de la période (mesure macOS × durée ; pas des watts). %lld jours de données.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Ce Mac ne permet pas de suspendre la charge sur secteur : la navigation, la pause thermique, le comportement en veille, la décharge et le calibrage ne sont donc pas affichés ici. Avec le mode adaptateur activé, la limite cible passe par lui.";
 "Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "Le planificateur fonctionne. Les tâches de limite de charge, de charge complète et de mode d’alimentation s’exécutent réellement à l’heure prévue et modifient un réglage du Mac ; les résultats apparaissent dans l’historique des tâches. La mise en pause de la charge, l’étalonnage et la décharge jusqu’à une cible ne sont pas encore disponibles.";
+"Şu yardımcı dosyalar silinemedi: %@" = "Ces fichiers d’assistance n’ont pas pu être supprimés : %@";
+"Giriş öğesi kayıttan silinemedi: %@" = "L’élément d’ouverture n’a pas pu être retiré : %@";
+"Şarj limiti sıfırlanamadı: %@" = "La limite de charge n’a pas pu être réinitialisée : %@";
+"Uygulama verileri silinemedi: %@" = "Les données de l’app n’ont pas pu être supprimées : %@";
+"Healthy Battery tam olarak kaldırılamadı" = "Healthy Battery n’a pas pu être entièrement supprimé";
+"Bazı adımlar tamamlanamadı:" = "Certaines étapes n’ont pas abouti :";

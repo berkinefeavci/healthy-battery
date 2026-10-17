@@ -973,3 +973,9 @@
 "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri." = "Dönemdeki toplam enerji etkisinden payı (macOS ölçümü × süre; watt değildir). %lld günlük veri.";
 "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır." = "Bu Mac şarjı takılıyken durdurmaya izin vermediği için yelken, ısı ile duraklatma, uyku davranışı, deşarj ve kalibrasyon burada gösterilmez. Adaptör modu açılınca hedef sınır onun üzerinden uygulanır.";
 "Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok." = "Zamanlayıcı çalışıyor. Şarj limiti, tam doldurma ve güç modu görevleri zamanı gelince gerçekten çalışır ve Mac ayarını değiştirir; sonuçlar Görev geçmişinde görünür. Şarjı duraklatma, kalibrasyon ve hedefe kadar boşaltma henüz yok.";
+"Şu yardımcı dosyalar silinemedi: %@" = "Şu yardımcı dosyalar silinemedi: %@";
+"Giriş öğesi kayıttan silinemedi: %@" = "Giriş öğesi kayıttan silinemedi: %@";
+"Şarj limiti sıfırlanamadı: %@" = "Şarj limiti sıfırlanamadı: %@";
+"Uygulama verileri silinemedi: %@" = "Uygulama verileri silinemedi: %@";
+"Healthy Battery tam olarak kaldırılamadı" = "Healthy Battery tam olarak kaldırılamadı";
+"Bazı adımlar tamamlanamadı:" = "Bazı adımlar tamamlanamadı:";

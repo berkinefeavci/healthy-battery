@@ -54,6 +54,16 @@ import Foundation
         precondition(UninstallPlan.adminShellCommand(for: [.unregisterLoginItem]) == nil,
                      "no helper steps means no admin command is needed")
 
+        // After the admin command, files that are still on disk are reported instead of "removed".
+        let ledBinary = "/Library/PrivilegedHelperTools/io.github.berkinefeavci.cellkeep.led"
+        let legacyPlist = "/Library/LaunchDaemons/local.chargemate.powermode.plist"
+        precondition(UninstallPlan.remainingHelperFiles(in: defaultSteps, exists: { _ in false }).isEmpty,
+                     "nothing left means no leftovers")
+        precondition(UninstallPlan.remainingHelperFiles(in: defaultSteps, exists: { $0 == ledBinary || $0 == legacyPlist })
+                        == [ledBinary, legacyPlist], "leftover helper files are listed in plan order")
+        precondition(UninstallPlan.remainingHelperFiles(in: [.unregisterLoginItem], exists: { _ in true }).isEmpty,
+                     "plans without helper steps have no leftovers to check")
+
         print("Uninstall plan: default options, helper targets and admin command assertions passed; nothing executed.")
     }
 }

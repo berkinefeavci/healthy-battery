@@ -68,6 +68,16 @@ enum UninstallPlan {
         return helperCommands.joined(separator: " && ")
     }
 
+    /// Helper binaries and daemon plists the admin command should have removed but that still exist,
+    /// in plan order. Uninstall reports these instead of claiming everything was removed.
+    static func remainingHelperFiles(in steps: [Step],
+                                     exists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }) -> [String] {
+        steps.flatMap { step -> [String] in
+            guard case .bootOutAndRemoveHelper(let target) = step else { return [] }
+            return [target.binaryPath, target.launchDaemonPlistPath].filter(exists)
+        }
+    }
+
     private static func shellQuote(_ value: String) -> String {
         "'" + value.replacingOccurrences(of: "'", with: "'\\''") + "'"
     }
