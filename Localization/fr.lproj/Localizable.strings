@@ -979,3 +979,9 @@
 "Uygulama verileri silinemedi: %@" = "Les données de l’app n’ont pas pu être supprimées : %@";
 "Healthy Battery tam olarak kaldırılamadı" = "Healthy Battery n’a pas pu être entièrement supprimé";
 "Bazı adımlar tamamlanamadı:" = "Certaines étapes n’ont pas abouti :";
+"Düzen" = "Édition";
+"Yinele" = "Rétablir";
+"Kes" = "Couper";
+"Kopyala" = "Copier";
+"Yapıştır" = "Coller";
+"Tümünü seç" = "Tout sélectionner";

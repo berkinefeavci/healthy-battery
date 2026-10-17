@@ -979,3 +979,9 @@
 "Uygulama verileri silinemedi: %@" = "The app data could not be deleted: %@";
 "Healthy Battery tam olarak kaldırılamadı" = "Healthy Battery could not be fully removed";
 "Bazı adımlar tamamlanamadı:" = "Some steps did not finish:";
+"Düzen" = "Edit";
+"Yinele" = "Redo";
+"Kes" = "Cut";
+"Kopyala" = "Copy";
+"Yapıştır" = "Paste";
+"Tümünü seç" = "Select All";

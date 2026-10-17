@@ -228,6 +228,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         appMenu.addItem(withTitle: String(localized: "Healthy Battery’ten çık"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         item.submenu = appMenu
         menu.addItem(item)
+        let editItem = NSMenuItem()
+        editItem.submenu = EditMenu.make()
+        menu.addItem(editItem)
         NSApp.mainMenu = menu
     }
 

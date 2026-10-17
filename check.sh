@@ -284,3 +284,7 @@ grep -Fq 'static func availableModes() -> Set<SystemPowerMode> { cachedModes }' 
 ! grep -rFq "sleepBehaviorEnabled" Sources
 # Doldur başarısız olunca nedeni (topUpMessage) panelde ve ayarlarda görünür.
 test "$(grep -c "battery.topUpMessage" Sources/ChargeMate/Views.swift)" -ge 2
+# Standart Düzen menüsü: metin alanlarında ⌘C/⌘V/⌘X/⌘A/⌘Z çalışsın (menü çubuğu uygulamasında gizli ana menü yeter).
+xcrun swiftc Sources/ChargeMate/EditMenu.swift Tests/EditMenuTests.swift -o .build/checks/edit-menu-tests
+.build/checks/edit-menu-tests
+grep -Fq 'EditMenu.make()' Sources/ChargeMate/App.swift
