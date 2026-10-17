@@ -502,6 +502,9 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
     @Published private(set) var policyConflict: (expected: Int, observed: Int)?
     @Published private(set) var controlState: ControlState = .idle
     @Published private(set) var actionMessage: String?
+    /// Why the last Top Up start/cancel did not succeed; stays until the next attempt. (actionMessage
+    /// is also reset by policy evaluations and was never shown anywhere.)
+    @Published private(set) var topUpMessage: String?
     enum ControlState: String { case idle, charging, pausedAtLimit, discharging, topUp, sailing, heatProtect }
     private var timer: Timer?
     private let readerQueue = DispatchQueue(label: "io.github.berkinefeavci.cellkeep.battery", qos: .utility)
@@ -859,6 +862,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
         guard !applyingLimit else { return }
         applyingLimit = true
         actionMessage = nil
+        topUpMessage = nil
         let telemetry = Self.telemetry(from: snapshot)
         controlQueue.async { [weak self] in
             guard let self else { return }
@@ -870,8 +874,13 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
                 self.actionMessage = result.message
+                self.topUpMessage = Self.failureText(result)
             }
         }
+    }
+
+    private static func failureText(_ result: ChargeControlCoordinator.Result) -> String? {
+        result.status == .configurationVerified ? nil : result.message
     }
 
     func stopTopUp() {
@@ -888,6 +897,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                 if let state = result.state { self.receiveNativeState(state) }
                 self.updatePolicyPresentation()
                 self.actionMessage = result.message
+                self.topUpMessage = Self.failureText(result)
             }
         }
     }
@@ -998,6 +1008,7 @@ final class BatteryMonitor: ObservableObject, @unchecked Sendable {
                     if let state = result.state { self.receiveNativeState(state) }
                     self.updatePolicyPresentation()
                     self.actionMessage = result.message
+                    self.topUpMessage = Self.failureText(result)
                     continuation.resume(returning: result)
                 }
             }

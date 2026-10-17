@@ -7,6 +7,7 @@
 - Schedule page: the note said no task changes a macOS setting. That was wrong: charge limit, charge to full and power mode tasks run and do change the setting. The note now says what runs and what does not yet.
 - Heat protection is one switch now (Settings → Charge control → Automatic protection). The locked "Coming soon" heat row and the second heat switch in the experimental advanced charge card are gone; the README lists heat protection as a working feature.
 - Removed the "Sleep behavior" switch from the experimental advanced charge card. It was saved but never used. The real sleep setting (Sleep page) is unchanged.
+- When Top Up fails, the reason now shows under the buttons in the panel and on Settings → Charge control, and stays until you try again. Before, it was kept internally and never shown.
 
 ## 1.4.2
 

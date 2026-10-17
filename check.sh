@@ -282,3 +282,5 @@ grep -Fq 'static func availableModes() -> Set<SystemPowerMode> { cachedModes }' 
 ! grep -Fq 'heatProtectionEnabled' Sources/ChargeMate/AdvancedChargeSettingsView.swift
 # "Uyku davranışı" anahtarı hiçbir yerde okunmuyordu; ayar alanı geri gelmesin (gerçek uyku ayarı: SleepBehaviorPreferences).
 ! grep -rFq "sleepBehaviorEnabled" Sources
+# Doldur başarısız olunca nedeni (topUpMessage) panelde ve ayarlarda görünür.
+test "$(grep -c "battery.topUpMessage" Sources/ChargeMate/Views.swift)" -ge 2

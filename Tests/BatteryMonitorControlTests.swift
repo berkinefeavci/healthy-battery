@@ -182,7 +182,7 @@ private final class FakeNative {
         check(monitor.percentageText == "%85", "percentageText uses Turkish %85 style, not \"85 %\"")
         monitor.startTopUp()
         until { !monitor.applyingLimit }
-        check(monitor.topUpActive && native.limit == 100 && native.writeCount == 3,
+        check(monitor.topUpActive && native.limit == 100 && monitor.topUpMessage == nil && native.writeCount == 3,
               "Top Up is functional and persists verified 100")
         providedSnapshot.externalConnected = false
         providedSnapshot.isCharging = false
@@ -276,6 +276,16 @@ private final class FakeNative {
         until { !monitor.applyingLimit && native.limit == 80 }
         check(!monitor.adapterModeActive && monitor.chargeLimit == 80 && monitor.barLimits == [80, 85, 90, 95, 100],
               "leaving adapter mode restores the previous native limit")
+        // Last, because a rejected write leaves the controller in recovery. The reason of a failed Top Up
+        // is published as topUpMessage and must survive later policy evaluations.
+        until { !monitor.applyingLimit && !monitor.topUpActive }
+        native.reject = true
+        monitor.startTopUp()
+        until { !monitor.applyingLimit }
+        check(monitor.topUpMessage?.contains("synthetic failure") == true, "failed Top Up exposes its reason")
+        monitor.handleWake()
+        _ = RunLoop.main.run(mode: .default, before: Date().addingTimeInterval(0.3))
+        check(monitor.topUpMessage?.contains("synthetic failure") == true, "Top Up failure reason survives policy evaluations")
         print("BatteryMonitor production integration: \(assertions) assertions passed; isolated defaults/history and fake hardware.")
     }
 }

@@ -98,6 +98,13 @@ struct PopoverView: View {
                             .font(.system(size: 10)).foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    // Why the last Doldur attempt failed; stays until the next attempt.
+                    if let message = battery.topUpMessage {
+                        Text(message)
+                            .font(.system(size: 10)).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                     if limitEditor {
                         NativeLimitControls().chargeCard()
                             .transition(.opacity.combined(with: .move(edge: .top)))
@@ -955,6 +962,10 @@ struct SettingsView: View {
                     if battery.topUpActive, let restore = battery.topUpRestoreLimit {
                         Text(ChargeLimitDisplay.topUpReturnText(limit: restore))
                             .font(.caption.weight(.medium)).foregroundStyle(.secondary)
+                    }
+                    if let message = battery.topUpMessage {
+                        Text(message).font(.caption).foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 Spacer()
