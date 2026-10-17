@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for considering a contribution to Cellkeep.
+Thanks for considering a contribution to Healthy Battery.
 
 ## Build and test
 

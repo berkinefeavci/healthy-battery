@@ -11,6 +11,7 @@
 - Uninstall no longer says "removed" when a step failed. It checks that the helper files are really gone and reports a failed login item, charge limit reset or data deletion; in that case the app stays open so you can try again.
 - Copy, paste, cut, select all and undo (⌘C, ⌘V, ⌘X, ⌘A, ⌘Z) now work in text fields such as the schedule editor. The app had no Edit menu, so macOS did not pass these shortcuts on.
 - Error texts from the charge helper (for example "The saved macOS limit could not be read") now appear in your language instead of Turkish.
+- The bug report template, SECURITY.md and CONTRIBUTING.md use the name Healthy Battery instead of Cellkeep.
 
 ## 1.4.2
 
