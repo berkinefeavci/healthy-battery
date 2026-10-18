@@ -1,0 +1,25 @@
+{
+  "music_prompt": "Bright, modern, minimal tech product launch music. Soft electronic pulse, warm plucked synths, light percussion, gentle build, optimistic and clean, Apple keynote feel. Instrumental, no vocals. A clear lift at 49 seconds and a soft resolved ending at 63 seconds.",
+  "en": [
+    { "at": 0.4,  "text": "Your MacBook's battery wears out every day. Sitting at full charge and running hot age it fastest." },
+    { "at": 6.6,  "text": "Meet Healthy Battery. Free, open-source battery care for your Mac." },
+    { "at": 11.0, "text": "Set a charge limit anywhere from eighty to a hundred percent. Going on a trip? One click tops it up to full." },
+    { "at": 20.8, "text": "See where every watt goes, measured by Apple's own sensors, never guessed." },
+    { "at": 28.8, "text": "Track your battery's health for up to four hundred days, and export it any time." },
+    { "at": 36.0, "text": "Too hot while charging? It lowers the limit and turns Turbo off until things cool down." },
+    { "at": 43.8, "text": "Schedules, Shortcuts, power modes and more. It runs itself." },
+    { "at": 49.8, "text": "Free. Open source. No account. No telemetry." },
+    { "at": 55.8, "text": "Healthy Battery. Install it with Homebrew, or download it from GitHub." }
+  ],
+  "tr": [
+    { "at": 0.4,  "text": "MacBook'unun bataryası her gün yıpranıyor. En çok da tam şarjda beklemek ve ısınmak yıpratıyor." },
+    { "at": 6.6,  "text": "Karşında Healthy Battery. Mac'in için ücretsiz, açık kaynak batarya bakımı." },
+    { "at": 11.0, "text": "Şarj limitini yüzde seksenle yüz arasında istediğin yere ayarla. Yolculuğa mı çıkıyorsun? Tek tıkla tam doldur." },
+    { "at": 20.8, "text": "Her vatın nereye gittiğini gör. Değerler tahmin edilmez, Apple'ın kendi sensörlerinden okunur." },
+    { "at": 28.8, "text": "Bataryanın sağlığını dört yüz güne kadar takip et, istediğin zaman dışa aktar." },
+    { "at": 36.0, "text": "Şarj olurken çok mu ısındı? Limiti düşürür, Turbo'yu kapatır. Serinleyince her şey geri gelir." },
+    { "at": 43.8, "text": "Zamanlama, Kestirmeler, güç modları ve fazlası. Gerisini kendisi halleder." },
+    { "at": 49.8, "text": "Ücretsiz. Açık kaynak. Hesap yok. Telemetri yok." },
+    { "at": 55.8, "text": "Healthy Battery. Homebrew ile kur, ya da GitHub'dan indir." }
+  ]
+}
