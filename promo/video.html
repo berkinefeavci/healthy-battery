@@ -1,0 +1,699 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Healthy Battery promo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #F3F5F7; }
+  body { font-family: 'Inter', sans-serif; color: #111316; -webkit-font-smoothing: antialiased; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #F3F5F7; }
+
+  .blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: .55; will-change: transform; }
+  #blobA { width: 900px; height: 900px; background: #BFEBDD; }
+  #blobB { width: 800px; height: 800px; background: #D7E4F6; }
+  #blobC { width: 600px; height: 600px; background: #F6E7C8; opacity: .35; }
+
+  .scene { position: absolute; inset: 0; opacity: 0; will-change: opacity, transform, filter; }
+  .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+
+  .col-text { position: absolute; left: 150px; top: 0; bottom: 0; width: 660px; display: flex; flex-direction: column; justify-content: center; }
+  .visual { position: absolute; left: 860px; top: 0; width: 960px; height: 1080px; }
+  .kicker { font: 600 22px 'Inter'; letter-spacing: .16em; text-transform: uppercase; color: #1F8F79; }
+  .title { font: 700 76px/1.04 'Inter Display', 'Inter'; letter-spacing: -.025em; margin-top: 22px; }
+  .sub { font: 400 29px/1.42 'Inter'; color: #5B616A; margin-top: 28px; max-width: 620px; }
+  .rv { will-change: opacity, transform; }
+
+  .card { position: absolute; background: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.95);
+          border-radius: 40px; box-shadow: 0 40px 90px rgba(25,35,45,.13), 0 2px 8px rgba(0,0,0,.05); }
+  .panel { background: #E5E5E7; border: 1px solid rgba(255,255,255,.7); }
+
+  /* scene 1 */
+  .big-line { font: 700 84px/1.06 'Inter Display', 'Inter'; letter-spacing: -.03em; max-width: 1500px; }
+  .big-line.soft { color: #6A7078; font-weight: 600; font-size: 54px; margin-top: 26px; }
+  .cap-label { font: 500 26px 'Inter'; color: #6A7078; letter-spacing: .02em; }
+  .cap-value { font: 700 120px 'Inter Display'; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+
+  /* panel pieces */
+  .pill { position: absolute; height: 76px; border-radius: 38px; background: rgba(255,255,255,.45);
+          display: flex; align-items: center; padding: 0 28px; font: 600 30px 'Inter'; color: #3A3D42; gap: 12px; }
+  .circle-btn { position: absolute; width: 76px; height: 76px; border-radius: 50%; background: rgba(255,255,255,.45);
+                display: flex; align-items: center; justify-content: center; }
+  .bar { position: absolute; height: 66px; border-radius: 33px; background: #D1D1D4; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,.06); }
+  .bar-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 33px;
+              background: linear-gradient(#8DD987, #63BD61); box-shadow: inset 0 2px 0 rgba(255,255,255,.35); }
+  .bar-label { position: absolute; left: 26px; top: 0; height: 66px; display: flex; align-items: center; font: 700 28px 'Inter'; color: #fff; font-variant-numeric: tabular-nums; }
+  .bar-marker { position: absolute; top: 0; bottom: 0; width: 0; border-left: 3px dashed rgba(255,255,255,.95); }
+  .status { position: absolute; font: 600 25px 'Inter'; color: #4A4D52; }
+
+  /* flow */
+  .node { position: absolute; width: 150px; height: 136px; border-radius: 30px;
+          background: linear-gradient(160deg, #FFFFFF, #ECECEE); border: 1px solid rgba(255,255,255,.95);
+          box-shadow: 0 14px 30px rgba(0,0,0,.10); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .node .n-name { font: 600 21px 'Inter'; color: #1A1C1F; margin-top: 4px; }
+  .node .n-w { font: 500 20px 'Inter'; color: #7A7F86; font-variant-numeric: tabular-nums; }
+
+  /* health */
+  .stat-row { display: flex; justify-content: space-between; font: 400 23px 'Inter'; color: #4A4F56; padding: 7px 0; }
+  .stat-row b { font-weight: 600; color: #15171A; font-variant-numeric: tabular-nums; }
+  .stat-h { font: 600 24px 'Inter'; margin-bottom: 6px; }
+
+  /* heat */
+  .hrow { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; border-bottom: 1px solid rgba(0,0,0,.07); font: 500 27px 'Inter'; color: #4A4F56; }
+  .hrow:last-child { border-bottom: 0; }
+  .hval { font: 700 30px 'Inter'; color: #15171A; font-variant-numeric: tabular-nums; }
+  .chip { padding: 8px 20px; border-radius: 22px; font: 600 24px 'Inter'; }
+
+  /* grid */
+  .tile { position: absolute; width: 300px; height: 256px; border-radius: 34px; background: rgba(255,255,255,.8);
+          border: 1px solid #fff; box-shadow: 0 24px 50px rgba(25,35,45,.10); padding: 30px; }
+  .tile .t-ico { width: 64px; height: 64px; border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+  .tile .t-name { font: 700 28px 'Inter Display'; margin-top: 22px; letter-spacing: -.01em; }
+  .tile .t-desc { font: 400 20px/1.35 'Inter'; color: #636871; margin-top: 8px; }
+  .tag { position: absolute; top: 30px; right: 26px; font: 600 14px 'Inter'; letter-spacing: .08em; text-transform: uppercase; color: #A06A00; background: #FCEFD2; padding: 6px 10px; border-radius: 10px; }
+
+  /* trust */
+  .word { font: 800 116px/1.08 'Inter Display'; letter-spacing: -.035em; }
+  .badge { display: inline-flex; align-items: center; gap: 12px; padding: 16px 28px; border-radius: 40px; background: rgba(255,255,255,.85);
+           border: 1px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,.07); font: 600 26px 'Inter'; color: #2A2D31; margin: 0 10px; }
+
+  /* cta */
+  .term { width: 1420px; border-radius: 26px; background: #15171B; box-shadow: 0 40px 90px rgba(0,0,0,.25); overflow: hidden; text-align: left; }
+  .term-top { height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 22px; background: #1F2227; }
+  .dot { width: 15px; height: 15px; border-radius: 50%; }
+  .term-body { padding: 34px 40px 40px; font: 500 29px 'DejaVu Sans Mono', monospace; color: #E8EAED; white-space: pre; }
+  .caret { display: inline-block; width: 16px; height: 34px; background: #6FDDBB; vertical-align: -6px; margin-left: 4px; }
+  .url { font: 600 40px 'Inter'; color: #1F8F79; margin-top: 46px; letter-spacing: -.01em; }
+  .wordmark { font: 800 128px 'Inter Display'; letter-spacing: -.04em; }
+  .tagline { font: 500 40px/1.3 'Inter'; color: #5B616A; margin-top: 18px; }
+
+  .cursor { position: absolute; width: 44px; height: 44px; pointer-events: none; z-index: 20; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="blob" id="blobA"></div>
+  <div class="blob" id="blobB"></div>
+  <div class="blob" id="blobC"></div>
+
+  <!-- 1. Hook -->
+  <section class="scene" id="s1">
+    <div class="center">
+      <div id="s1bat" style="position:relative;width:520px;height:250px;margin-bottom:60px">
+        <svg width="520" height="250" viewBox="0 0 520 250">
+          <rect x="6" y="6" width="468" height="238" rx="64" fill="none" stroke="#2A2D33" stroke-width="12"/>
+          <rect x="484" y="80" width="30" height="90" rx="14" fill="#2A2D33"/>
+          <clipPath id="s1clip"><rect x="26" y="26" width="428" height="198" rx="46"/></clipPath>
+          <rect id="s1fill" x="26" y="26" width="0" height="198" fill="#63BD61" clip-path="url(#s1clip)"/>
+        </svg>
+        <div id="s1pct" style="position:absolute;left:0;top:0;width:480px;height:250px;display:flex;align-items:center;justify-content:center;font:800 92px 'Inter Display';color:#fff;letter-spacing:-.03em;font-variant-numeric:tabular-nums">0%</div>
+        <div id="s1heat" style="position:absolute;inset:-60px;border-radius:120px;background:radial-gradient(closest-side,rgba(255,110,60,.45),rgba(255,110,60,0));z-index:-1;opacity:0"></div>
+      </div>
+      <div class="big-line rv" id="s1a" data-k="s1a"></div>
+      <div class="big-line soft rv" id="s1b" data-k="s1b"></div>
+      <div class="rv" id="s1cap" style="margin-top:44px;display:flex;align-items:baseline;gap:22px">
+        <span class="cap-label" data-k="cap"></span>
+        <span class="cap-value" id="s1capv" style="font-size:64px"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Logo -->
+  <section class="scene" id="s2">
+    <div class="center">
+      <div id="s2icon" style="width:300px;height:300px;border-radius:68px;background:linear-gradient(#F9FAFC,#E0E4E9);box-shadow:0 40px 80px rgba(20,40,50,.18),inset 0 1px 0 #fff;display:flex;align-items:center;justify-content:center">
+        <svg id="s2svg" width="250" height="250" viewBox="0 0 1024 1024"></svg>
+      </div>
+      <div class="wordmark rv" id="s2word" style="margin-top:56px">Healthy Battery</div>
+      <div class="tagline rv" id="s2tag" data-k="tag"></div>
+    </div>
+  </section>
+
+  <!-- 3. Charge limit -->
+  <section class="scene" id="s3">
+    <div class="col-text">
+      <div class="kicker rv" data-k="s3k"></div>
+      <div class="title rv" data-k="s3t"></div>
+      <div class="sub rv" data-k="s3s"></div>
+    </div>
+    <div class="visual">
+      <div class="card panel" id="s3panel" style="left:60px;top:330px;width:840px;height:420px">
+        <div class="pill" style="left:40px;top:40px"><span data-k="limitword"></span><span id="s3limit" style="font-variant-numeric:tabular-nums">100%</span></div>
+        <div class="circle-btn" style="left:500px;top:40px"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="#8A8E94" stroke-width="2.6"/><path d="M10 17h14" stroke="#8A8E94" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+        <div class="pill" id="s3topup" style="left:592px;top:40px;padding:0 24px"><span data-k="topup"></span><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M10 17h14M17 10v14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+        <div class="bar" style="left:40px;top:160px;width:760px">
+          <div class="bar-fill" id="s3fill" style="width:50%"></div>
+          <div class="bar-label" id="s3pct">50%</div>
+          <div id="s3pause" style="position:absolute;top:19px;width:20px;height:28px;opacity:0"><div style="position:absolute;left:0;width:7px;height:28px;border-radius:2px;background:#fff"></div><div style="position:absolute;right:0;width:7px;height:28px;border-radius:2px;background:#fff"></div></div>
+          <div class="bar-marker" id="s3marker"></div>
+        </div>
+        <div style="position:absolute;left:40px;right:40px;top:272px;height:2px;background:rgba(0,0,0,.08)"></div>
+        <div class="status" id="s3status" style="left:40px;top:310px"></div>
+        <div id="s3dot" style="position:absolute;right:44px;top:316px;width:16px;height:16px;border-radius:50%;background:#34C759"></div>
+      </div>
+      <svg class="cursor" id="s3cursor" viewBox="0 0 24 24"><path d="M4 2l15 11.2-6.6 1 3.9 7.3-2.7 1.4-3.9-7.4L4 20.4z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </div>
+  </section>
+
+  <!-- 4. Power flow -->
+  <section class="scene" id="s4">
+    <div class="col-text">
+      <div class="kicker rv" data-k="s4k"></div>
+      <div class="title rv" data-k="s4t"></div>
+      <div class="sub rv" data-k="s4s"></div>
+    </div>
+    <div class="visual">
+      <div class="card panel" id="s4panel" style="left:20px;top:250px;width:920px;height:600px">
+        <div class="status" style="left:44px;top:42px;font-size:26px" data-k="onadapter"></div>
+        <div id="s4flow" style="position:absolute;left:30px;top:90px;width:860px;height:480px">
+          <svg id="s4svg" width="860" height="480" viewBox="0 0 860 480" style="position:absolute;left:0;top:0"></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Long-term health -->
+  <section class="scene" id="s5">
+    <div class="col-text">
+      <div class="kicker rv" data-k="s5k"></div>
+      <div class="title rv" data-k="s5t"></div>
+      <div class="sub rv" data-k="s5s"></div>
+    </div>
+    <div class="visual">
+      <div class="card" id="s5card" style="left:30px;top:200px;width:900px;height:680px;padding:40px 46px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <div style="font:700 32px 'Inter Display'" data-k="lth"></div>
+          <div style="font:500 22px 'Inter';color:#7A7F86" id="s5days"></div>
+        </div>
+        <svg id="s5svg" width="808" height="300" viewBox="0 0 808 300" style="margin-top:26px;display:block"></svg>
+        <div style="display:flex;gap:60px;margin-top:26px">
+          <div style="flex:1" id="s5colA"></div>
+          <div style="flex:1" id="s5colB"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Heat protection -->
+  <section class="scene" id="s6">
+    <div class="col-text">
+      <div class="kicker rv" data-k="s6k" style="color:#C2410C"></div>
+      <div class="title rv" data-k="s6t"></div>
+      <div class="sub rv" data-k="s6s"></div>
+    </div>
+    <div class="visual">
+      <div id="s6therm" style="position:absolute;left:20px;top:240px;width:200px;height:600px">
+        <svg width="200" height="600" viewBox="0 0 200 600">
+          <rect x="50" y="10" width="60" height="470" rx="30" fill="#fff" stroke="#D5D8DD" stroke-width="4"/>
+          <circle cx="80" cy="520" r="62" fill="#fff" stroke="#D5D8DD" stroke-width="4"/>
+          <rect id="s6merc" x="64" y="200" width="32" height="320" rx="16" fill="#F97316"/>
+          <circle id="s6bulb" cx="80" cy="520" r="46" fill="#F97316"/>
+          <g id="s6ticks"></g>
+        </svg>
+      </div>
+      <div class="card" id="s6card" style="left:260px;top:280px;width:660px;height:auto;padding:24px 44px 18px">
+        <div class="hrow"><span data-k="temp"></span><span class="hval" id="s6temp">31.0 °C</span></div>
+        <div class="hrow"><span data-k="climit"></span><span class="hval" id="s6limit">90%</span></div>
+        <div class="hrow"><span>Turbo</span><span class="chip" id="s6turbo">On</span></div>
+      </div>
+      <div id="s6banner" style="position:absolute;left:260px;top:640px;width:660px;height:96px;border-radius:30px;display:flex;align-items:center;gap:18px;padding:0 34px;font:600 28px 'Inter'"></div>
+    </div>
+  </section>
+
+  <!-- 7. Automation grid -->
+  <section class="scene" id="s7">
+    <div style="position:absolute;left:0;right:0;top:120px;text-align:center">
+      <div class="kicker rv" data-k="s7k"></div>
+      <div class="title rv" data-k="s7t" style="font-size:80px"></div>
+    </div>
+    <div id="s7grid" style="position:absolute;left:0;right:0;top:370px;height:600px"></div>
+  </section>
+
+  <!-- 8. Trust -->
+  <section class="scene" id="s8">
+    <div class="center">
+      <div id="s8words"></div>
+      <div id="s8badges" style="margin-top:70px;display:flex;justify-content:center"></div>
+    </div>
+  </section>
+
+  <!-- 9. CTA -->
+  <section class="scene" id="s9">
+    <div class="center">
+      <div style="display:flex;align-items:center;gap:40px" class="rv" id="s9head">
+        <div style="width:150px;height:150px;border-radius:36px;background:linear-gradient(#F9FAFC,#E0E4E9);box-shadow:0 20px 40px rgba(20,40,50,.16);display:flex;align-items:center;justify-content:center">
+          <svg id="s9svg" width="124" height="124" viewBox="0 0 1024 1024"></svg>
+        </div>
+        <div class="wordmark" style="font-size:104px">Healthy Battery</div>
+      </div>
+      <div class="term rv" id="s9term" style="margin-top:70px">
+        <div class="term-top"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FEBC2E"></div><div class="dot" style="background:#28C840"></div></div>
+        <div class="term-body"><span style="color:#6FDDBB">$ </span><span id="s9cmd"></span><span class="caret" id="s9caret"></span></div>
+      </div>
+      <div class="url rv" id="s9url">github.com/berkinefeavci/healthy-battery</div>
+      <div class="rv" id="s9foot" style="font:500 26px 'Inter';color:#7A7F86;margin-top:18px" data-k="foot"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const STR = {
+  en: {
+    s1a: "Your MacBook's battery wears out a little every day.",
+    s1b: "Sitting at 100% and running hot age it fastest.",
+    cap: "Maximum capacity",
+    tag: "Free, open-source battery care for Apple Silicon MacBooks.",
+    s3k: "Charge limit",
+    s3t: "Stop at 80%.<br>Or anywhere up to 100%.",
+    s3s: "Healthy Battery drives macOS's own native charge limit. Need a full battery for a trip? One click: Top Up.",
+    limitword: "Limit:",
+    topup: "Top Up",
+    st_charging: "Charging to the limit",
+    st_hold: "Charging on hold · running on the adapter",
+    st_topup: "Top Up · charging to 100% for your trip",
+    s4k: "Live power flow",
+    s4t: "See where every watt goes.",
+    s4s: "Adapter, processor, display — read from Apple's own sensors. If something can't be measured, it shows “—”, never a guess.",
+    onadapter: "The MacBook is running on the adapter",
+    adapter: "Adapter", processor: "Processor", display: "Display", other: "Other",
+    s5k: "Long-term health",
+    s5t: "Watch your battery's health over months.",
+    s5s: "Daily summaries for up to 400 days, exportable as CSV. Everything stays on your Mac.",
+    lth: "Long-term health",
+    days: "days recorded",
+    last7: "Last 7 days", last30: "Last 30 days",
+    avg: "Average charge", t90: "Time at 90% or above", cyc: "Cycles added", peak: "Peak temperature",
+    s6k: "Heat protection",
+    s6t: "Too hot? It steps in.",
+    s6s: "Above 35 °C while charging, the limit drops to 80% and Turbo turns off. Below 32 °C, your usual settings come back.",
+    temp: "Battery temperature", climit: "Charge limit",
+    on: "On", off: "Off",
+    hp_on: "Heat protection active", hp_off: "Usual limit restored", hp_idle: "Monitoring temperature",
+    s7k: "Automation",
+    s7t: "And it runs itself.",
+    t1: "Schedules", d1: "Limits, Top Up and power modes on a timetable",
+    t2: "Shortcuts", d2: "Ten actions for Apple Shortcuts",
+    t3: "Power modes", d3: "Separate for battery and adapter",
+    t4: "Discharge", d4: "Run from the battery with the cable in",
+    t5: "Calibration", d5: "A full cycle, start to finish",
+    t6: "MagSafe Light", d6: "Off, scheduled or your color",
+    exp: "Experimental",
+    w1: "Free.", w2: "Open source.", w3: "No account.", w4: "No telemetry.",
+    b1: "MIT license", b2: "Signed & notarized by Apple", b3: "5 languages",
+    foot: "For Apple Silicon MacBooks · Download from GitHub Releases"
+  },
+  tr: {
+    s1a: "MacBook'unun bataryası her gün biraz daha yıpranıyor.",
+    s1b: "En çok da hep %100'de durmak ve ısınmak yıpratıyor.",
+    cap: "Maksimum kapasite",
+    tag: "Apple Silicon MacBook'lar için ücretsiz, açık kaynak batarya bakımı.",
+    s3k: "Şarj limiti",
+    s3t: "%80'de dursun.<br>Ya da %100'e kadar istediğin yerde.",
+    s3s: "Healthy Battery, macOS'un kendi şarj limitini kullanır. Yolculuk için tam batarya mı lazım? Tek tık: Doldur.",
+    limitword: "Limit:",
+    topup: "Doldur",
+    st_charging: "Limite kadar şarj oluyor",
+    st_hold: "Şarj beklemede · adaptörden çalışıyor",
+    st_topup: "Doldur · yolculuk için %100'e şarj oluyor",
+    s4k: "Canlı güç akışı",
+    s4t: "Her vatın nereye gittiğini gör.",
+    s4s: "Adaptör, işlemci, ekran — Apple'ın kendi sensörlerinden okunur. Ölçülemeyen değer tahmin edilmez, “—” olarak görünür.",
+    onadapter: "MacBook adaptörden çalışıyor",
+    adapter: "Adaptör", processor: "İşlemci", display: "Ekran", other: "Diğer",
+    s5k: "Uzun vadeli sağlık",
+    s5t: "Bataryanın sağlığını aylarca izle.",
+    s5s: "400 güne kadar günlük özet, CSV olarak dışa aktarılabilir. Her şey Mac'inde kalır.",
+    lth: "Uzun vadeli sağlık",
+    days: "gün kaydedildi",
+    last7: "Son 7 gün", last30: "Son 30 gün",
+    avg: "Ortalama şarj", t90: "%90 üstünde geçen süre", cyc: "Eklenen döngü", peak: "En yüksek sıcaklık",
+    s6k: "Isı koruması",
+    s6t: "Çok mu ısındı? Hemen devreye girer.",
+    s6s: "Şarj olurken 35 °C'yi geçince limit %80'e iner, Turbo kapanır. 32 °C'nin altında ayarların geri gelir.",
+    temp: "Batarya sıcaklığı", climit: "Şarj limiti",
+    on: "Açık", off: "Kapalı",
+    hp_on: "Isı koruması devrede", hp_off: "Her zamanki limit geri geldi", hp_idle: "Sıcaklık izleniyor",
+    s7k: "Otomasyon",
+    s7t: "Gerisini kendisi halleder.",
+    t1: "Zamanlama", d1: "Limit, Doldur ve güç modları takvimle",
+    t2: "Kestirmeler", d2: "Apple Kestirmeler için on eylem",
+    t3: "Güç modları", d3: "Batarya ve adaptör için ayrı ayrı",
+    t4: "Boşaltma", d4: "Kablo takılıyken bataryadan çalış",
+    t5: "Kalibrasyon", d5: "Baştan sona tam bir döngü",
+    t6: "MagSafe Işığı", d6: "Kapalı, zamanlı ya da istediğin renk",
+    exp: "Deneysel",
+    w1: "Ücretsiz.", w2: "Açık kaynak.", w3: "Hesap yok.", w4: "Telemetri yok.",
+    b1: "MIT lisansı", b2: "Apple tarafından imzalı ve onaylı", b3: "5 dil",
+    foot: "Apple Silicon MacBook'lar için · GitHub Releases'tan indir"
+  }
+};
+const LANG = new URLSearchParams(location.search).get('lang') === 'tr' ? 'tr' : 'en';
+const S = STR[LANG];
+const num = (v, d = 0) => { const x = v.toFixed(d); return LANG === 'tr' ? x.replace('.', ',') : x; };
+const pct = (v, d = 0) => LANG === 'tr' ? '%' + num(v, d) : num(v, d) + '%';
+document.querySelectorAll('[data-k]').forEach(el => { el.innerHTML = S[el.dataset.k]; });
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, p) => a + (b - a) * p;
+const eOut = p => 1 - Math.pow(1 - p, 3);
+const eInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const eBack = p => { const c = 1.70158, c3 = c + 1; return 1 + c3 * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const mix = (c1, c2, p) => { const a = c1.match(/\w\w/g).map(h => parseInt(h, 16)), b = c2.match(/\w\w/g).map(h => parseInt(h, 16));
+  return `rgb(${a.map((v, i) => Math.round(lerp(v, b[i], p))).join(',')})`; };
+
+function reveal(el, t, at, dist = 34, dur = .7) {
+  const p = eOut(prog(t, at, at + dur));
+  el.style.opacity = p;
+  el.style.transform = `translateY(${(1 - p) * dist}px)`;
+  return p;
+}
+function revealAll(scene, t, start = .15, stagger = .16) {
+  scene.querySelectorAll(':scope > .col-text > .rv').forEach((el, i) => reveal(el, t, start + i * stagger));
+}
+
+/* ---------- icon ---------- */
+const ICON = `<defs><linearGradient id="rim" gradientUnits="userSpaceOnUse" x1="0" y1="305" x2="0" y2="719"><stop stop-color="#5C616B"/><stop offset="1" stop-color="#0E0F12"/></linearGradient>
+<linearGradient id="liquid" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A6EFD3"/><stop offset=".35" stop-color="#6FDDBB"/><stop offset=".75" stop-color="#3DBE9E"/><stop offset="1" stop-color="#1F8F79"/></linearGradient>
+<clipPath id="inner"><rect x="202" y="331" width="585" height="362" rx="107"/></clipPath></defs>
+<rect x="770" y="421" width="78" height="182" rx="36" fill="url(#rim)"/>
+<rect x="176" y="305" width="637" height="414" rx="132" fill="url(#rim)"/>
+<rect x="202" y="331" width="585" height="362" rx="107" fill="#DDEBE4"/>
+<g clip-path="url(#inner)"><g class="liq">
+<path d="M211 464C304 421 388 448 489 469C589 490 688 471 777 424V585A99 99 0 0 1 678 684H310A99 99 0 0 1 211 585Z" fill="url(#liquid)"/>
+<path d="M236 459C316 428 392 450 489 470C588 490 678 475 754 435" fill="none" stroke="#F2FFF8" stroke-opacity=".75" stroke-width="17" stroke-linecap="round"/></g></g>`;
+$('s2svg').innerHTML = ICON;
+$('s9svg').innerHTML = ICON.replace(/id="(rim|liquid|inner)"/g, 'id="$1b"').replace(/url\(#(rim|liquid|inner)\)/g, 'url(#$1b)');
+
+/* ---------- scene 4: flow diagram ---------- */
+const ICONS = {
+  plug: `<svg width="40" height="44" viewBox="0 0 40 44"><path d="M13 3v10M27 3v10" stroke="#EAB308" stroke-width="5" stroke-linecap="round"/><path d="M6 13h28v6a14 14 0 0 1-28 0z" fill="#EAB308"/><rect x="16" y="30" width="8" height="12" rx="3" fill="#EAB308"/></svg>`,
+  mac: `<svg width="50" height="38" viewBox="0 0 50 38"><rect x="8" y="3" width="34" height="24" rx="3" fill="#9A9DA3" stroke="#111" stroke-width="3.5"/><path d="M2 32h46v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" fill="#111"/></svg>`,
+  chip: `<svg width="42" height="42" viewBox="0 0 42 42"><rect x="9" y="9" width="24" height="24" rx="4" fill="none" stroke="#B04FCB" stroke-width="3.5"/><rect x="15" y="15" width="12" height="12" rx="2" fill="none" stroke="#B04FCB" stroke-width="3"/><path d="M15 3v6M21 3v6M27 3v6M15 33v6M21 33v6M27 33v6M3 15h6M3 21h6M3 27h6M33 15h6M33 21h6M33 27h6" stroke="#B04FCB" stroke-width="3" stroke-linecap="round"/></svg>`,
+  disp: `<svg width="46" height="42" viewBox="0 0 46 42"><rect x="3" y="3" width="40" height="27" rx="4" fill="#9ED8EC" stroke="#1898C7" stroke-width="3.5"/><path d="M16 38h14M23 30v8" stroke="#1898C7" stroke-width="4" stroke-linecap="round"/></svg>`,
+  dots: `<svg width="42" height="16" viewBox="0 0 42 16"><circle cx="8" cy="8" r="4.5" fill="#6B6F76"/><circle cx="21" cy="8" r="4.5" fill="#6B6F76"/><circle cx="34" cy="8" r="4.5" fill="#6B6F76"/></svg>`
+};
+const NODES = [
+  { id: 'adapter', x: 0,   y: 172, ico: 'plug' },
+  { id: 'mac',     x: 355, y: 172, ico: 'mac', name: 'MacBook' },
+  { id: 'processor', x: 700, y: 10,  ico: 'chip' },
+  { id: 'display',   x: 700, y: 172, ico: 'disp' },
+  { id: 'other',     x: 700, y: 334, ico: 'dots' }
+];
+const flow = $('s4flow');
+NODES.forEach(n => {
+  const d = document.createElement('div');
+  d.className = 'node'; d.id = 'n_' + n.id;
+  d.style.left = n.x + 'px'; d.style.top = n.y + 'px';
+  d.innerHTML = `${ICONS[n.ico]}<div class="n-name">${n.name || S[n.id]}</div><div class="n-w" id="w_${n.id}">0.0 W</div>`;
+  flow.appendChild(d);
+});
+const PATHS = [
+  { d: 'M150 240 L355 240', c: '#E9C24A', w: 24, a: 0 },
+  { d: 'M505 228 C 600 228, 610 78, 700 78', c: '#B550CC', w: 20, a: .55 },
+  { d: 'M505 240 L700 240', c: '#5DB0D4', w: 10, a: .7 },
+  { d: 'M505 252 C 600 252, 610 402, 700 402', c: '#7D7F84', w: 13, a: .85 }
+];
+$('s4svg').innerHTML = PATHS.map((p, i) =>
+  `<path id="p${i}" d="${p.d}" fill="none" stroke="${p.c}" stroke-width="${p.w}" stroke-linecap="butt" opacity=".9"/>` +
+  `<path id="q${i}" d="${p.d}" fill="none" stroke="#fff" stroke-width="${Math.max(4, p.w * .28)}" stroke-linecap="round" stroke-dasharray="1 46" opacity="0"/>`).join('');
+PATHS.forEach((p, i) => { const el = $('p' + i); p.len = el.getTotalLength(); el.style.strokeDasharray = p.len; el.style.strokeDashoffset = p.len; });
+
+/* ---------- scene 5: chart ---------- */
+const DAYS = 400;
+const series = [];
+for (let i = 0; i < DAYS; i++) {
+  const base = 100 - 2.6 * (i / DAYS) - .5 * Math.pow(i / DAYS, 2);
+  series.push(base + .22 * Math.sin(i * .045) + .1 * Math.sin(i * .13 + 1.3));
+}
+const yMin = 96, yMax = 101, CW = 740, CH = 260;
+const px = i => (i / (DAYS - 1)) * CW, py = v => 10 + (1 - (v - yMin) / (yMax - yMin)) * CH;
+let grid = '';
+for (let v = yMin; v <= yMax; v++) grid += `<line x1="0" x2="${CW}" y1="${py(v)}" y2="${py(v)}" stroke="#E4E6EA" stroke-width="2"/><text x="${CW + 14}" y="${py(v) + 8}" font-family="Inter" font-size="20" fill="#9AA0A7">${v}</text>`;
+const line = series.map((v, i) => `${i ? 'L' : 'M'}${px(i).toFixed(1)} ${py(v).toFixed(1)}`).join(' ');
+$('s5svg').innerHTML = `<defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#F59E42" stop-opacity=".28"/><stop offset="1" stop-color="#F59E42" stop-opacity="0"/></linearGradient>
+<clipPath id="reveal"><rect id="s5clip" x="0" y="0" width="0" height="300"/></clipPath></defs>${grid}
+<g clip-path="url(#reveal)"><path d="${line} L${CW} ${py(yMin)} L0 ${py(yMin)} Z" fill="url(#ar)"/><path d="${line}" fill="none" stroke="#F08A24" stroke-width="4" stroke-linejoin="round"/></g>
+<circle id="s5head" r="9" fill="#F08A24" stroke="#fff" stroke-width="4"/>`;
+const STATS = [['avg', 76, '%'], ['t90', 15, '%'], ['cyc', 3, ''], ['peak', 37.4, ' °C']];
+const STATS30 = [['avg', 74, '%'], ['t90', 12, '%'], ['cyc', 11, ''], ['peak', 39.2, ' °C']];
+const statCol = (title, rows, pre) => `<div class="stat-h">${title}</div>` + rows.map((r, i) => `<div class="stat-row"><span>${S[r[0]]}</span><b id="${pre}${i}">0</b></div>`).join('');
+$('s5colA').innerHTML = statCol(S.last7, STATS, 'sa');
+$('s5colB').innerHTML = statCol(S.last30, STATS30, 'sb');
+
+/* ---------- scene 6: thermometer ticks ---------- */
+const T_MIN = 25, T_MAX = 40, tY = v => 470 - (v - T_MIN) / (T_MAX - T_MIN) * 430;
+$('s6ticks').innerHTML = [30, 32, 35, 40].map(v => `<line x1="118" x2="134" y1="${tY(v)}" y2="${tY(v)}" stroke="${v === 35 ? '#EA580C' : '#B9BEC5'}" stroke-width="4"/>` +
+  `<text x="140" y="${tY(v) + 7}" font-family="Inter" font-weight="600" font-size="20" fill="${v === 35 ? '#EA580C' : '#9AA0A7'}">${v}°</text>`).join('');
+
+/* ---------- scene 7: tiles ---------- */
+const TILE_ICONS = [
+  ['#E7F0FE', `<svg width="34" height="34" viewBox="0 0 34 34"><rect x="3" y="6" width="28" height="25" rx="5" fill="none" stroke="#2F6FED" stroke-width="3"/><path d="M3 13h28M10 2v7M24 2v7" stroke="#2F6FED" stroke-width="3" stroke-linecap="round"/><circle cx="11" cy="20" r="2" fill="#2F6FED"/><circle cx="17" cy="20" r="2" fill="#2F6FED"/><circle cx="23" cy="20" r="2" fill="#2F6FED"/><circle cx="11" cy="26" r="2" fill="#2F6FED"/></svg>`],
+  ['#F3E8FD', `<svg width="34" height="34" viewBox="0 0 34 34"><path d="M17 3l13 7.5-13 7.5L4 10.5z" fill="#A855F7"/><path d="M4 17l13 7.5L30 17" fill="none" stroke="#C084FC" stroke-width="3" stroke-linejoin="round"/><path d="M4 23.5l13 7.5 13-7.5" fill="none" stroke="#D8B4FE" stroke-width="3" stroke-linejoin="round"/></svg>`],
+  ['#FEF6DC', `<svg width="34" height="34" viewBox="0 0 34 34"><path d="M5 26a13 13 0 1 1 24 0" fill="none" stroke="#D99A00" stroke-width="3.2" stroke-linecap="round"/><path d="M17 21l7-8" stroke="#D99A00" stroke-width="3.2" stroke-linecap="round"/><circle cx="17" cy="21" r="3" fill="#D99A00"/></svg>`],
+  ['#E3F6EF', `<svg width="34" height="34" viewBox="0 0 34 34"><rect x="2" y="9" width="26" height="16" rx="5" fill="none" stroke="#1F8F79" stroke-width="3"/><rect x="29.5" y="14" width="3" height="6" rx="1.5" fill="#1F8F79"/><rect x="6" y="13" width="8" height="8" rx="2" fill="#1F8F79"/><path d="M19 13l4 4-4 4" fill="none" stroke="#1F8F79" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`],
+  ['#E3F6EF', `<svg width="34" height="34" viewBox="0 0 34 34"><path d="M28 17A11 11 0 1 1 22 7.3" fill="none" stroke="#1F8F79" stroke-width="3.2" stroke-linecap="round"/><path d="M21 3l3 5-5 2" fill="none" stroke="#1F8F79" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 11v7l4 3" fill="none" stroke="#1F8F79" stroke-width="3" stroke-linecap="round"/></svg>`],
+  ['#FDEBDD', `<svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="6" fill="#F97316"/><path d="M17 3v4M17 27v4M3 17h4M27 17h4M7 7l3 3M24 24l3 3M27 7l-3 3M10 24l-3 3" stroke="#F97316" stroke-width="3" stroke-linecap="round"/></svg>`]
+];
+const g7 = $('s7grid');
+const TW = 300, TH = 256, GAP = 36, COLS = 3, gx0 = (1920 - (COLS * TW + (COLS - 1) * GAP)) / 2;
+// single row of six would be too wide; 3x2
+TILE_ICONS.forEach((ti, i) => {
+  const d = document.createElement('div');
+  d.className = 'tile'; d.id = 'tile' + i;
+  const col = i % COLS, row = Math.floor(i / COLS);
+  d.style.left = (gx0 + col * (TW + GAP)) + 'px'; d.style.top = (row * (TH + GAP)) + 'px';
+  d.innerHTML = `<div class="t-ico" style="background:${ti[0]}">${ti[1]}</div><div class="t-name">${S['t' + (i + 1)]}</div><div class="t-desc">${S['d' + (i + 1)]}</div>` +
+    (i === 3 || i === 4 ? `<div class="tag">${S.exp}</div>` : '');
+  g7.appendChild(d);
+});
+
+/* ---------- scene 8 ---------- */
+$('s8words').innerHTML = ['w1', 'w2', 'w3', 'w4'].map((k, i) => `<div class="word" id="w8_${i}" style="color:${i === 0 ? '#1F8F79' : '#111316'}">${S[k]}</div>`).join('');
+const BADGE_ICO = [
+  `<svg width="26" height="26" viewBox="0 0 26 26"><path d="M8 9l-5 4 5 4M18 9l5 4-5 4M15 5l-4 16" fill="none" stroke="#1F8F79" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  `<svg width="26" height="26" viewBox="0 0 26 26"><path d="M13 2l9 4v6c0 6-4 10-9 12-5-2-9-6-9-12V6z" fill="#1F8F79"/><path d="M8.5 13l3 3 6-6" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  `<svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="10.5" fill="none" stroke="#1F8F79" stroke-width="2.6"/><path d="M2.5 13h21M13 2.5c3.5 3.5 3.5 17.5 0 21M13 2.5c-3.5 3.5-3.5 17.5 0 21" fill="none" stroke="#1F8F79" stroke-width="2.2"/></svg>`
+];
+$('s8badges').innerHTML = ['b1', 'b2', 'b3'].map((k, i) => `<div class="badge" id="b8_${i}">${BADGE_ICO[i]}${S[k]}</div>`).join('');
+
+/* ---------- timeline ---------- */
+const SCENES = [
+  { id: 's1', a: 0,    b: 6.2 },
+  { id: 's2', a: 6.0,  b: 10.6 },
+  { id: 's3', a: 10.4, b: 20.4 },
+  { id: 's4', a: 20.2, b: 28.4 },
+  { id: 's5', a: 28.2, b: 35.6 },
+  { id: 's6', a: 35.4, b: 43.4 },
+  { id: 's7', a: 43.2, b: 49.6 },
+  { id: 's8', a: 49.4, b: 55.4 },
+  { id: 's9', a: 55.2, b: 63.0 }
+];
+window.DURATION = 63.0;
+
+const UPD = {
+  s1(t, el) {
+    // battery fills to 100, then heat glow + capacity ticks down
+    const fillP = eInOut(prog(t, .1, 1.6));
+    const lv = Math.round(lerp(20, 100, fillP));
+    $('s1fill').setAttribute('width', 428 * lv / 100);
+    $('s1pct').textContent = pct(lv);
+    const heat = prog(t, 2.6, 3.6);
+    $('s1fill').setAttribute('fill', mix('63BD61', 'EF6A3A', heat * .85));
+    $('s1heat').style.opacity = heat * (.75 + .25 * Math.sin(t * 6));
+    $('s1bat').style.transform = `scale(${lerp(.92, 1, eOut(prog(t, 0, .8)))})`;
+    $('s1bat').style.opacity = eOut(prog(t, 0, .5));
+    reveal($('s1a'), t, .9);
+    reveal($('s1b'), t, 2.5);
+    reveal($('s1cap'), t, 3.2, 20);
+    const cap = lerp(100, 82, eInOut(prog(t, 3.5, 5.6)));
+    $('s1capv').textContent = pct(cap, 1);
+    $('s1capv').style.color = mix('111316', 'DC4A1E', prog(t, 3.5, 5.6));
+  },
+  s2(t) {
+    const p = prog(t, .1, 1.0);
+    $('s2icon').style.transform = `scale(${lerp(.4, 1, eBack(p))}) rotate(${lerp(-8, 0, eOut(p))}deg)`;
+    $('s2icon').style.opacity = eOut(prog(t, .1, .5));
+    const liq = document.querySelector('#s2svg .liq');
+    liq.setAttribute('transform', `translate(${Math.sin(t * 2.2) * 14} ${lerp(260, 0, eOut(prog(t, .5, 1.8)))})`);
+    reveal($('s2word'), t, .8, 40);
+    reveal($('s2tag'), t, 1.15, 30);
+  },
+  s3(t, el) {
+    revealAll(el, t);
+    const panel = $('s3panel');
+    const pp = eOut(prog(t, .3, 1.1));
+    panel.style.opacity = pp; panel.style.transform = `translateY(${(1 - pp) * 60}px) scale(${lerp(.96, 1, pp)})`;
+    // limit 100 -> 80 between 1.4 and 2.6 ; charge 52 -> 80 between 2.2 and 4.6 ; top-up click at 6.0 ; to 100 by 8.6
+    const limit = t < 6.1 ? Math.round(lerp(100, 80, eInOut(prog(t, 1.4, 2.6))) / 5) * 5 : 100;
+    const charge = t < 6.1 ? lerp(52, 80, eInOut(prog(t, 2.2, 4.6))) : lerp(80, 100, eInOut(prog(t, 6.4, 8.8)));
+    const markerPos = t < 6.1 ? lerp(100, 80, eInOut(prog(t, 1.4, 2.6))) : lerp(80, 100, eOut(prog(t, 6.1, 6.6)));
+    $('s3limit').textContent = pct(limit);
+    $('s3fill').style.width = charge + '%';
+    $('s3pct').textContent = pct(Math.round(charge));
+    $('s3marker').style.left = `calc(${markerPos}% - 1.5px)`;
+    $('s3marker').style.opacity = markerPos > 99.5 ? 0 : 1;
+    const hold = t >= 4.6 && t < 6.2;
+    const pauseOp = hold ? eOut(prog(t, 4.6, 5.0)) : 0;
+    const pz = $('s3pause'); pz.style.opacity = pauseOp; pz.style.left = `calc(${charge / 2}% - 10px)`;
+    // charging shimmer
+    $('s3fill').style.filter = hold ? 'none' : `brightness(${1 + .06 * Math.sin(t * 7)})`;
+    $('s3status').textContent = t < 4.6 ? S.st_charging : (t < 6.1 ? S.st_hold : S.st_topup);
+    $('s3dot').style.background = t < 4.6 ? '#F5A524' : (t < 6.1 ? '#34C759' : '#2F6FED');
+    // top up button highlight
+    const tb = $('s3topup');
+    const act = t >= 6.0;
+    tb.style.background = act ? '#2F6FED' : 'rgba(255,255,255,.45)';
+    tb.style.color = act ? '#fff' : '#3A3D42';
+    const press = t > 5.85 && t < 6.15 ? .94 : 1;
+    tb.style.transform = `scale(${press})`;
+    // cursor path: enters at 4.9, reaches button 5.8, clicks, leaves
+    const c = $('s3cursor');
+    const cin = eInOut(prog(t, 4.9, 5.8)), cout = eInOut(prog(t, 6.6, 7.4));
+    const bx = 60 + 592 + 120, by = 330 + 40 + 44;
+    const x = lerp(lerp(900, bx, cin), 980, cout), y = lerp(lerp(900, by, cin), 1000, cout);
+    c.style.left = x + 'px'; c.style.top = y + 'px';
+    c.style.opacity = t > 4.9 && t < 7.4 ? 1 : 0;
+    c.style.transform = `scale(${press < 1 ? .85 : 1})`;
+  },
+  s4(t, el) {
+    revealAll(el, t);
+    const pp = eOut(prog(t, .3, 1.1));
+    const panel = $('s4panel');
+    panel.style.opacity = pp; panel.style.transform = `translateY(${(1 - pp) * 60}px) scale(${lerp(.96, 1, pp)})`;
+    NODES.forEach((n, i) => {
+      const np = eBack(prog(t, .7 + (i === 0 ? 0 : i === 1 ? .35 : .9 + (i - 2) * .12), 1.2 + (i === 0 ? 0 : i === 1 ? .35 : .9 + (i - 2) * .12)));
+      const nd = $('n_' + n.id); nd.style.transform = `scale(${np})`; nd.style.opacity = clamp(np * 1.5);
+    });
+    PATHS.forEach((p, i) => {
+      const start = i === 0 ? 1.0 : 1.9 + i * .12;
+      const dp = eInOut(prog(t, start, start + .9));
+      $('p' + i).style.strokeDashoffset = p.len * (1 - dp);
+      const q = $('q' + i); q.style.opacity = prog(t, start + .7, start + 1.1) * .9;
+      q.style.strokeDashoffset = -t * 95;
+    });
+    const live = prog(t, 1.4, 2.4);
+    const cpu = 20.4 + 2.2 * Math.sin(t * 1.9) + 1.1 * Math.sin(t * 4.3), disp = 6.9 + .25 * Math.sin(t * 1.3), oth = 8.4 + .6 * Math.sin(t * 2.7 + 1);
+    const tot = cpu + disp + oth;
+    const vals = { adapter: tot - 0.4 + .3 * Math.sin(t * 3.1), mac: tot, processor: cpu, display: disp, other: oth };
+    Object.entries(vals).forEach(([k, v]) => { $('w_' + k).textContent = num(v * live, 1) + ' W'; });
+    $('p1').setAttribute('stroke-width', 14 + cpu * .3);
+  },
+  s5(t, el) {
+    revealAll(el, t);
+    const pp = eOut(prog(t, .3, 1.1));
+    const card = $('s5card');
+    card.style.opacity = pp; card.style.transform = `translateY(${(1 - pp) * 60}px) scale(${lerp(.96, 1, pp)})`;
+    const dp = eInOut(prog(t, 1.0, 4.2));
+    $('s5clip').setAttribute('width', CW * dp + 2);
+    const idx = Math.min(DAYS - 1, Math.round(dp * (DAYS - 1)));
+    const h = $('s5head'); h.setAttribute('cx', px(idx)); h.setAttribute('cy', py(series[idx])); h.style.opacity = dp > 0 && dp < 1 ? 1 : (dp >= 1 ? 1 : 0);
+    $('s5days').textContent = `${Math.max(1, idx + 1)} ${S.days}`;
+    const sp = eOut(prog(t, 2.2, 4.4));
+    [[STATS, 'sa'], [STATS30, 'sb']].forEach(([rows, pre]) => rows.forEach((r, i) => {
+      const v = r[1] * sp; $(pre + i).textContent = r[2] === '%' ? pct(Math.round(v)) : (r[0] === 'peak' ? num(v, 1) : Math.round(v)) + r[2];
+    }));
+  },
+  s6(t, el) {
+    revealAll(el, t);
+    const pp = eOut(prog(t, .3, 1.1));
+    ['s6therm', 's6card'].forEach((id, i) => { const e = $(id); const q = eOut(prog(t, .3 + i * .15, 1.1 + i * .15)); e.style.opacity = q; e.style.transform = `translateY(${(1 - q) * 60}px)`; });
+    // temperature curve
+    let temp;
+    if (t < 1.2) temp = 31;
+    else if (t < 3.6) temp = lerp(31, 36.2, eInOut(prog(t, 1.2, 3.6)));
+    else if (t < 4.6) temp = 36.2 - .15 * Math.sin((t - 3.6) * 3);
+    else temp = lerp(36.1, 31.4, eInOut(prog(t, 4.6, 6.8)));
+    const rising = t < 4.6;
+    const active = rising ? temp >= 35 : temp >= 32;
+    const restored = !rising && temp < 32;
+    const hot = clamp((temp - 30) / 6);
+    const col = hot < .5 ? mix('3B82F6', 'F59E0B', hot * 2) : mix('F59E0B', 'DC2626', (hot - .5) * 2);
+    const top = tY(temp);
+    $('s6merc').setAttribute('y', top); $('s6merc').setAttribute('height', 520 - top);
+    $('s6merc').setAttribute('fill', col); $('s6bulb').setAttribute('fill', col);
+    $('s6temp').textContent = num(temp, 1) + ' °C';
+    $('s6temp').style.color = active ? '#DC2626' : '#15171A';
+    $('s6limit').innerHTML = active ? `<span style="color:#9AA0A7;text-decoration:line-through;font-weight:500">${pct(90)}</span>&nbsp; ${pct(80)}` : pct(90);
+    const tb = $('s6turbo');
+    tb.textContent = active ? S.off : S.on;
+    tb.style.background = active ? '#ECEDEF' : '#DDF3E4'; tb.style.color = active ? '#6A7078' : '#1B7A3A';
+    const bn = $('s6banner');
+    const bp = eOut(prog(t, 1.0, 1.6)); bn.style.opacity = bp; bn.style.transform = `translateY(${(1 - bp) * 30}px)`;
+    const shield = c => `<svg width="34" height="34" viewBox="0 0 26 26"><path d="M13 2l9 4v6c0 6-4 10-9 12-5-2-9-6-9-12V6z" fill="${c}"/><path d="M8.5 13l3 3 6-6" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    if (active) { bn.style.background = '#FDE7DC'; bn.style.color = '#B4380C'; bn.innerHTML = shield('#EA580C') + S.hp_on; }
+    else if (restored) { bn.style.background = '#DDF3E4'; bn.style.color = '#1B7A3A'; bn.innerHTML = shield('#22A045') + S.hp_off; }
+    else { bn.style.background = 'rgba(255,255,255,.75)'; bn.style.color = '#4A4F56'; bn.innerHTML = shield('#9AA0A7') + S.hp_idle; }
+    $('s6card').style.boxShadow = active ? `0 40px 90px rgba(220,60,20,${.14 + .06 * Math.sin(t * 6)}), 0 2px 8px rgba(0,0,0,.05)` : '';
+  },
+  s7(t, el) {
+    el.querySelectorAll(':scope > div > .rv').forEach((e, i) => reveal(e, t, .15 + i * .16));
+    for (let i = 0; i < 6; i++) {
+      const p = prog(t, .7 + i * .14, 1.35 + i * .14);
+      const e = $('tile' + i);
+      e.style.opacity = eOut(p);
+      e.style.transform = `translateY(${(1 - eOut(p)) * 70}px) scale(${lerp(.85, 1, eBack(p))})`;
+    }
+    // gentle float
+    for (let i = 0; i < 6; i++) $('tile' + i).style.translate = `0 ${Math.sin(t * 1.4 + i) * 5}px`;
+  },
+  s8(t) {
+    for (let i = 0; i < 4; i++) {
+      const p = prog(t, .2 + i * .55, .75 + i * .55);
+      const e = $('w8_' + i);
+      e.style.opacity = eOut(p);
+      e.style.transform = `translateY(${(1 - eOut(p)) * 50}px)`;
+      e.style.filter = `blur(${(1 - eOut(p)) * 12}px)`;
+    }
+    for (let i = 0; i < 3; i++) {
+      const p = prog(t, 2.6 + i * .2, 3.2 + i * .2);
+      const e = $('b8_' + i);
+      e.style.opacity = eOut(p); e.style.transform = `translateY(${(1 - eOut(p)) * 30}px) scale(${lerp(.9, 1, eBack(p))})`;
+    }
+  },
+  s9(t) {
+    reveal($('s9head'), t, .15, 40);
+    reveal($('s9term'), t, .5, 40);
+    const cmd = 'brew install --cask berkinefeavci/healthy-battery/healthy-battery';
+    const n = Math.round(cmd.length * prog(t, 1.2, 3.6));
+    $('s9cmd').textContent = cmd.slice(0, n);
+    $('s9caret').style.opacity = (n < cmd.length || Math.floor(t * 2.2) % 2 === 0) ? 1 : 0;
+    reveal($('s9url'), t, 3.8, 24);
+    reveal($('s9foot'), t, 4.1, 20);
+    const liq = document.querySelector('#s9svg .liq');
+    liq.setAttribute('transform', `translate(${Math.sin(t * 2.2) * 14} ${lerp(200, 0, eOut(prog(t, .3, 1.6)))})`);
+  }
+};
+
+window.renderFrame = function (t) {
+  // background drift
+  $('blobA').style.transform = `translate(${-200 + 160 * Math.sin(t * .23)}px, ${-260 + 120 * Math.cos(t * .19)}px)`;
+  $('blobB').style.transform = `translate(${1250 + 140 * Math.cos(t * .21)}px, ${420 + 150 * Math.sin(t * .17)}px)`;
+  $('blobC').style.transform = `translate(${700 + 260 * Math.sin(t * .15 + 1)}px, ${640 + 90 * Math.cos(t * .25)}px)`;
+  for (const sc of SCENES) {
+    const el = $(sc.id);
+    if (t < sc.a - .01 || t > sc.b + .01) { el.style.opacity = 0; el.style.display = 'none'; continue; }
+    el.style.display = 'block';
+    const fin = sc.a === 0 ? 1 : eOut(prog(t, sc.a, sc.a + .5));
+    const fout = sc.b >= window.DURATION ? 1 : 1 - eInOut(prog(t, sc.b - .5, sc.b));
+    el.style.opacity = Math.min(fin, fout);
+    const outP = 1 - fout;
+    el.style.transform = `scale(${1 - outP * .04})`;
+    el.style.filter = outP > 0 ? `blur(${outP * 10}px)` : 'none';
+    UPD[sc.id](t - sc.a, el);
+  }
+};
+// final fade to background
+window.renderFrame(0);
+window.READY = document.fonts.ready.then(() => true);
+
+// live preview when opened in a browser normally
+if (!new URLSearchParams(location.search).has('render')) {
+  const t0 = performance.now();
+  (function loop() { renderFrame(((performance.now() - t0) / 1000) % window.DURATION); requestAnimationFrame(loop); })();
+}
+</script>
+</body>
+</html>
